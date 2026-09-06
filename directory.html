@@ -57,11 +57,9 @@
   const people = await QIST.getPeople();
   const $ = id => document.getElementById(id);
 
-  const topicCounts = {};
-  people.flatMap(p => p.topics || []).forEach(t => topicCounts[t] = (topicCounts[t] || 0) + 1);
-  Object.keys(topicCounts).filter(t => topicCounts[t] >= 3).sort().forEach(t =>
+  [...new Set(people.flatMap(p => p.topics || []))].sort().forEach(t =>
     $('f-topic').insertAdjacentHTML('beforeend', `<option>${QIST.esc(t)}</option>`));
-  [...new Set(people.map(p => p.country))].filter(Boolean).sort().forEach(c =>
+  [...new Set(people.map(p => p.country))].sort().forEach(c =>
     $('f-country').insertAdjacentHTML('beforeend', `<option>${QIST.esc(c)}</option>`));
 
   function stage(p) {
@@ -78,11 +76,11 @@
   function openPerson(p) {
     $('person-detail').innerHTML = `
       <div class="top" style="display:flex;gap:16px;align-items:center;margin-bottom:16px">
-        ${QIST.avatarHtml(p, 'avatar', 'width:72px;height:72px;flex:0 0 72px;font-size:1.4rem')}
+        <div class="avatar" style="width:72px;height:72px;flex:0 0 72px;font-size:1.4rem;background:${QIST.avatarColor(p.name)}">${QIST.initials(p.name)}</div>
         <div>
           <h2 style="font-size:1.5rem">${QIST.esc(p.name)}</h2>
           <div class="role">${QIST.esc(p.title || '')}</div>
-          ${(p.city || p.country) ? `<div class="loc muted small">📍 ${QIST.esc([p.city, p.country].filter(Boolean).join(', '))}</div>` : ''}
+          <div class="loc muted small">📍 ${QIST.esc(p.city)}, ${QIST.esc(p.country)}</div>
         </div>
       </div>
       <p><b>Institution:</b> ${QIST.esc(p.institution || '—')}</p>
@@ -90,14 +88,11 @@
       <p style="margin:10px 0"><b>Research topics:</b></p>
       <div class="tags" style="margin-bottom:14px">${(p.topics || []).map(t => `<span class="tag gold">${QIST.esc(t)}</span>`).join('')}</div>
       ${p.bio ? `<p class="small" style="color:var(--ink-soft);margin-bottom:14px">${QIST.esc(p.bio)}</p>` : ''}
-      <p style="margin:10px 0"><b>Publications &amp; research:</b></p>
-      <div id="scholar-box" style="margin-bottom:14px"></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         ${p.link ? `<a class="btn btn-navy btn-sm" href="${QIST.esc(p.link)}" target="_blank" rel="noopener">🔗 Public profile</a>` : ''}
         <a class="btn btn-outline btn-sm" href="map.html">🗺️ See on map</a>
         <a class="btn btn-primary btn-sm" href="matching.html?with=${QIST.esc(p.id)}">🤝 Propose collaboration</a>
       </div>`;
-    QIST.renderScholar(p, document.getElementById('scholar-box'));
     $('person-modal').classList.add('open');
   }
 
@@ -130,10 +125,7 @@
       el.style.cursor = 'pointer';
       el.addEventListener('click', ev => {
         if (ev.target.classList.contains('tag')) {
-          const sel = $('f-topic'), t = ev.target.dataset.topic;
-          if (![...sel.options].some(o => o.value === t))
-            sel.insertAdjacentHTML('beforeend', `<option>${QIST.esc(t)}</option>`);
-          sel.value = t;
+          $('f-topic').value = ev.target.dataset.topic;
           apply();
           ev.stopPropagation();
           return;
@@ -149,9 +141,6 @@
     apply();
   });
   apply();
-
-  const dq = new URLSearchParams(location.search).get('q');
-  if (dq) { $('f-q').value = dq; apply(); }
 
   const want = new URLSearchParams(location.search).get('person');
   if (want) {

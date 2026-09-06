@@ -57,10 +57,8 @@
   const $ = id => document.getElementById(id);
   const people = await QIST.getPeople();
 
-  const topicCounts = {};
-  people.flatMap(p => p.topics || []).forEach(t => topicCounts[t] = (topicCounts[t] || 0) + 1);
-  const allTopics = Object.keys(topicCounts).sort((a, b) => topicCounts[b] - topicCounts[a]);
-  [...new Set(people.map(p => p.country))].filter(Boolean).sort().forEach(c =>
+  const allTopics = [...new Set(people.flatMap(p => p.topics || []))].sort();
+  [...new Set(people.map(p => p.country))].sort().forEach(c =>
     $('m-country').insertAdjacentHTML('beforeend', `<option>${QIST.esc(c)}</option>`));
   $('topic-suggestions').innerHTML = allTopics.slice(0, 18).map(t =>
     `<span class="tag" data-t="${QIST.esc(t)}">${QIST.esc(t)}</span>`).join('');
@@ -155,13 +153,6 @@
   if (withId) {
     const p = people.find(x => String(x.id) === withId);
     if (p) { $('m-topics').value = (p.topics || []).join(', '); run(); }
-  }
-
-  const q = new URLSearchParams(location.search).get('q');
-  if (q && !withId) {
-    $('m-topics').value = q.split(/[,;&/]/).map(s => s.trim()).filter(Boolean).join(', ');
-    $('m-goal').value = 'any';
-    run();
   }
 })();
 </script>

@@ -194,108 +194,17 @@ const QIST = {
     t._h = setTimeout(() => t.classList.remove('show'), 3200);
   },
 
-  /* Avatar: uploaded photo when present, initials otherwise */
-  avatarHtml(p, cls = 'avatar', style = '') {
-    if (p.photo) return `<img class="${cls}" src="${this.esc(p.photo)}" alt="${this.esc(p.name)}" style="${style}">`;
-    return `<div class="${cls}" style="background:${this.avatarColor(p.name)};${style}">${this.initials(p.name)}</div>`;
-  },
-
-  /* ---------- publications & research lookup ----------
-     Live author search via the OpenAlex API (free, CORS-enabled) with a
-     hardcoded Google Scholar search link as companion / fallback.
-     Auto-matched by name (institution used to disambiguate) — labeled
-     as such in the UI because homonyms exist. */
-  scholarUrl(p) {
-    return 'https://scholar.google.com/scholar?q=' + encodeURIComponent('"' + p.name + '"');
-  },
-
-  async scholarLookup(p) {
-    const key = 'qist_scholar_' + p.id;
-    try { const c = sessionStorage.getItem(key); if (c) return JSON.parse(c); } catch (_) {}
-    const r = await fetch('https://api.openalex.org/authors?search=' +
-      encodeURIComponent(p.name) + '&per_page=5', { signal: AbortSignal.timeout(8000) });
-    if (!r.ok) throw new Error('author search failed');
-    const cands = (await r.json()).results || [];
-    let out = { author: null, works: [] };
-    if (cands.length) {
-      const instWord = (p.institution || '').toLowerCase().split(/\s+/).find(w => w.length > 3) || '';
-      let best = cands[0];
-      if (instWord) {
-        const m = cands.find(a =>
-          (a.last_known_institutions || []).concat((a.affiliations || []).map(x => x.institution || {}))
-            .some(i => (i.display_name || '').toLowerCase().includes(instWord)));
-        if (m) best = m;
-      }
-      const fields = (best.topics || best.x_concepts || [])
-        .slice(0, 6).map(t => t.display_name).filter(Boolean);
-      const wr = await fetch('https://api.openalex.org/works?filter=author.id:' +
-        best.id.split('/').pop() + '&sort=cited_by_count:desc&per_page=5',
-        { signal: AbortSignal.timeout(8000) });
-      const works = wr.ok ? (await wr.json()).results || [] : [];
-      out = {
-        author: {
-          name: best.display_name,
-          works_count: best.works_count, cited: best.cited_by_count,
-          inst: (best.last_known_institutions || [])[0]?.display_name || '',
-          url: best.id, orcid: best.orcid || ''
-        },
-        fields,
-        works: works.map(w => ({
-          title: w.title || w.display_name || 'Untitled', year: w.publication_year || '',
-          venue: w.primary_location?.source?.display_name || '',
-          cited: w.cited_by_count || 0, url: w.doi || w.id
-        }))
-      };
-    }
-    try { sessionStorage.setItem(key, JSON.stringify(out)); } catch (_) {}
-    return out;
-  },
-
-  scholarBoxHtml(p, res) {
-    const links = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
-      <a class="btn btn-outline btn-sm" href="${this.scholarUrl(p)}" target="_blank" rel="noopener">🎓 Google Scholar search</a>
-      ${res && res.author ? `<a class="btn btn-outline btn-sm" href="${this.esc(res.author.url)}" target="_blank" rel="noopener">📚 OpenAlex profile</a>` : ''}
-    </div>`;
-    if (!res || !res.author) {
-      return `<p class="small muted">No publication record auto-matched on OpenAlex.</p>${links}`;
-    }
-    const a = res.author;
-    return `
-      <p class="small" style="color:var(--ink-soft)">
-        <b>${this.esc(a.name)}</b>${a.inst ? ` · ${this.esc(a.inst)}` : ''} —
-        ${a.works_count} publications · ${a.cited.toLocaleString()} citations
-        <span class="muted">(auto-matched by name via OpenAlex — verify homonyms)</span></p>
-      ${res.fields.length ? `<div class="tags" style="margin:8px 0">${res.fields.map(f =>
-        `<span class="tag">${this.esc(f)}</span>`).join('')}</div>` : ''}
-      ${res.works.length ? `<ul class="small" style="margin:8px 0 0 18px;color:var(--ink-soft)">${res.works.map(w => `
-        <li style="margin-bottom:6px"><a href="${this.esc(w.url)}" target="_blank" rel="noopener">${this.esc(w.title)}</a>
-        <span class="muted">${w.year ? ' · ' + w.year : ''}${w.venue ? ' · ' + this.esc(w.venue) : ''} · cited ${w.cited}×</span></li>`).join('')}
-      </ul>` : ''}
-      ${links}`;
-  },
-
-  async renderScholar(p, el) {
-    if (!el) return;
-    el.innerHTML = '<p class="small muted">Searching publications on OpenAlex…</p>';
-    try {
-      el.innerHTML = this.scholarBoxHtml(p, await this.scholarLookup(p));
-    } catch (_) {
-      el.innerHTML = `<p class="small muted">Publication lookup unavailable right now.</p>
-        <a class="btn btn-outline btn-sm" href="${this.scholarUrl(p)}" target="_blank" rel="noopener">🎓 Google Scholar search</a>`;
-    }
-  },
-
   personCard(p, opts = {}) {
     const tags = (p.topics || []).map(t =>
       `<span class="tag" data-topic="${this.esc(t)}">${this.esc(t)}</span>`).join('');
     return `
     <div class="card person-card" data-id="${this.esc(p.id)}">
       <div class="top">
-        ${this.avatarHtml(p)}
+        <div class="avatar" style="background:${this.avatarColor(p.name)}">${this.initials(p.name)}</div>
         <div>
           <h3>${this.esc(p.name)}</h3>
           <div class="role">${this.esc(p.title || '')}${p.institution ? ' · ' + this.esc(p.institution) : ''}</div>
-          ${(p.city || p.country) ? `<div class="loc">📍 ${this.esc([p.city, p.country].filter(Boolean).join(', '))}</div>` : ''}
+          <div class="loc">📍 ${this.esc(p.city || '')}${p.country ? ', ' + this.esc(p.country) : ''}</div>
         </div>
       </div>
       <div class="tags">${tags}</div>
@@ -303,218 +212,15 @@ const QIST = {
     </div>`;
   },
 
-  /* ---------- Science Bridge: expert intelligence engine ----------
-     Deterministic V1 per the platform architecture doc (§9/§10):
-     semantic-ish term matching over structured profiles + weighted
-     criteria + generated explanation. No black box: every subscore
-     derives from a real profile field. */
-  SB_STOP: new Set(('a,an,and,are,as,at,be,by,for,from,has,have,in,into,is,it,its,of,on,or,that,the,their,' +
-    'to,we,with,who,need,needs,needed,looking,find,expert,experts,expertise,researcher,researchers,' +
-    'working,work,based,using,use,help,solve,our,your,new,can,how').split(',')),
-  SB_SYN: {
-    'ai': ['artificial intelligence', 'machine learning', 'deep learning', 'data science', 'neural'],
-    'ml': ['machine learning', 'deep learning', 'ai'],
-    'artificial': ['ai', 'machine learning'],
-    'intelligence': ['ai', 'machine learning'],
-    'nlp': ['natural language processing', 'language models', 'llm'],
-    'llm': ['language models', 'nlp', 'generative'],
-    'vision': ['computer vision', 'image', 'imaging'],
-    'battery': ['batteries', 'lithium', 'energy storage', 'electrochemistry'],
-    'batteries': ['battery', 'lithium', 'energy storage'],
-    'lithium': ['battery', 'batteries', 'energy storage'],
-    'solar': ['photovoltaic', 'renewable'],
-    'renewable': ['solar', 'wind', 'energy transition', 'sustainable'],
-    'hydrogen': ['fuel cell', 'energy'],
-    'water': ['wastewater', 'membrane', 'hydrology', 'desalination'],
-    'wastewater': ['water', 'membrane', 'treatment'],
-    'oil': ['petroleum', 'gas', 'hydrocarbon'],
-    'gas': ['oil', 'petroleum', 'hydrocarbon'],
-    'mining': ['metallurgy', 'minerals', 'extraction'],
-    'metallurgy': ['mining', 'metals', 'materials'],
-    'materials': ['material', 'nanomaterials', 'polymers', 'metallurgy'],
-    'cancer': ['oncology', 'tumor', 'immunotherapy'],
-    'oncology': ['cancer', 'tumor'],
-    'medical': ['medicine', 'clinical', 'health', 'biomedical'],
-    'medicine': ['medical', 'clinical', 'biomedical', 'health'],
-    'health': ['medical', 'public health', 'epidemiology'],
-    'drug': ['pharmaceutical', 'pharmacology', 'therapeutics'],
-    'genomics': ['genetics', 'sequencing', 'bioinformatics'],
-    'agriculture': ['crop', 'farming', 'food'],
-    'climate': ['environmental', 'carbon', 'sustainability'],
-    'environmental': ['environment', 'climate', 'ecology', 'sustainability'],
-    'robotics': ['robot', 'automation', 'mechatronics', 'control'],
-    'manufacturing': ['production', 'industrial', 'automation'],
-    'quantum': ['photonics', 'physics'],
-    'finance': ['fintech', 'economics', 'banking'],
-    'economics': ['economic', 'policy', 'finance'],
-    'law': ['legal', 'policy', 'regulation'],
-    'education': ['learning', 'pedagogy', 'teaching'],
-    'security': ['cybersecurity', 'cryptography'],
-    'space': ['satellite', 'aerospace', 'remote sensing'],
-    'logistics': ['supply chain', 'transport', 'operations'],
-    'defect': ['quality', 'inspection', 'detection'],
-    'defects': ['quality', 'inspection', 'detection']
-  },
-  SB_REGION: ['Kazakhstan', 'Uzbekistan', 'Kyrgyzstan', 'Mongolia', 'Turkey', 'Pakistan', 'India'],
-  SB_CRITERIA: [
-    ['topic', 'Research-topic similarity', 35],
-    ['pubs', 'Publication & profile relevance', 20],
-    ['activity', 'Recent research activity', 10],
-    ['projects', 'Relevant projects & breadth', 10],
-    ['industry', 'Industry experience', 10],
-    ['network', 'Network proximity', 5],
-    ['geo', 'Geography & language', 5],
-    ['collab', 'Collaboration interest', 5]
-  ],
-
-  sbTerms(query) {
-    const words = (query || '').toLowerCase().replace(/[^a-zа-яё0-9&+\- ]/gi, ' ')
-      .split(/[\s\-]+/).filter(w => (w.length > 2 || w === 'ai' || w === 'ml') && !this.SB_STOP.has(w));
-    const seen = new Set(); const terms = [];
-    for (const w of words) {
-      if (seen.has(w)) continue;
-      seen.add(w);
-      terms.push({ term: w, alts: this.SB_SYN[w] || [] });
-    }
-    return terms;
-  },
-
-  expertSearch(query, people) {
-    const terms = this.sbTerms(query);
-    if (!terms.length) return { terms: [], results: [] };
-    const results = [];
-    for (const p of people) {
-      const topics = (p.topics || []).map(t => t.toLowerCase());
-      const kws = (p.keywords || []).map(t => t.toLowerCase());
-      const fields = topics.concat(kws);
-      const text = `${p.bio || ''} ${p.title || ''} ${p.institution || ''}`.toLowerCase();
-      let topicHits = 0, textHits = 0;
-      const matched = new Set();
-      // short tokens ("ai", "ion", "gas") match whole words only — substring
-      // matching there produces false hits like ion ⊂ sorption
-      const hit = (hay, c) => c.length > 3 ? hay.includes(c)
-        : hay.split(/[^a-zа-яё0-9]+/).includes(c);
-      for (const { term, alts } of terms) {
-        const cands = [term, ...alts];
-        const fHit = fields.find(f => cands.some(c =>
-          hit(f, c) || (c.length > 3 && f.length > 3 && c.includes(f))));
-        if (fHit) { topicHits++; matched.add(fHit); continue; }
-        if (cands.some(c => hit(text, c))) textHits++;
-      }
-      if (!topicHits && !textHits) continue;
-      const coverage = (topicHits + 0.5 * textHits) / terms.length;
-      if (coverage < 0.25) continue;
-
-      const nMatch = matched.size;
-      const title = (p.title || '').toLowerCase();
-      const sub = {
-        topic: Math.round(Math.min(100, 35 + 65 * Math.min(1, coverage * 1.15))),
-        pubs: Math.round(Math.min(100, 40 + (p.link ? 32 : 0) + 28 * Math.min(1, nMatch / 3))),
-        activity: Math.round(Math.min(100, 45 + (p.bio ? 22 : 0) +
-          11 * Math.min(3, (p.topics || []).length + (p.keywords || []).length > 6 ? 3 : 1))),
-        projects: Math.round(Math.min(100, 40 + 20 * Math.min(3, nMatch))),
-        industry: p.sector === 'Industry' ? 95 : p.sector === 'Academia & Industry' ? 85 :
-          /industry|engineer|founder|lead|director|manager|scientist at/.test(title) ? 75 : 45,
-        network: p.featured ? 92 : p.institution ? 68 : 52,
-        geo: this.SB_REGION.includes(p.country) ? 88 :
-          (query.toLowerCase().includes((p.country || '¤').toLowerCase()) ? 95 : 72),
-        collab: p.collab === 'yes' ? 95 : p.collab === 'maybe' ? 82 : 60
-      };
-      let score = 0;
-      for (const [key, , w] of this.SB_CRITERIA) score += sub[key] * w / 100;
-      score = Math.min(99, Math.round(score));
-      results.push({ p, score, sub, matched: [...matched], coverage });
-    }
-    results.sort((a, b) => b.score - a.score || a.p.name.localeCompare(b.p.name));
-    return { terms, results };
-  },
-
-  /* Generated, fact-based explanation — cites only real profile fields. */
-  sbWhy(r, rank) {
-    const p = r.p, bits = [];
-    if (r.matched.length)
-      bits.push(`Research profile spans ${r.matched.slice(0, 4).join(', ')} — directly matching your challenge`);
-    if (p.title && p.institution) bits.push(`${p.title} at ${p.institution}`);
-    else if (p.title) bits.push(p.title);
-    else if (p.institution) bits.push(`based at ${p.institution}`);
-    if (p.sector === 'Industry') bits.push('works in industry R&D rather than pure academia');
-    else if (p.sector === 'Academia & Industry') bits.push('has experience across both academia and industry');
-    if (p.collab === 'yes') bits.push('has volunteered for the QIST expert panel');
-    else if (p.collab === 'maybe') bits.push('has expressed interest in the QIST expert panel');
-    if (p.country) bits.push(`currently in ${p.country}`);
-    return bits.map(b => b.charAt(0).toUpperCase() + b.slice(1)).join('. ') + '.';
-  },
-
   /* ---------- shared chrome ---------- */
   renderHeader(active) {
     const u = this.currentUser();
-    const nav = `
-    
-  <a href="index.html" class="${active === 'index.html' ? 'active' : ''}">
-    Home
-  </a>
-
-<a href="marketplace.html" class="${active === 'marketplace.html' ? 'active' : ''}">Marketplace</a>
-
-
-  <div class="nav-dropdown">
-    <a href="organizations.html"
-       class="nav-dropdown-toggle ${active === 'organizations.html' || active === 'finder.html' ? 'active' : ''}">
-      For Industry Partners <span class="nav-chevron">⌄</span>
-    </a>
-
-    <div class="nav-dropdown-menu">
-      <a href="organizations.html">
-        <strong>Industry Partners</strong>
-        <span>Scientific expertise for your R&amp;D needs</span>
-      </a>
-
-      <a href="finder.html">
-        <strong>Expert Finder</strong>
-        <span>Find scientists and research expertise</span>
-      </a>
-    </div>
-  </div>
-
-<a href="scientists.html" class="${active === 'scientists.html' ? 'active' : ''}">Scientists</a>
-
-<a href="accelerator.html" class="${active === 'accelerator.html' ? 'active' : ''}">DeepTech Accelerator</a>
-
-  <a href="schools.html" class="${active === 'schools.html' ? 'active' : ''}">Schools</a>
-
-  <div class="nav-dropdown">
-    <span class="nav-dropdown-toggle ${['map.html', 'directory.html', 'channels.html', 'matching.html', 'newsletter.html'].includes(active) ? 'active' : ''}" tabindex="0">
-      QIST Community <span class="nav-chevron">⌄</span>
-    </span>
-
-    <div class="nav-dropdown-menu">
-      <a href="map.html">
-        <strong>Map</strong>
-        <span>Explore our global researcher network</span>
-      </a>
-
-      <a href="directory.html">
-        <strong>People</strong>
-        <span>Browse QIST researchers</span>
-      </a>
-
-      <a href="channels.html">
-        <strong>Channels</strong>
-        <span>Community discussions and opportunities</span>
-      </a>
-
-      <a href="matching.html">
-        <strong>Matching</strong>
-        <span>Find collaborators and connections</span>
-      </a>
-
-      <a href="newsletter.html">
-        <strong>Newsletter</strong>
-        <span>News from the QIST community</span>
-      </a>
-    </div>
-  </div>
-`;
+    const links = [
+      ['index.html', 'Home'], ['map.html', 'Map'], ['directory.html', 'People'],
+      ['channels.html', 'Channels'], ['matching.html', 'Matching'], ['newsletter.html', 'Newsletter']
+    ];
+    const nav = links.map(([href, label]) =>
+      `<a href="${href}" class="${active === href ? 'active' : ''}">${label}</a>`).join('');
     const auth = u
       ? `<a class="btn btn-ghost btn-sm" href="profile.html">👤 ${this.esc(u.name.split(' ')[0])}</a>
          ${u.role === 'admin' ? '<a class="btn btn-primary btn-sm" href="admin.html">Admin</a>' : ''}
