@@ -265,7 +265,8 @@
       for (var d = 0; d < drawn.length; d++) {
         var it = drawn[d], b2 = it.badge, an = it.anchor, cl = it.c;
         var depth = it.badge.z;
-        var rad = (W < 520 ? 13 : 17) * (0.72 + 0.38 * depth);
+        var base = Math.max(11, Math.min(19, W * 0.042));
+        var rad = base * (0.72 + 0.38 * depth);
         var alpha = Math.min(1, 0.35 + depth * 1.1);
 
         ctx.globalAlpha = alpha;
@@ -293,7 +294,7 @@
         ctx.fillText(cl.initials, b2.x, b2.y + rad * 0.03);
 
         // "+N more here" counter
-        if (cl.count > 1 && rad > 12) {
+        if (cl.count > 1 && rad > 10) {
           var bx = b2.x + rad * 0.78, by = b2.y - rad * 0.78;
           var label = '+' + (cl.count - 1);
           ctx.font = '700 ' + Math.round(rad * 0.5) + 'px "Inter", system-ui, sans-serif';

@@ -361,7 +361,7 @@ table.data tr:hover td { background: var(--paper); }
   .hero-search { min-height: 52px; }
   .hero-search input[type=text] { font-size: .82rem; }
   .hero-search button { width: 40px; height: 40px; }
-  .science-globe { width: min(112%, 430px); left: 50%; transform: translateX(-50%); }
+  .science-globe { width: min(96vw, 420px); }
   .grid-3, .grid-2, .form-grid { grid-template-columns: 1fr; }
   .main-nav {
     display: none; position: absolute; top: 64px; left: 0; right: 0;
@@ -371,6 +371,10 @@ table.data tr:hover td { background: var(--paper); }
   .main-nav.open { display: flex; }
   .nav-toggle { display: block; margin-left: auto; }
   .nav-auth .btn { padding: 6px 12px; font-size: .8rem; }
-  .map-panel { position: static; width: auto; max-height: none; margin: 0; border-radius: 0; }
-  #map { height: 62vh; }
+  .map-page { display: flex; flex-direction: column; }
+  #map { order: 1; height: 58vh; min-height: 320px; }
+  .map-panel {
+    order: 2; position: static; width: auto; margin: 0; border-radius: 0;
+    border-left: 0; border-right: 0; max-height: 46vh; overflow-y: auto;
+  }
 }
