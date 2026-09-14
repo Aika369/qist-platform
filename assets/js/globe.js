@@ -13,6 +13,11 @@
   'use strict';
 
   var RAD = Math.PI / 180;
+  // Every drawn element sits at some multiple of R. The canvas has to contain
+  // the largest of them, or the glow and the arcs get sliced off at the edges.
+  var HALO_OUT  = 1.18;   // outer edge of the atmosphere glow
+  var BADGE_LIFT = 1.14;  // how far the initials circles float above the surface
+  var ARC_LIFT  = 0.16;   // apex of a hub arc, i.e. R * (1 + ARC_LIFT)
   var TILT = 20 * RAD;            // north pole leans toward the viewer
   var COS_T = Math.cos(TILT), SIN_T = Math.sin(TILT);
 
@@ -126,7 +131,7 @@
       }
     })();
 
-    var W = 0, H = 0, cx = 0, cy = 0, R = 0, dpr = 1;
+    var W = 0, H = 0, cx = 0, cy = 0, R = 0, dpr = 1, badgeBase = 17;
     function resize() {
       var rect = canvas.getBoundingClientRect();
       dpr = Math.min(global.devicePixelRatio || 1, 2);
@@ -134,10 +139,14 @@
       canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       cx = W / 2; cy = H / 2;
-      R = Math.min(W, H) * 0.44;
+      badgeBase = Math.max(11, Math.min(19, W * 0.042));
+      // reserve room for the glow, and for a badge at full depth plus its ring
+      var halfMin = Math.min(W, H) / 2;
+      var badgeMargin = badgeBase * 1.10 + 7;
+      R = Math.min((halfMin - 3) / HALO_OUT, (halfMin - badgeMargin) / BADGE_LIFT);
     }
 
-    var rot = -1.9;                 // start with Central Asia facing forward
+    var rot = 0.325;                // (90° - 71.4°) in radians: Astana faces the viewer
     var spin = 0.0016;
     var dragging = false, lastX = 0, velocity = 0, hovered = null;
     var reduced = global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -184,11 +193,12 @@
       ctx.clearRect(0, 0, W, H);
 
       /* atmosphere */
-      var halo = ctx.createRadialGradient(cx, cy, R * 0.92, cx, cy, R * 1.22);
-      halo.addColorStop(0, 'rgba(70,140,230,0.20)');
+      var halo = ctx.createRadialGradient(cx, cy, R * 0.90, cx, cy, R * HALO_OUT);
+      halo.addColorStop(0, 'rgba(70,140,230,0.22)');
+      halo.addColorStop(0.55, 'rgba(70,140,230,0.09)');
       halo.addColorStop(1, 'rgba(70,140,230,0)');
       ctx.fillStyle = halo;
-      ctx.beginPath(); ctx.arc(cx, cy, R * 1.22, 0, 6.2832); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx, cy, R * HALO_OUT, 0, 6.2832); ctx.fill();
 
       /* far-side dots, seen through the globe */
       ctx.fillStyle = 'rgba(' + COLORS.landFar + ',0.13)';
@@ -231,9 +241,9 @@
       var t = now / 1000;
       for (var r2 = 0; r2 < arcs.length; r2++) {
         var arc = arcs[r2];
-        drawArc(arc.a, arc.b, 0.19, 1.1, COLORS.arc + '0.34)', 44);
+        drawArc(arc.a, arc.b, ARC_LIFT, 1.1, COLORS.arc + '0.34)', 44);
         var f = ((t * 0.16) + arc.phase) % 1;
-        var pp = pointOnArc(arc.a, arc.b, f, 0.19);
+        var pp = pointOnArc(arc.a, arc.b, f, ARC_LIFT);
         if (pp.z > -0.05) {
           ctx.fillStyle = COLORS.pulse;
           ctx.globalAlpha = 0.5 + 0.5 * Math.sin(Math.PI * f);
@@ -252,22 +262,46 @@
 
       /* hub badges — initials in a circle, floating above the surface */
       screenPts.length = 0;
-      var drawn = [];
+      var cand = [];
       for (var h = 0; h < hubs.length; h++) {
         var c = hubs[h];
-        var anchor = project(c.v, R);
-        var badge = project(c.v, R * 1.14);
+        var badge = project(c.v, R * BADGE_LIFT);
         if (badge.z <= 0.06) continue;
-        drawn.push({ c: c, anchor: anchor, badge: badge });
+        cand.push({
+          c: c,
+          anchor: project(c.v, R),
+          badge: badge,
+          rad: badgeBase * (0.72 + 0.38 * badge.z)
+        });
+      }
+      // biggest clusters win a badge; the ones they would sit on top of fall
+      // back to a plain node, so Europe stops turning into a pile of circles
+      cand.sort(function (a, b) { return b.c.count - a.c.count; });
+      // fewer badges on a small canvas, or they swamp the globe
+      var maxBadges = W < 380 ? 6 : (W < 480 ? 9 : 12);
+      var drawn = [], crowded = [];
+      for (var ci = 0; ci < cand.length; ci++) {
+        var it2 = cand[ci], clear = drawn.length < maxBadges;
+        for (var pj = 0; pj < drawn.length; pj++) {
+          var o2 = drawn[pj];
+          var dx2 = it2.badge.x - o2.badge.x, dy2 = it2.badge.y - o2.badge.y;
+          var need = (it2.rad + o2.rad) * 0.95;
+          if (dx2 * dx2 + dy2 * dy2 < need * need) { clear = false; break; }
+        }
+        (clear ? drawn : crowded).push(it2);
+      }
+      for (var cr = 0; cr < crowded.length; cr++) {
+        var cp = crowded[cr].badge;
+        ctx.fillStyle = 'rgba(244,233,210,' + (0.3 + 0.45 * cp.z).toFixed(3) + ')';
+        ctx.beginPath(); ctx.arc(cp.x, cp.y, 2.2 + cp.z, 0, 6.2832); ctx.fill();
       }
       drawn.sort(function (a, b) { return a.badge.z - b.badge.z; });
 
       for (var d = 0; d < drawn.length; d++) {
         var it = drawn[d], b2 = it.badge, an = it.anchor, cl = it.c;
         var depth = it.badge.z;
-        var base = Math.max(11, Math.min(19, W * 0.042));
-        var rad = base * (0.72 + 0.38 * depth);
-        var alpha = Math.min(1, 0.35 + depth * 1.1);
+        var rad = it.rad;
+        var alpha = Math.min(1, 0.58 + depth * 0.85);
 
         ctx.globalAlpha = alpha;
         // tether to the surface
