@@ -112,7 +112,9 @@
       }
       if (q) {
         const hay = `${p.name} ${p.title} ${p.institution} ${p.city} ${p.country} ${(p.topics || []).join(' ')} ${p.bio || ''}`.toLowerCase();
-        if (!hay.includes(q)) return false;
+        const stopWords = new Set(['the', 'and', 'for', 'with', 'from', 'into', 'your', 'that', 'this', 'want', 'need', 'solve']);
+        const terms = q.split(/[^a-z0-9]+/).filter(term => term.length > 2 && !stopWords.has(term));
+        if (!(hay.includes(q) || (terms.length && terms.some(term => hay.includes(term))))) return false;
       }
       return true;
     });
@@ -145,9 +147,11 @@
     ['f-q', 'f-topic', 'f-country', 'f-role', 'f-exp'].forEach(id => $(id).value = '');
     apply();
   });
+  const params = new URLSearchParams(location.search);
+  $('f-q').value = params.get('q') || '';
   apply();
 
-  const want = new URLSearchParams(location.search).get('person');
+  const want = params.get('person');
   if (want) {
     const p = people.find(x => String(x.id) === want);
     if (p) openPerson(p);

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QIST — Qazaqstan Researchers Network</title>
-<meta name="description" content="QIST connects researchers, PhD students, postdocs and professors from Kazakhstan around the world: researcher map, directory, jobs, grants, conferences and academic matching.">
+<title>Science Bridge Project — QIST</title>
+<meta name="description" content="An AI-powered scientific intelligence platform connecting scientists, universities, industry, startups, and governments. Discover experts and build collaborations.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,15 +14,74 @@
 <header class="site-header" id="site-header"></header>
 
 <section class="hero">
-  <div class="container">
-    <span class="kicker">Qazaq International Science &amp; Technology Association</span>
-    <h1>The global network of <em>Kazakhstani researchers</em></h1>
-    <p class="lead">QIST unites PhD students, postdocs, professors and industry scientists from Kazakhstan
-    working in 30+ countries — to share opportunities, find collaborators, mentor the next
-    generation and strengthen Qazaq science.</p>
-    <div class="hero-actions">
-      <a class="btn btn-primary" href="map.html">🗺️ Explore the researcher map</a>
-      <a class="btn btn-ghost" href="login.html#register">Join the community</a>
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <span class="kicker">Science Bridge Project <span class="kicker-divider" aria-hidden="true">|</span> Qazaq International Science &amp; Technology Association</span>
+      <h1>Find the scientists<br>to solve your <em>R&amp;D needs.</em></h1>
+      <p class="lead">An AI-powered scientific intelligence platform connecting scientists, universities, industry, startups, and governments. Discover experts. Build collaborations.</p>
+
+      <form class="hero-search" id="hero-search" role="search">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+        <label class="sr-only" for="hero-query">Describe the R&amp;D problem you want to solve</label>
+        <input id="hero-query" name="q" type="text" placeholder="Describe the R&amp;D problem you want to solve…" autocomplete="off">
+        <button type="submit" aria-label="Search for scientists">→</button>
+      </form>
+
+      <div class="hero-suggestions" aria-label="Suggested research areas">
+        <span>Suggested:</span>
+        <button type="button" data-query="Oil &amp; gas engineering">Oil &amp; gas engineering</button>
+        <button type="button" data-query="Mining &amp; metallurgy">Mining &amp; metallurgy</button>
+        <button type="button" data-query="Energy transition">Energy transition</button>
+        <button type="button" data-query="Biomedical engineering">Biomedical engineering</button>
+        <button type="button" data-query="Artificial intelligence smart systems">AI &amp; smart systems</button>
+        <button type="button" data-query="Medicine">Medicine</button>
+        <button type="button" data-query="Logistics supply chain">Logistics &amp; supply chain</button>
+      </div>
+    </div>
+
+    <div class="science-globe" aria-label="Global network of connected scientists">
+      <div class="globe-halo"></div>
+      <svg class="globe-lines" viewBox="0 0 520 520" role="img" aria-hidden="true">
+        <defs>
+          <radialGradient id="globeFill" cx="45%" cy="38%" r="62%">
+            <stop offset="0" stop-color="#145b9a" stop-opacity=".72"/>
+            <stop offset=".72" stop-color="#053061" stop-opacity=".68"/>
+            <stop offset="1" stop-color="#031c3b" stop-opacity=".9"/>
+          </radialGradient>
+          <filter id="networkGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <clipPath id="globeClip"><circle cx="260" cy="260" r="208"/></clipPath>
+        </defs>
+        <circle class="globe-core" cx="260" cy="260" r="208" fill="url(#globeFill)"/>
+        <g class="globe-grid" clip-path="url(#globeClip)">
+          <ellipse cx="260" cy="260" rx="208" ry="74"/>
+          <ellipse cx="260" cy="260" rx="208" ry="142"/>
+          <ellipse cx="260" cy="260" rx="76" ry="208"/>
+          <ellipse cx="260" cy="260" rx="148" ry="208"/>
+          <path d="M52 260h416M70 180h380M70 340h380"/>
+        </g>
+        <g class="land" clip-path="url(#globeClip)">
+          <path d="M101 160l40-45 51-18 45 20 26 29-20 24-39-8-18 33-38 13-31-17z"/>
+          <path d="M187 221l45 10 25 39-11 55-31 70-24-15 3-47-24-39z"/>
+          <path d="M274 132l53-27 84 19 58 50-16 54-41 1-22-25-41 15-17 49-35-15-23-50-39-22z"/>
+          <path d="M379 306l43 14 37 49-30 31-54-12-18-42z"/>
+        </g>
+        <g class="connections" filter="url(#networkGlow)">
+          <path d="M138 160Q246 74 365 135"/>
+          <path d="M138 160Q190 290 255 344"/>
+          <path d="M255 344Q335 306 407 333"/>
+          <path d="M365 135Q390 228 407 333"/>
+          <path d="M138 160Q281 220 407 333"/>
+          <circle cx="138" cy="160" r="5"/><circle cx="365" cy="135" r="5"/>
+          <circle cx="255" cy="344" r="5"/><circle cx="407" cy="333" r="5"/>
+        </g>
+      </svg>
+      <div class="scientist-node node-one"><span>AK</span><small>Almaty</small></div>
+      <div class="scientist-node node-two"><span>LN</span><small>London</small></div>
+      <div class="scientist-node node-three"><span>SB</span><small>Boston</small></div>
+      <div class="scientist-node node-four"><span>ST</span><small>Seoul</small></div>
     </div>
   </div>
 </section>
@@ -150,6 +209,20 @@
     QIST.pushOverlay('subscribers', { email: document.getElementById('cta-email').value });
     document.getElementById('cta-email').value = '';
     QIST.toast('Subscribed! You will receive the next QIST digest.');
+  });
+
+  const openDirectorySearch = query => {
+    const value = String(query || '').trim();
+    location.href = 'directory.html' + (value ? '?q=' + encodeURIComponent(value) : '');
+  };
+
+  document.getElementById('hero-search').addEventListener('submit', e => {
+    e.preventDefault();
+    openDirectorySearch(document.getElementById('hero-query').value);
+  });
+
+  document.querySelectorAll('.hero-suggestions [data-query]').forEach(button => {
+    button.addEventListener('click', () => openDirectorySearch(button.dataset.query));
   });
 })();
 </script>
