@@ -267,6 +267,132 @@ const QIST = {
       </div>`;
   },
 
+  /* ---------- QIST primary research fields ----------
+     The canonical list researchers pick from. Keep this array as the
+     single source of truth — the map, directory and matching pages all
+     read it from here.
+
+     Records may carry their own value:
+       p.primaryField  = "Neuroscience"
+       p.primaryFields = ["Neuroscience", "Biomedical Sciences, and Medicine"]
+     When neither is set, classify() infers fields from the free-text
+     `topics` and `title` already in data/people.json. That inference is a
+     bridge for the 497 legacy records, not a permanent answer: ask people
+     to choose their field at registration and store it on the record.
+     ------------------------------------------------------------------ */
+  PRIMARY_FIELDS: [
+    'Artificial Intelligence',
+    'Computer Science',
+    'Data Science, and Statistics',
+    'Cybersecurity, and Digital Technologies',
+    'Robotics',
+    'Engineering',
+    'Electronics',
+    'Materials Science',
+    'Physics and Physical Sciences',
+    'Mathematics and Computational Sciences',
+    'Chemistry and Chemical Sciences',
+    'Astronomy, Space Science',
+    'Biology and Life Sciences',
+    'Biotechnology, Genetics, and Bioinformatics',
+    'Biomedical Sciences, and Medicine',
+    'Neuroscience',
+    'Pharmaceutical Sciences',
+    'Public Health, Epidemiology',
+    'Environmental Science',
+    'Earth Sciences and Geosciences',
+    'Energy, Renewable Energy',
+    'Agriculture and Food Science',
+    'Veterinary Sciences',
+    'Economics',
+    'Management, Entrepreneurship, Innovation',
+    'Education, and Learning Sciences',
+    'Law, Legal Studies, and Governance',
+    'Politics, International Relations, and Public Policy',
+    'Social Sciences',
+    'Behavioral Sciences',
+    'Communication and Media',
+    'Architecture, and Design',
+    'Arts, and Humanities',
+    'Interdisciplinary Research',
+    'Other Research Area'
+  ],
+
+  // keyword rules, evaluated against `topics` + `title` only (bios are too noisy)
+  FIELD_RULES: [
+    ['Artificial Intelligence', /\b(a\.?i\.?|artificial intelligence|machine learning|deep learning|llms?|large language models?|nlp|natural language processing|neural networks?|computer vision|generative ai|edge ai|ai accelerators|word embeddings|semantic parsing|multimodal ai|vision.language|kazllm|reasoning)\b/],
+    ['Computer Science', /\b(computer science|software engineer|programming|algorithms?|computer engineering|computer graphics|devops|hci|human.computer interaction|media computer science|computational linguist|informatics)\b/],
+    ['Data Science, and Statistics', /\b(data science|data analysis|data analytics|statistic|biostatistic|big data|econometric|bayesian|analytics|quantitat\w+ analys|data.driven|predictive modeling)\b/],
+    ['Cybersecurity, and Digital Technologies', /\b(cyber ?security|syber security|information security|network security|blockchain|digital transformation|digital technolog|data protection|digital ethics|digital health algorithms)\b/],
+    ['Robotics', /\b(robot\w*|human.robot|industrial automation|cyber.physical|intelligent control|drone technolog)\b/],
+    ['Engineering', /\b(engineering|engineer\b|mechanical|civil\b|tribology|manufacturing|metrology|hydraulic|thermal.fluid|combustion|aerospace|transport\w* engineer|surface engineering|biomechanics|construction)\b/],
+    ['Electronics', /\b(electronic\w*|semiconductor|integrated circuit|microelectrode|photonic|optoelectronic|electrical engineering|medium voltage|signal processing|wireless communication|fiber optic|sensing)\b/],
+    ['Materials Science', /\b(material\w*|nanomaterial|nanotechnolog|nanoscience|polymer|coatings|corrosion|composite|perovskite|graphene|biomaterial|metallurg|ceramic|additive manufacturing|3d printing)\b/],
+    ['Physics and Physical Sciences', /\b(physic\w*|optics|spectroscopy|quantum|laser|plasma|condensed matter|terahertz|nonlinear optics|gravitation|accelerator|ultrafast|topological insulators)\b/],
+    ['Mathematics and Computational Sciences', /\b(mathematic\w*|mathemeatics|math\b|algebra|differential equations|pdes?|functional analysis|spectral theory|optimal stopping|optimization|game theory|integrable systems|computational (science|economics|materials|biology|microbiology)|inverse problems|navier.stokes)\b/],
+    ['Chemistry and Chemical Sciences', /\b(chemistry|chemical\w*|catalysis|electrochemi\w*|organometallic|supramolecular|sorption|mass spectrometry|ssnmr|nmr\b|photocatalysis|cheminformatics|xps|xrd)\b/],
+    ['Astronomy, Space Science', /\b(astronom\w*|astrophysic\w*|cosmolog\w*|space\b|nasa|black holes?|primordial|universe|satellite)\b/],
+    ['Biology and Life Sciences', /\b(biolog\w*|life science\w*|microbiolog\w*|cell (biology|therapy|signaling)|plant\b|evolution|evo.devo|embryolog\w*|physiolog\w*|redox biology|mitophagy|parasitolog\w*)\b/],
+    ['Biotechnology, Genetics, and Bioinformatics', /\b(biotech\w*|genetic\w*|genomic\w*|bioinformatic\w*|synthetic biology|gene therapy|epigenetic\w*|proteomic\w*|metagenomic\w*|dna|rna\b|stem cells?|protein (engineering|biomarker)|enetics)\b/],
+    ['Biomedical Sciences, and Medicine', /\b(medicine|medical|biomedic\w*|biomedicine|clinical|oncolog\w*|cancer|cardio\w*|surger\w*|surgeon|immuno\w*|diabet\w*|nephrolog\w*|patholog\w*|radiolog\w*|pediatric\w*|obstetric\w*|gynecolog\w*|ophthalmolog\w*|anesthes\w*|hematolog\w*|md\b|patient|disease\w*|therapy|tissue engineering|regenerative medicine|vaccin\w*|nursing|dialysis|transplantation|endocrin\w*|rheumato\w*|dermatolog\w*|otolaryngolog\w*)\b/],
+    ['Neuroscience', /\b(neuroscience|neurolog\w*|neurosurg\w*|neuromodulation|neurorehab\w*|neuroimaging|neurodegeneration|brain|parkinson\w*|alzheimer\w*|cognitive neuro\w*|dbs\b|eeg|fmri|stroke)\b/],
+    ['Pharmaceutical Sciences', /\b(pharmac\w*|drug (discovery|delivery)|biopharma\w*|pharma\b|mucoadhesive)\b/],
+    ['Public Health, Epidemiology', /\b(public health\w*|publich? healt|epidemiolog\w*|health (policy|polic\w*|system\w*|equity|financing|literacy|communication|awareness)|global health|nutrition|hpv|screening|biosafety)\b/],
+    ['Environmental Science', /\b(environment\w*|sustainab\w*|climate|pollution|waste\w*|water (quality|purification|resources|treatment|technolog\w*)|circular\w*|life cycle assessment|carbon capture|co.?2|emissions|sewage|wastewater|ccs\b)\b/],
+    ['Earth Sciences and Geosciences', /\b(geolog\w*|geophys\w*|geoscience\w*|earth (science|observation)|geodesy|gnss|seismic|hydrolog\w*|glaciolog\w*|glacier|soil\b|mining|oceanograph\w*|remote sensing|gis\b|petrol\b|oil ?& ?gas|rare earth|ore enrichment)\b/],
+    ['Energy, Renewable Energy', /\b(energy|renewable|solar|hydrogen|batter\w+|lithium|photovoltaic|smart grid\w*|e.fuel|biofuel\w*|nuclear\b|wind\b|bess\b|fcr\b)\b/],
+    ['Agriculture and Food Science', /\b(agricultur\w*|agro\w*|food\b|crop\w*|fertiliz\w*|precision agriculture|forestry|rural development|honey)\b/],
+    ['Veterinary Sciences', /\b(veterinar\w*|animal health)\b/],
+    ['Economics', /\b(economic\w*|economist|economics|finance|financial|macroeconom\w*|monetary|trade\b|banking|accounting|fintech|equity valuation|market.data)\b/],
+    ['Management, Entrepreneurship, Innovation', /\b(management|manager|entrepreneur\w*|innovation|business|leadership|hrm\b|human capital|marketing|branding|strategy|strategic|startup|consulting|project management|supply chain|logistics|corporate governance|csr\b|people analytics|productivity|hospitality|tourism)\b/],
+    ['Education, and Learning Sciences', /\b(education\w*|educator|teach\w*|learning|pedagog\w*|curriculum|school\b|edtech|literacy|college (access|success|counseling)|academic mobility|mentoring)\b/],
+    ['Law, Legal Studies, and Governance', /\b(law\b|legal\b|governance|human rights|regulation\b|compliance|civil service|public administration)\b/],
+    ['Politics, International Relations, and Public Policy', /\b(politic\w*|international relations|public policy|policy\b|diplomacy|foreign policy|geopolit\w*|security studies|elite studies|migration|development studies|eurasia|institutional development)\b/],
+    ['Social Sciences', /\b(social science\w*|sociolog\w*|social polic\w*|anthropolog\w*|human geography|gender|social\b|demograph\w*)\b/],
+    ['Behavioral Sciences', /\b(behavio\w*|psycholog\w*|cognitive|consumer behavior|well.being|burnout|affective touch)\b/],
+    ['Communication and Media', /\b(communication|media\b|journalis\w*|public relations|social media)\b/],
+    ['Architecture, and Design', /\b(architect\w*|design\b|urban (planning|road|forestry)|built environment|smart buildings|robotic fabrication)\b/],
+    ['Arts, and Humanities', /\b(arts?\b|humanities|histor\w*|philosoph\w*|literature|language\w*|culture|cultural heritage|museum\w*|islamic studies|linguist\w*)\b/],
+    ['Interdisciplinary Research', /\b(interdisciplinar\w*|multidisciplinar\w*|transdisciplinar\w*)\b/]
+  ],
+
+  _fieldCache: new WeakMap(),
+
+  /* Returns the canonical field(s) for a person, always at least one. */
+  primaryFields(p) {
+    if (!p || typeof p !== 'object') return ['Other Research Area'];
+
+    // 1. an explicit value on the record always wins
+    const explicit = []
+      .concat(p.primaryFields || [])
+      .concat(p.primaryField ? [p.primaryField] : [])
+      .filter(f => this.PRIMARY_FIELDS.indexOf(f) > -1);
+    if (explicit.length) return explicit;
+
+    // 2. otherwise infer, and remember the answer
+    if (this._fieldCache.has(p)) return this._fieldCache.get(p);
+    const hay = ((p.topics || []).join(' ') + ' ' + (p.title || '')).toLowerCase();
+    const hits = [];
+    for (const [field, re] of this.FIELD_RULES) {
+      if (re.test(hay)) hits.push(field);
+    }
+    const out = hits.length ? hits.slice(0, 4) : ['Other Research Area'];
+    this._fieldCache.set(p, out);
+    return out;
+  },
+
+  /* Convenience: the single best field, for badges and cards. */
+  primaryField(p) { return this.primaryFields(p)[0]; },
+
+  /* { field: count } across a list of people. */
+  fieldCounts(people) {
+    const counts = {};
+    (people || []).forEach(p => this.primaryFields(p).forEach(f => {
+      counts[f] = (counts[f] || 0) + 1;
+    }));
+    return counts;
+  },
+
   async boot(active) {
     this.renderHeader(active);
     this.renderFooter();

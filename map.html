@@ -76,10 +76,13 @@
   const topicSel = document.getElementById('map-topic');
   [...new Set(people.map(p => p.country))].filter(Boolean).sort().forEach(c =>
     countrySel.insertAdjacentHTML('beforeend', `<option>${QIST.esc(c)}</option>`));
-  const topicCounts = {};
-  people.flatMap(p => p.topics || []).forEach(t => topicCounts[t] = (topicCounts[t] || 0) + 1);
-  Object.keys(topicCounts).filter(t => topicCounts[t] >= 3).sort().forEach(t =>
-    topicSel.insertAdjacentHTML('beforeend', `<option>${QIST.esc(t)}</option>`));
+  // QIST primary research fields — the canonical list lives in app.js
+  const fieldCounts = QIST.fieldCounts(people);
+  QIST.PRIMARY_FIELDS.forEach(f => {
+    const n = fieldCounts[f] || 0;
+    topicSel.insertAdjacentHTML('beforeend',
+      `<option value="${QIST.esc(f)}"${n ? '' : ' disabled'}>${QIST.esc(f)}${n ? ` (${n})` : ' —'}</option>`);
+  });
 
   function popupHtml(p) {
     return `<div class="map-pop">
@@ -99,7 +102,7 @@
     const co = countrySel.value, to = topicSel.value;
     const shown = people.filter(p => {
       if (co && p.country !== co) return false;
-      if (to && !(p.topics || []).includes(to)) return false;
+      if (to && !QIST.primaryFields(p).includes(to)) return false;
       if (q) {
         const hay = `${p.name} ${p.title} ${p.institution} ${p.city} ${p.country} ${(p.topics || []).join(' ')}`.toLowerCase();
         if (!hay.includes(q)) return false;

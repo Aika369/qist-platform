@@ -17,7 +17,7 @@
   <div class="container hero-grid">
     <div class="hero-copy">
       <span class="kicker">Science Bridge Project <span class="kicker-divider" aria-hidden="true">|</span> Qazaq International Science &amp; Technology Association</span>
-      <h1>Find the scientists<br>to solve your <em>R&amp;D needs.</em></h1>
+      <h1>Find the <em class="hl">scientists</em><br>to solve your <em class="hl">R&amp;D needs</em>.</h1>
       <p class="lead">An AI-powered scientific intelligence platform connecting scientists, universities, industry, startups, and governments. Discover experts. Build collaborations.</p>
 
       <form class="hero-search" id="hero-search" role="search">
@@ -39,49 +39,13 @@
       </div>
     </div>
 
-    <div class="science-globe" aria-label="Global network of connected scientists">
-      <div class="globe-halo"></div>
-      <svg class="globe-lines" viewBox="0 0 520 520" role="img" aria-hidden="true">
-        <defs>
-          <radialGradient id="globeFill" cx="45%" cy="38%" r="62%">
-            <stop offset="0" stop-color="#145b9a" stop-opacity=".72"/>
-            <stop offset=".72" stop-color="#053061" stop-opacity=".68"/>
-            <stop offset="1" stop-color="#031c3b" stop-opacity=".9"/>
-          </radialGradient>
-          <filter id="networkGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="blur"/>
-            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-          <clipPath id="globeClip"><circle cx="260" cy="260" r="208"/></clipPath>
-        </defs>
-        <circle class="globe-core" cx="260" cy="260" r="208" fill="url(#globeFill)"/>
-        <g class="globe-grid" clip-path="url(#globeClip)">
-          <ellipse cx="260" cy="260" rx="208" ry="74"/>
-          <ellipse cx="260" cy="260" rx="208" ry="142"/>
-          <ellipse cx="260" cy="260" rx="76" ry="208"/>
-          <ellipse cx="260" cy="260" rx="148" ry="208"/>
-          <path d="M52 260h416M70 180h380M70 340h380"/>
-        </g>
-        <g class="land" clip-path="url(#globeClip)">
-          <path d="M101 160l40-45 51-18 45 20 26 29-20 24-39-8-18 33-38 13-31-17z"/>
-          <path d="M187 221l45 10 25 39-11 55-31 70-24-15 3-47-24-39z"/>
-          <path d="M274 132l53-27 84 19 58 50-16 54-41 1-22-25-41 15-17 49-35-15-23-50-39-22z"/>
-          <path d="M379 306l43 14 37 49-30 31-54-12-18-42z"/>
-        </g>
-        <g class="connections" filter="url(#networkGlow)">
-          <path d="M138 160Q246 74 365 135"/>
-          <path d="M138 160Q190 290 255 344"/>
-          <path d="M255 344Q335 306 407 333"/>
-          <path d="M365 135Q390 228 407 333"/>
-          <path d="M138 160Q281 220 407 333"/>
-          <circle cx="138" cy="160" r="5"/><circle cx="365" cy="135" r="5"/>
-          <circle cx="255" cy="344" r="5"/><circle cx="407" cy="333" r="5"/>
-        </g>
-      </svg>
-      <div class="scientist-node node-one"><span>AK</span><small>Almaty</small></div>
-      <div class="scientist-node node-two"><span>LN</span><small>London</small></div>
-      <div class="scientist-node node-three"><span>SB</span><small>Boston</small></div>
-      <div class="scientist-node node-four"><span>ST</span><small>Seoul</small></div>
+    <div class="science-globe">
+      <div class="globe-stage">
+        <canvas id="globe" role="img"
+                aria-label="Rotating globe showing where researchers in the QIST network are based"></canvas>
+        <div class="globe-tip" id="globe-tip"></div>
+      </div>
+      <p class="globe-hint">Drag to spin &middot; hover a circle for names</p>
     </div>
   </div>
 </section>
@@ -177,11 +141,26 @@
 <footer class="site-footer" id="site-footer"></footer>
 
 <script src="assets/js/app.js"></script>
+<script src="assets/js/globe.js"></script>
 <script>
 (async () => {
   await QIST.boot('index.html');
 
   const [people, posts] = await Promise.all([QIST.getPeople(), QIST.getPosts()]);
+
+  // hero globe — fails quietly so a bad fetch never takes the hero down
+  try {
+    const landDots = await fetch('assets/data/land-dots.json').then(r => r.json());
+    QistGlobe.mount(document.getElementById('globe'), {
+      people,
+      landDots,
+      tooltip: document.getElementById('globe-tip'),
+      hubs: 12
+    });
+  } catch (err) {
+    console.error('Globe failed to load:', err);
+    document.querySelector('.science-globe').style.display = 'none';
+  }
 
   document.getElementById('st-people').textContent = people.length;
   document.getElementById('st-countries').textContent = new Set(people.map(p => p.country)).size;
