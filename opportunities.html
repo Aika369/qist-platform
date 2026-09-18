@@ -19,44 +19,44 @@
     <div>
       <h2 class="rule">Opportunities</h2>
       <p class="small muted" style="margin-top:6px;max-width:62ch">
-        Гранты, роли в консорциумах, академические и индустриальные позиции, поиск соавторов.
-        Для каждой возможности показан вердикт по праву участия для выбранной вами страны — со ссылкой на первоисточник.
+        Grants, consortium roles, academic and industry positions, co-author calls.
+        Every entry carries an eligibility verdict for your country, with a link to the source it came from.
       </p>
     </div>
   </div>
 
-  <!-- профиль читателя: от него зависят вердикты -->
+  <!-- reader profile: the verdicts depend on it -->
   <div class="opp-profile">
     <div>
-      <label for="of-country">Моя страна</label>
-      <select id="of-country"></select>
+      <label for="of-country">My country</label>
+      <select id="of-country" aria-label="My country"></select>
     </div>
     <div>
-      <label for="of-stage">Моя стадия карьеры</label>
+      <label for="of-stage">My career stage</label>
       <select id="of-stage">
-        <option value="any">Студент / магистрант</option>
-        <option value="phd_student">PhD-кандидат</option>
+        <option value="any">Student / Master's</option>
+        <option value="phd_student">PhD candidate</option>
         <option value="phd_plus" selected>PhD / Researcher</option>
         <option value="postdoc_plus">Postdoc</option>
         <option value="pi_only">Professor / PI</option>
       </select>
     </div>
     <p class="opp-profile-note">
-      Пока это не сохранённый профиль, а выбор на время просмотра — он попадает в ссылку,
-      поэтому страницу можно переслать коллеге вместе с настройками.
+      Not a saved profile yet — just a choice for this visit. It goes into the URL, so you can
+      send this page to a colleague with your settings intact.
     </p>
   </div>
 
-  <!-- фильтры -->
+  <!-- filters -->
   <div class="filters" id="opp-filters">
-    <input type="text" id="of-q" class="search-input" placeholder="Поиск по названию, организации, теме…">
-    <select id="of-type"><option value="">Все типы</option></select>
-    <select id="of-field"><option value="">Все области науки</option></select>
-    <label class="opp-check"><input type="checkbox" id="of-elig"> Только те, куда я прохожу</label>
-    <label class="opp-check"><input type="checkbox" id="of-open" checked> Скрыть истёкшие</label>
+    <input type="text" id="of-q" class="search-input" placeholder="Search by title, organisation or topic…">
+    <select id="of-type"><option value="">All types</option></select>
+    <select id="of-field"><option value="">All research fields</option></select>
+    <label class="opp-check"><input type="checkbox" id="of-elig"> Only what I am eligible for</label>
+    <label class="opp-check"><input type="checkbox" id="of-open" checked> Hide expired</label>
   </div>
 
-  <p class="small muted" id="opp-count" style="margin-bottom:14px">Загружаем возможности…</p>
+  <p class="small muted" id="opp-count" style="margin-bottom:14px">Loading opportunities…</p>
 
   <div id="opp-list"></div>
 
@@ -72,23 +72,22 @@
   const $ = id => document.getElementById(id);
   const list = $('opp-list'), count = $('opp-count');
 
-  /* ---------- загрузка данных: явные состояния загрузки и ошибки ---------- */
+  /* ---------- data loading: explicit loading and error states ---------- */
   let opps, elig;
   try {
     [opps, elig] = await Promise.all([QIST.getOpportunities(), QIST.getEligibility()]);
   } catch (err) {
-    console.error('Не удалось загрузить возможности:', err);
+    console.error('Failed to load opportunities:', err);
     count.textContent = '';
     list.innerHTML = `<div class="card pad-lg opp-empty">
-      <h3>Не удалось загрузить список</h3>
-      <p class="small muted">Проверьте соединение и обновите страницу. Если повторится — напишите нам, это ошибка на нашей стороне.</p>
-      <button class="btn btn-outline" onclick="location.reload()">Обновить</button></div>`;
+      <h3>Could not load the list</h3>
+      <p class="small muted">Check your connection and reload. If it keeps happening, tell us — that would be a fault on our side.</p>
+      <button class="btn btn-outline" onclick="location.reload()">Reload</button></div>`;
     return;
   }
 
-  /* ---------- заполняем справочники ---------- */
-  Object.entries(elig.countries).forEach(([code, name]) =>
-    $('of-country').insertAdjacentHTML('beforeend', `<option value="${code}">${QIST.esc(name)}</option>`));
+  /* ---------- populate the lookups ---------- */
+  QIST.fillCountrySelect($('of-country'), elig, 'KZ');
 
   const usedTypes = [...new Set(opps.map(o => o.type))];
   usedTypes.forEach(t => $('of-type').insertAdjacentHTML('beforeend',
@@ -97,7 +96,7 @@
   [...new Set(opps.flatMap(o => o.fields || []))].sort().forEach(f =>
     $('of-field').insertAdjacentHTML('beforeend', `<option value="${QIST.esc(f)}">${QIST.esc(f)}</option>`));
 
-  /* ---------- состояние живёт в адресной строке ---------- */
+  /* ---------- state lives in the URL ---------- */
   const IDS = { country:'of-country', stage:'of-stage', q:'of-q', type:'of-type', field:'of-field' };
   function readUrl() {
     const p = new URLSearchParams(location.search);
@@ -114,7 +113,7 @@
   }
   readUrl();
 
-  /* ---------- отрисовка ---------- */
+  /* ---------- rendering ---------- */
   const VERDICT_CLASS = { ok:'ok', bad:'bad', unk:'unk' };
   const VERDICT_MARK  = { ok:'✓', bad:'✗', unk:'?' };
 
@@ -125,13 +124,13 @@
     const left = QIST.daysLeft(o);
 
     const deadline = !o.deadline
-      ? '<span class="muted">без дедлайна</span>'
+      ? '<span class="muted">no deadline</span>'
       : expired
-        ? `<span class="opp-expired">дедлайн прошёл ${QIST.esc(o.deadline)}</span>`
-        : `дедлайн <b class="deadline">через ${left} дн.</b>`;
+        ? `<span class="opp-expired">deadline passed ${QIST.esc(o.deadline)}</span>`
+        : `deadline <b class="deadline">in ${left} days</b>`;
 
     const src = c.source
-      ? `<div class="opp-src">Источник: <a href="${QIST.esc(c.source.url)}" target="_blank" rel="noopener">${QIST.esc(c.source.name)}</a>${c.source.version ? ', ' + QIST.esc(c.source.version) : ''}${c.source.date ? ' от ' + QIST.esc(c.source.date) : ''}</div>`
+      ? `<div class="opp-src">Source: <a href="${QIST.esc(c.source.url)}" target="_blank" rel="noopener">${QIST.esc(c.source.name)}</a>${c.source.version ? ', ' + QIST.esc(c.source.version) : ''}${c.source.date ? ' of ' + QIST.esc(c.source.date) : ''}</div>`
       : '';
 
     const stageLabel = elig.career_stages[o.career_stage] || o.career_stage;
@@ -151,25 +150,25 @@
 
       <div class="opp-elig">
         <div class="opp-elig-row">
-          <span class="k">Страна</span>
+          <span class="k">Country</span>
           <span class="v">${QIST.esc(c.text)}${o.eligibility && o.eligibility.note ? ' ' + QIST.esc(o.eligibility.note) + '.' : ''}</span>
           <span class="verdict v-${VERDICT_CLASS[c.verdict]}">${VERDICT_MARK[c.verdict]} ${QIST.esc(c.label)}</span>
         </div>
         <div class="opp-elig-row">
-          <span class="k">Стадия</span>
-          <span class="v">Требуется: ${QIST.esc(stageLabel)}.</span>
-          <span class="verdict v-${s.ok ? 'ok' : 'bad'}">${s.ok ? '✓ подходит' : '✗ не подходит'}</span>
+          <span class="k">Stage</span>
+          <span class="v">Required: ${QIST.esc(stageLabel)}.</span>
+          <span class="verdict v-${s.ok ? 'ok' : 'bad'}">${s.ok ? '✓ you qualify' : '✗ you do not qualify'}</span>
         </div>
         ${src}
       </div>
 
-      ${o.role_expected ? `<p class="opp-role"><span>Ожидаемая роль:</span> ${QIST.esc(o.role_expected)}${o.workload ? ' · ' + QIST.esc(o.workload) : ''}</p>` : ''}
+      ${o.role_expected ? `<p class="opp-role"><span>Expected role:</span> ${QIST.esc(o.role_expected)}${o.workload ? ' · ' + QIST.esc(o.workload) : ''}</p>` : ''}
       ${(o.fields || []).length ? `<div class="tags">${o.fields.map(f => `<span class="tag">${QIST.esc(f)}</span>`).join('')}</div>` : ''}
 
       <div class="opp-actions">
-        <button class="btn btn-primary" data-interest="${QIST.esc(o.id)}"${expired ? ' disabled' : ''}>Интересно</button>
-        ${o.source_url ? `<a class="btn btn-outline" href="${QIST.esc(o.source_url)}" target="_blank" rel="noopener">Первоисточник →</a>` : ''}
-        <button class="btn btn-ghost" data-dismiss="${QIST.esc(o.id)}">Не подходит</button>
+        <button class="btn btn-primary" data-interest="${QIST.esc(o.id)}"${expired ? ' disabled' : ''}>Interested</button>
+        ${o.source_url ? `<a class="btn btn-outline" href="${QIST.esc(o.source_url)}" target="_blank" rel="noopener">Open the source →</a>` : ''}
+        <button class="btn btn-ghost" data-dismiss="${QIST.esc(o.id)}">Not for me</button>
       </div>
     </article>`;
   }
@@ -200,16 +199,16 @@
     });
 
     count.innerHTML = shown.length
-      ? `<b>${shown.length}</b> из ${opps.length} возможностей`
+      ? `<b>${shown.length}</b> of ${opps.length} opportunities`
       : '';
 
     list.innerHTML = shown.length
       ? shown.map(o => card(o, country, stage)).join('')
       : `<div class="card pad-lg opp-empty">
-           <h3>Под эти условия ничего не подошло</h3>
-           <p class="small muted">Сейчас в базе ${opps.length} возможностей — это мало, и мы это знаем.
-             Снимите часть фильтров или подпишитесь, чтобы получать новые по мере поступления.</p>
-           <button class="btn btn-outline" id="opp-reset">Сбросить фильтры</button>
+           <h3>Nothing matches these filters</h3>
+           <p class="small muted">There are ${opps.length} opportunities in the database right now — we know that is few.
+             Clear some filters, or subscribe to get new ones as they arrive.</p>
+           <button class="btn btn-outline" id="opp-reset">Clear filters</button>
          </div>`;
 
     const reset = $('opp-reset');
@@ -220,25 +219,25 @@
     });
   }
 
-  /* ---------- действия ---------- */
+  /* ---------- actions ---------- */
   list.addEventListener('click', async (e) => {
     const dis = e.target.closest('[data-dismiss]');
-    if (dis) { dismissed.add(dis.dataset.dismiss); render(); QIST.toast('Скрыто до конца сессии. Причины отказа начнут собираться, когда подключим приём откликов.'); return; }
+    if (dis) { dismissed.add(dis.dataset.dismiss); render(); QIST.toast('Hidden for this session. Dismissal reasons start being collected once responses are wired up.'); return; }
 
     const btn = e.target.closest('[data-interest]');
     if (!btn) return;
     const o = opps.find(x => x.id === btn.dataset.interest);
-    btn.disabled = true; btn.textContent = 'Отправляем…';
+    btn.disabled = true; btn.textContent = 'Sending…';
     const res = await QIST.recordInterest(o, { country: $('of-country').value, stage: $('of-stage').value });
     if (res.ok) {
-      btn.textContent = '✓ Отклик отправлен';
-      QIST.toast('Отклик записан. Куратор свяжется с вами по этой возможности.');
+      btn.textContent = '✓ Response sent';
+      QIST.toast('Recorded. A QIST curator will follow up about this opportunity.');
     } else if (res.reason === 'not_configured') {
-      btn.disabled = false; btn.textContent = 'Интересно';
-      QIST.toast('Приём откликов ещё не подключён: задайте QIST.INTEREST_ENDPOINT в assets/js/app.js. Инструкция — в README.');
+      btn.disabled = false; btn.textContent = 'Interested';
+      QIST.toast('Responses are not wired up yet: set QIST.INTEREST_ENDPOINT in assets/js/app.js. See the README.');
     } else {
-      btn.disabled = false; btn.textContent = 'Интересно';
-      QIST.toast('Не удалось отправить отклик. Попробуйте ещё раз или откройте первоисточник.');
+      btn.disabled = false; btn.textContent = 'Interested';
+      QIST.toast('Could not send your response. Try again, or open the source directly.');
     }
   });
 

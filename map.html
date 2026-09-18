@@ -26,8 +26,8 @@
   <div class="map-panel">
     <h2>Researchers worldwide</h2>
     <div class="view-switch" style="margin-bottom:12px">
-      <a href="directory.html">Список</a>
-      <a href="map.html" class="active">Карта</a>
+      <a href="directory.html">List</a>
+      <a href="map.html" class="active">Map</a>
     </div>
 
     <p class="small muted" id="map-count" style="margin-bottom:12px">Loading…</p>
@@ -117,15 +117,15 @@
 
     cluster.clearLayers();
 
-    /* Точные координаты есть только у части записей. У остальных в исходных данных
-       стоит центр страны, а города и организации нет. Раскидывать их случайным
-       джиттером вокруг центра — значит показывать выдуманный адрес, поэтому они
-       собираются в одну страновую метку с явной подписью. */
+    /* Only some records carry precise coordinates. For the rest the source data holds a
+       country centroid with no city and no organisation. Scattering them with random jitter
+       around that centroid would display an invented address, so they collapse into one
+       country marker that says exactly what it is. */
     const precise = shown.filter(p => QIST.hasPreciseGeo(p));
     const vague   = shown.filter(p => !QIST.hasPreciseGeo(p));
 
     precise.forEach(p => {
-      const jitter = () => (Math.random() - 0.5) * 0.015; // разводим пины одного города
+      const jitter = () => (Math.random() - 0.5) * 0.015; // separate pins within one city
       const m = L.marker([p.lat + jitter(), p.lng + jitter()], { icon: pin });
       m.bindPopup(popupHtml(p), { maxWidth: 320 });
       m.bindTooltip(p.name, { permanent: true, direction: 'right', offset: [9, 0], className: 'map-name-label' });
@@ -142,18 +142,18 @@
       const m = L.marker([group[0].lat, group[0].lng], { icon });
       m.bindPopup(`<div style="min-width:220px">
         <b>${QIST.esc(country)}</b>
-        <div class="small muted" style="margin:4px 0 8px">${group.length} исследователей · город в данных не указан</div>
+        <div class="small muted" style="margin:4px 0 8px">${group.length} researchers · no city recorded in the data</div>
         <div class="small">${group.slice(0, 8).map(x => QIST.esc(x.name)).join('<br>')}${
-          group.length > 8 ? `<br><span class="muted">…и ещё ${group.length - 8}</span>` : ''}</div>
-        <div class="small muted" style="margin-top:8px">Метка стоит в центре страны, а не по месту работы.</div>
+          group.length > 8 ? `<br><span class="muted">…and ${group.length - 8} more</span>` : ''}</div>
+        <div class="small muted" style="margin-top:8px">This marker sits at the centre of the country, not at a workplace.</div>
       </div>`, { maxWidth: 320 });
       cluster.addLayer(m);
     });
 
     const nPrecise = shown.filter(p => QIST.hasPreciseGeo(p)).length;
     document.getElementById('map-count').innerHTML =
-      `${shown.length} из ${people.length} исследователей · ${new Set(shown.map(p => p.country)).size} стран` +
-      `<br><span style="color:var(--ink-faint)">точный город известен у ${nPrecise}; остальные показаны страновой меткой</span>`;
+      `${shown.length} of ${people.length} researchers · ${new Set(shown.map(p => p.country)).size} countries` +
+      `<br><span style="color:var(--ink-faint)">${nPrecise} have a known city; the rest are shown as a country marker</span>`;
     document.getElementById('map-list').innerHTML = shown.slice(0, 30).map(p =>
       `<div style="padding:7px 0;border-bottom:1px solid var(--paper-2);cursor:pointer" data-lat="${p.lat}" data-lng="${p.lng}">
         <b style="color:var(--navy)">${QIST.esc(p.name)}</b><br>

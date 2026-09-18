@@ -79,21 +79,59 @@ Backend: see [backend/README.md](backend/README.md).
 Вердикт **никогда не вычисляется моделью**. При обновлении списка ЕС правьте
 `source_version` и `source_date` вместе со статусами — они показываются пользователю.
 
-### Настройка перед запуском — два поля в `assets/js/app.js`
+### Wiring up responses — three fields in `assets/js/app.js`
 
 ```js
-INTEREST_ENDPOINT: '',   // куда уходит нажатие «Интересно»
-CONTACT_EMAIL: '',       // адрес для «удалите мой профиль» на about.html
+INTEREST_ENDPOINT: '',   // where "Interested" on an opportunity goes
+SIGNUP_ENDPOINT:   '',   // where pilot sign-ups from the home page go
+CONTACT_EMAIL:     '',   // address behind "remove my profile" on about.html
 ```
 
-Пока `INTEREST_ENDPOINT` пуст, кнопка «Интересно» честно сообщает, что приём откликов
-не подключён, и ничего не отправляет. Варианты значения:
+While a field is empty the matching control **disables itself and says so**. Nothing is
+written to `localStorage`: we do not collect data into a place we cannot read it from.
 
-- URL формы **Tally** или **Formspree** — принимает `POST` с JSON;
-- `mailto:your@email` — открывает почтовый клиент с заполненным письмом;
-- URL вашего бэкенда, когда он будет развёрнут.
+#### Use Formspree, not Tally
 
-**Пока это поле пусто, отклики не собираются вообще.** Это главное ограничение итерации 1.
+Checked on 2026-09-18: **Tally will not work here.** Its API only creates and manages forms
+and requires a secret bearer token, so a static page cannot submit a response without
+exposing that key. There is no public client-side submission endpoint.
+
+Services that do accept a cross-origin JSON `POST` from a static page:
+
+| Service | Endpoint shape | Free tier |
+|---|---|---|
+| **Formspree** | `https://formspree.io/f/{id}` | 50 submissions/month |
+| Web3Forms | `https://api.web3forms.com/submit` | unlimited, needs `access_key` in the body |
+| Basin, Getform, Formcarry | similar | varies |
+
+Setting up Formspree, start to finish:
+
+1. Create a form at formspree.io and copy its endpoint, e.g. `https://formspree.io/f/xyzabcd`.
+2. Paste it into both `INTEREST_ENDPOINT` and `SIGNUP_ENDPOINT` (one form can receive both;
+   each payload carries a `kind` field — `opportunity_interest` or `pilot_signup`).
+3. Set `CONTACT_EMAIL` to the address that should receive data-removal requests.
+4. Commit. Nothing else changes.
+
+`QIST.submitForm()` already sends `Accept: application/json` — without that header Formspree
+answers with an HTML redirect instead of JSON and the success check fails.
+
+`mailto:address` also works as an endpoint value: it opens the user's mail client with the
+payload prefilled. No account needed anywhere, but it needs the visitor to press send.
+
+### Country eligibility data
+
+`data/eligibility.json` holds all 250 ISO countries with a Horizon Europe status each:
+
+- `eu_member` — EU Member State (27)
+- `associated` — Associated Country (23), same rights as EU Member States
+- `funded` — third country automatically eligible for EU funding (116)
+- `self_funded` — participation possible, normally at own cost (84)
+
+Source: European Commission, *List of Participating Countries in Horizon Europe*, v4.0 of
+2026-07-31. The lists were extracted by automated reading of that PDF on 2026-09-18 —
+`eligibility.json` records this in its `verification` block. **Spot-check the nine priority
+countries against the source before a public launch**, and record who did it in
+`verification.reviewed_by`.
 
 ## Структура разделов
 

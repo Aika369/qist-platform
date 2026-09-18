@@ -106,8 +106,8 @@
 <section class="section" style="padding-top:0">
   <div class="container">
     <div class="section-head">
-      <h2 class="rule">Свежие возможности</h2>
-      <a href="opportunities.html">Все возможности →</a>
+      <h2 class="rule">Latest opportunities</h2>
+      <a href="opportunities.html">All opportunities →</a>
     </div>
     <div id="recent-posts" class="grid grid-3"></div>
   </div>
@@ -162,10 +162,10 @@
     document.querySelector('.science-globe').style.display = 'none';
   }
 
-  /* Честные счётчики.
-     Было: «902 research fields» — это темы из биографий, разбитые по запятым,
-     и «13 opportunities posted», где часть уже с прошедшим дедлайном.
-     Стало: направления по классификатору QIST и только активные возможности. */
+  /* Honest counters.
+     Before: "902 research fields" was biography text split on commas, and
+     "13 opportunities posted" counted entries whose deadline had already passed.
+     Now: fields from the QIST classifier, and active opportunities only. */
   const unique = people.filter(p => !p.possible_duplicate_of);
   const fieldsWithPeople = Object.keys(QIST.fieldCounts(unique))
     .filter(f => f !== 'Other Research Area').length;
@@ -185,12 +185,12 @@
     <div class="card">
       <div class="post" style="border:0;box-shadow:none;padding:0;margin:0">
         <div class="meta"><span class="badge">${QIST.esc(QIST.OPPORTUNITY_TYPES[o.type] || o.type)}</span>${
-          o.deadline ? `<span class="deadline">до ${QIST.esc(o.deadline)}</span>` : '<span>без дедлайна</span>'}</div>
+          o.deadline ? `<span class="deadline">by ${QIST.esc(o.deadline)}</span>` : '<span>no deadline</span>'}</div>
         <h3><a href="opportunities.html">${QIST.esc(o.title)}</a></h3>
         <p class="small muted">${QIST.esc((o.summary || '').slice(0, 130))}…</p>
       </div>
     </div>`).join('')
-    : `<div class="card"><p class="small muted">Активных возможностей сейчас нет — мы их добавляем.</p></div>`;
+    : `<div class="card"><p class="small muted">No active opportunities right now — we are adding them.</p></div>`;
 
   const featured = [...people].sort((a, b) => (b.featured || 0) - (a.featured || 0)).slice(0, 6);
   document.getElementById('featured-people').innerHTML =
@@ -198,37 +198,37 @@
   document.querySelectorAll('#featured-people .person-card').forEach(el =>
     el.addEventListener('click', () => location.href = 'directory.html?person=' + el.dataset.id));
 
-  /* Запись в пилот. Раньше адрес сохранялся в localStorage посетителя,
-     то есть до нас не доходил вообще. Теперь — на настроенный endpoint,
-     а если он не задан, форма честно об этом говорит. */
+  /* Pilot sign-up. This used to save the address into the visitor's own localStorage,
+     which meant it never reached us. Now it posts to the configured endpoint, and if
+     none is configured the form says so instead of pretending. */
   const form = document.getElementById('cta-subscribe');
   const emailInput = document.getElementById('cta-email');
   const btn = form.querySelector('button');
 
   if (!QIST.SIGNUP_ENDPOINT) {
     emailInput.disabled = true;
-    emailInput.placeholder = 'приём заявок ещё не подключён';
+    emailInput.placeholder = 'sign-ups are not wired up yet';
     btn.disabled = true;
-    btn.textContent = 'Скоро';
+    btn.textContent = 'Soon';
     form.insertAdjacentHTML('afterend',
       '<p class="small" style="color:#9eacc0;margin-top:10px;flex-basis:100%">' +
-      'Приём заявок ещё не подключён — мы не хотим собирать адреса туда, откуда не сможем их достать. ' +
-      'Настройка: <code>QIST.SIGNUP_ENDPOINT</code> в <code>assets/js/app.js</code>, инструкция в README.</p>');
+      'Sign-ups are not wired up yet — we will not collect addresses into a place we cannot read them from. ' +
+      'Set <code>QIST.SIGNUP_ENDPOINT</code> in <code>assets/js/app.js</code>; see the README.</p>');
   } else {
     form.addEventListener('submit', async e => {
       e.preventDefault();
       const email = emailInput.value.trim();
       if (!email) return;
-      btn.disabled = true; btn.textContent = 'Отправляем…';
+      btn.disabled = true; btn.textContent = 'Sending…';
       const res = await QIST.submitForm(QIST.SIGNUP_ENDPOINT, {
-        _subject: 'Запись в пилот ScienceBridge',
+        _subject: 'ScienceBridge pilot sign-up',
         kind: 'pilot_signup', email, at: new Date().toISOString()
       });
       if (res.ok) {
-        form.innerHTML = '<p style="color:#f4e9d2;margin:0">Готово. Первое письмо придёт, когда наберём подборку под ваш профиль.</p>';
+        form.innerHTML = '<p style="color:#f4e9d2;margin:0">You are on the list. The first digest arrives once we have a selection that fits your profile.</p>';
       } else {
         btn.disabled = false; btn.textContent = 'Subscribe';
-        QIST.toast('Не удалось отправить. Попробуйте ещё раз.');
+        QIST.toast('Could not send. Please try again.');
       }
     });
   }

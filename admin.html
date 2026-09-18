@@ -65,20 +65,20 @@
 (async () => {
   await QIST.boot('admin.html');
 
-  // Админка правит данные на сервере. Без него она правила localStorage,
-  // то есть изменения видел только сам администратор. Отключено 2026-09-18.
+  // The admin console edits server data. Without a server it edited localStorage,
+  // so only the administrator ever saw the changes. Disabled 2026-09-18.
   if (!QIST.authAvailable()) {
     document.querySelector('.container').innerHTML = `
       <div class="card" style="padding:30px 32px;margin-top:26px">
-        <h2 style="margin-bottom:10px">Админка недоступна без сервера</h2>
+        <h2 style="margin-bottom:10px">The admin console needs a server</h2>
         <p class="small muted" style="margin-bottom:8px">
-          Раньше изменения сохранялись в браузере администратора и не попадали на сайт.
-          Теперь панель включается только при работающем бэкенде.
+          Changes used to be saved in the administrator's own browser and never reached the site.
+          The console now switches on only when the backend is running.
         </p>
         <p class="small muted" style="margin-bottom:18px">
-          Возможности сейчас редактируются в <code>data/opportunities.json</code> — см. README.
+          Opportunities are edited in <code>data/opportunities.json</code> for now — see the README.
         </p>
-        <a class="btn btn-outline" href="index.html">На главную</a>
+        <a class="btn btn-outline" href="index.html">Back to home</a>
       </div>`;
     return;
   }

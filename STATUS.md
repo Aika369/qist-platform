@@ -1,58 +1,64 @@
 # STATUS
 
-Обновлено: 2026-09-18 · Итерации 1–2
+Updated: 2026-09-18 · Iterations 1–3
 
-## Работает
+## Works
 
-**Итерация 1 — Opportunities**
-- `opportunities.html`: 10 структурированных возможностей, фильтры, вердикт права участия
-  для 9 стран, проверка стадии карьеры, скрытие истёкших, состояние в адресной строке.
-- Движок `QIST.checkCountry` берёт вердикт из `data/eligibility.json` и всегда показывает
-  ссылку на первоисточник. Моделью ничего не вычисляется.
-- Меню: Home · Opportunities · Researchers · About QIST. Карта — вид, а не раздел.
-- `about.html`: происхождение данных каталога, «это мой профиль», «удалить профиль».
+**Opportunities** — `opportunities.html`
+10 structured opportunities with filters, search, expiry handling and URL-shareable state.
+Every card carries an eligibility verdict for the visitor's country and career stage, with
+a link to the source the verdict came from. No match percentages: none are calibrated yet.
 
-**Итерация 2 — убрано то, что было неправдой**
-- Зашитые логин и пароль администратора удалены из публичного JS.
-- Вход, регистрация и админка отключаются без бэкенда с объяснением причины,
-  вместо поддельных аккаунтов в localStorage посетителя.
-- Счётчики на главной: было `497 / 42 / 902 / 13`, стало `492 / 41 / 32 / 7`.
-  902 «направления» были биографиями, разбитыми по запятым; 13 возможностей включали истёкшие;
-  497 человек включали 5 дубликатов.
-- Поле `geo_precision` у каждой записи каталога. 338 записей имеют координату центра страны —
-  теперь это видно: на карте страновая метка вместо россыпи пинов в поле, в каталоге
-  «Казахстан · город не указан», на глобусе код страны с пунктирной обводкой вместо
-  инициалов одного человека над 99 людьми.
-- 5 вероятных дубликатов помечены полем `possible_duplicate_of` и подписаны в каталоге.
-- Форма записи в пилот на главной заменила подписку, писавшую адреса в localStorage.
+**Eligibility engine** — `QIST.checkCountry()`
+All 250 ISO countries, four Horizon Europe statuses (EU member / associated / funded /
+self-funded). Verdicts are read from `data/eligibility.json`, never computed by a model.
 
-## Ограничения — знать до релиза
+**Navigation** — Home · Opportunities · Researchers · About QIST
+Map and globe are views inside Researchers, not sections. Matching is not in public
+navigation: it is personal and belongs behind sign-in.
 
-1. **Приём откликов и заявок не подключён.** `INTEREST_ENDPOINT` и `SIGNUP_ENDPOINT` пусты,
-   кнопки честно отключены. **Пока они пусты, ни один отклик и ни один адрес не собираются.**
-   Настраивается за 2 минуты — README, раздел «Настройка перед запуском».
-2. **`CONTACT_EMAIL` не задан** → кнопки «удалить мой профиль» на about.html неактивны.
-   Это остаётся открытым риском: 492 человека опубликованы без работающего способа отказаться.
-3. **Данные в JSON, бэкенд не развёрнут.** Возможности редактируются в файле и попадают
-   на сайт коммитом. `backend/` написан, но нигде не запущен.
-4. **7 активных возможностей.** Мало. Это главное узкое место продукта, а не код.
-5. **Статус Монголии в Horizon Europe не подтверждён** — показывается «условие неизвестно».
-6. **Города для 338 записей не восстановлены** — геокодер недоступен из окружения разработки.
+**Honesty fixes**
+- Hard-coded admin credentials removed from the public JS *and* from the sign-in page text.
+- Sign-in, registration and the admin console disable themselves without a backend,
+  instead of writing fake accounts into the visitor's own browser.
+- Home page counters: `497 / 42 / 902 / 13` → `492 / 41 / 32 / 7`.
+- `geo_precision` on every directory record: 338 hold a country centroid, and that is now
+  visible on the map, in the directory and on the globe rather than shown as a real address.
+- 5 probable duplicate records flagged, not deleted.
 
-## Проверено
+**Language** — the whole interface and all opportunity data are in English.
+Researchers' own names are left exactly as recorded.
 
-37 автоматических проверок в headless Chromium: `test.mjs` (21) и `test2.mjs` (16).
-Покрыто: вердикты eligibility на 2 программах и 4 странах, фильтры, пустые состояния,
-истёкшие возможности, поведение кнопок без настроенных endpoint, отсутствие зашитых паролей
-в собранном `app.js`, честные счётчики, подписи точности координат, отсутствие
-горизонтальной прокрутки на 390px, целостность главной и каталога. Ошибок JS нет.
+## Limits — know these before launch
 
-`L is not defined` на map.html воспроизводится только в тестовой среде, где заблокирован
-unpkg.com. На живом сайте Leaflet загружается — проверено 14.09.2026.
-**Логика страновых меток на карте автоматически не проверена** по этой же причине.
+1. **`INTEREST_ENDPOINT`, `SIGNUP_ENDPOINT`, `CONTACT_EMAIL` are empty.** Until they are set,
+   no response and no email address is collected at all. Formspree setup: README.
+   Tally does not work for this — see D-17.
+2. **`CONTACT_EMAIL` is the most urgent of the three**: 492 people are published with no
+   working way to ask for removal.
+3. **Eligibility lists were extracted by automated reading of the EC PDF.** One earlier read
+   of the same document was wrong about three countries. Have a human spot-check the nine
+   priority countries and record it in `eligibility.json` → `verification.reviewed_by` (B-18).
+4. **7 active opportunities.** This is the product's real bottleneck, not the code.
+5. **Backend is written but not deployed.** Opportunities are edited in a JSON file and reach
+   the site by commit.
+6. **Cities for 338 records are not recovered** — no geocoder reachable from the dev sandbox.
+7. **10 directory records have no country and no organisation** and cannot be matched (B-19).
 
-## Следующий шаг
+## Verified
 
-И2.5 — три поля и одна форма, всё требует вашего решения:
-`INTEREST_ENDPOINT`, `SIGNUP_ENDPOINT`, `CONTACT_EMAIL`.
-Без них итерации 1 и 2 не дают ни одной метрики.
+56 automated checks in headless Chromium across `test.mjs` (21), `test2.mjs` (16),
+`test3.mjs` (19). Covering: eligibility verdicts across two programmes and nine countries,
+filters, empty and error states, expired entries, button behaviour with no endpoint
+configured, absence of the admin password anywhere in the build, honest counters, coordinate
+precision labels, the full 250-country selector, English-only interface text, and no
+horizontal scroll at 390px. No JavaScript errors.
+
+`L is not defined` on map.html appears only in the sandbox, where unpkg.com is blocked.
+Leaflet loads on the live site — checked 2026-09-14. **The country-marker logic on the map
+is therefore not covered by automated tests; please look at it after deploying.**
+
+## Next
+
+Set the three endpoint fields. Everything else in iterations 1–3 is already working and
+produces no measurement until they exist.

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>About QIST — ScienceBridge</title>
-<meta name="description" content="Кто стоит за ScienceBridge, откуда взяты профили исследователей, как управлять своими данными и как удалить профиль.">
+<meta name="description" content="Who is behind ScienceBridge, where the researcher profiles came from, how to manage your data and how to remove your profile.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,65 +19,65 @@
 
   <div class="card pad-lg" style="text-align:left;margin-bottom:20px">
     <p style="font-size:1.02rem;color:var(--ink-soft)">
-      ScienceBridge — платформа <b>QIST (Qazaq International Science and Technology Association)</b>,
-      объединяющей исследователей из Казахстана и научной диаспоры по всему миру.
-      Задача платформы — находить людям международные проекты, гранты, позиции и соавторов,
-      и делать это так, чтобы право участия было проверено до того, как человек потратит время на заявку.
+      ScienceBridge is a platform of <b>QIST (Qazaq International Science and Technology Association)</b>,
+      the network of researchers from Kazakhstan and its scientific diaspora worldwide.
+      Its job is to find people international projects, grants, positions and co-authors — and to check
+      eligibility before anyone spends a week on an application they cannot win.
     </p>
-    <p class="small muted" style="margin-top:12px">qista.org · платформа в стадии пилота</p>
+    <p class="small muted" style="margin-top:12px">qista.org · pilot stage</p>
   </div>
 
-  <h3 id="data" style="margin-bottom:10px">Откуда взяты профили исследователей</h3>
+  <h3 id="data" style="margin-bottom:10px">Where the researcher profiles came from</h3>
   <div class="card pad-lg" style="text-align:left;margin-bottom:20px">
     <p class="small" style="color:var(--ink-soft)">
-      Каталог собран из <b>публичных источников</b>: страниц университетов, Google Scholar
-      и открытых профилей исследователей. Мы храним имя, должность, организацию, город, страну,
-      направления исследований и ссылку на публичный профиль.
-      <b>Адреса электронной почты в каталоге не хранятся и не публикуются.</b>
+      The directory was compiled from <b>public sources</b>: university pages, Google Scholar and
+      open researcher profiles. We store name, title, organisation, city, country, research fields
+      and a link to the public profile.
+      <b>Email addresses are neither stored nor published in the directory.</b>
     </p>
     <p class="small" style="color:var(--ink-soft);margin-top:10px">
-      Если вы нашли себя в каталоге и хотите исправить данные, забрать профиль под свой контроль
-      или удалить его — напишите нам, и мы обработаем запрос. Отдельные основания не нужны:
-      достаточно вашей просьбы.
+      If you found yourself in the directory and want to correct it, take control of the profile,
+      or have it removed — write to us and we will act on it. No justification is needed:
+      your request is enough.
     </p>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
-      <a class="btn btn-primary" id="claim-link" href="#">Это мой профиль — хочу управлять им</a>
-      <a class="btn btn-outline" id="remove-link" href="#">Удалить мой профиль</a>
+      <a class="btn btn-primary" id="claim-link" href="#">This is my profile — let me manage it</a>
+      <a class="btn btn-outline" id="remove-link" href="#">Remove my profile</a>
     </div>
     <p class="small muted" id="contact-fallback" style="margin-top:12px"></p>
   </div>
 
-  <h3 style="margin-bottom:10px">Что мы делаем с вашими данными</h3>
+  <h3 style="margin-bottom:10px">What we do with your data</h3>
   <div class="card pad-lg" style="text-align:left;margin-bottom:20px">
     <ul class="small" style="color:var(--ink-soft);list-style:none;display:flex;flex-direction:column;gap:9px">
-      <li>— Email используется только для писем с возможностями. Мы не передаём его третьим лицам и не публикуем в каталоге.</li>
-      <li>— Отписаться можно из любого письма; после отписки адрес удаляется.</li>
-      <li>— Мы не показываем ваш контакт организациям без вашего явного согласия на конкретный запрос.</li>
-      <li>— Платформа — проект сообщества QIST. Публичная поддержка государственных лиц не означает, что платформа управляется государством.</li>
+      <li>— Your email is used only for the opportunities digest. We do not pass it to third parties and do not publish it in the directory.</li>
+      <li>— You can unsubscribe from any email; the address is deleted when you do.</li>
+      <li>— We never reveal your contact details to an organisation without your explicit consent to that specific request.</li>
+      <li>— The platform is a QIST community project. Public support from government figures does not mean the platform is run by the state.</li>
     </ul>
   </div>
 
-  <h3 style="margin-bottom:10px">Ещё на платформе</h3>
+  <h3 style="margin-bottom:10px">Elsewhere on the platform</h3>
   <div class="grid grid-2" style="margin-bottom:20px">
     <div class="card feature-card">
       <div class="icon">📮</div>
-      <h3>Рассылка</h3>
-      <p class="small muted">Архив выпусков и подписка на письмо с возможностями.</p>
-      <p style="margin-top:10px"><a href="newsletter.html">Открыть архив →</a></p>
+      <h3>Newsletter</h3>
+      <p class="small muted">Past issues and subscription to the opportunities digest.</p>
+      <p style="margin-top:10px"><a href="newsletter.html">Open the archive →</a></p>
     </div>
     <div class="card feature-card">
       <div class="icon">💬</div>
-      <h3>Обсуждения сообщества</h3>
-      <p class="small muted">Темы, которые не являются возможностями: знакомства, советы, семинары QIST.</p>
-      <p style="margin-top:10px"><a href="channels.html">Перейти к обсуждениям →</a></p>
+      <h3>Community discussions</h3>
+      <p class="small muted">Threads that are not opportunities: introductions, advice, QIST seminars.</p>
+      <p style="margin-top:10px"><a href="channels.html">Go to discussions →</a></p>
     </div>
   </div>
 
-  <h3 style="margin-bottom:10px">Связаться</h3>
+  <h3 style="margin-bottom:10px">Contact</h3>
   <div class="card pad-lg" style="text-align:left">
     <p class="small" style="color:var(--ink-soft)">
-      По вопросам о данных, партнёрству и размещению возможностей — пишите команде QIST.
-      Ответ обычно в течение нескольких рабочих дней.
+      For questions about data, partnerships or posting an opportunity, write to the QIST team.
+      We usually reply within a few working days.
     </p>
     <p class="small muted" style="margin-top:8px" id="contact-line"></p>
   </div>
@@ -91,7 +91,7 @@
 (async () => {
   await QIST.boot('about.html');
 
-  // Единственный адрес задаётся в одном месте — assets/js/app.js -> QIST.CONTACT_EMAIL
+  // The single address lives in one place: assets/js/app.js -> QIST.CONTACT_EMAIL
   const mail = QIST.CONTACT_EMAIL || '';
   const claim = document.getElementById('claim-link');
   const remove = document.getElementById('remove-link');
@@ -99,13 +99,13 @@
   const line = document.getElementById('contact-line');
 
   if (mail) {
-    claim.href  = `mailto:${mail}?subject=${encodeURIComponent('Это мой профиль в каталоге ScienceBridge')}&body=${encodeURIComponent('Здравствуйте!\n\nМоё имя в каталоге: \nСсылка на профиль: \n\nХочу управлять этим профилем.')}`;
-    remove.href = `mailto:${mail}?subject=${encodeURIComponent('Прошу удалить мой профиль из каталога ScienceBridge')}&body=${encodeURIComponent('Здравствуйте!\n\nМоё имя в каталоге: \nСсылка на профиль: \n\nПрошу удалить мои данные.')}`;
+    claim.href  = `mailto:${mail}?subject=${encodeURIComponent('This is my profile in the ScienceBridge directory')}&body=${encodeURIComponent('Hello,\n\nMy name in the directory: \nProfile link: \n\nI would like to manage this profile.')}`;
+    remove.href = `mailto:${mail}?subject=${encodeURIComponent('Please remove my profile from the ScienceBridge directory')}&body=${encodeURIComponent('Hello,\n\nMy name in the directory: \nProfile link: \n\nPlease delete my data.')}`;
     line.textContent = mail;
   } else {
-    // Честное состояние: адрес не настроен — не делаем вид, что кнопки работают.
+    // Honest state: no address configured, so we do not pretend the buttons work.
     [claim, remove].forEach(b => { b.classList.add('btn-outline'); b.classList.remove('btn-primary'); b.setAttribute('aria-disabled','true'); b.href = '#'; b.addEventListener('click', e => e.preventDefault()); });
-    fallback.innerHTML = '<b>Контактный адрес ещё не задан.</b> Укажите его в <code>assets/js/app.js</code> → <code>QIST.CONTACT_EMAIL</code>, и кнопки заработают.';
+    fallback.innerHTML = '<b>No contact address is configured yet.</b> Set it in <code>assets/js/app.js</code> → <code>QIST.CONTACT_EMAIL</code> and these buttons will work.';
     line.textContent = '—';
   }
 })();

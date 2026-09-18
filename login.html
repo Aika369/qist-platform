@@ -29,10 +29,7 @@
         <input type="password" id="l-password" required style="width:100%">
       </div>
       <button class="btn btn-primary" type="submit" style="width:100%">Sign in</button>
-      <p class="small muted" style="margin-top:14px">
-        Demo accounts — admin: <code>admin@qist.kz</code> / <code>qist-admin-2026</code>,
-        member: <code>member@qist.kz</code> / <code>qist-member-2026</code>
-      </p>
+
     </form>
 
     <form id="register-form" style="display:none">
@@ -77,23 +74,23 @@
   const $ = id => document.getElementById(id);
   const next = new URLSearchParams(location.search).get('next') || 'index.html';
 
-  // Учётные записи живут только на сервере. Пока он не развёрнут, не делаем вид,
-  // что регистрация работает: раньше она писала аккаунт в localStorage посетителя.
+  // Accounts live on the server only. Until it is deployed we do not pretend registration
+  // works: it used to write the account into the visitor's own localStorage.
   if (!QIST.authAvailable()) {
     document.querySelector('.auth-wrap').innerHTML = `
       <div class="card auth-card" style="padding:30px 32px">
-        <h2 style="margin-bottom:10px">Личные кабинеты ещё не подключены</h2>
+        <h2 style="margin-bottom:10px">Accounts are not connected yet</h2>
         <p class="small muted" style="margin-bottom:14px">
-          Профили, сохранённые возможности и персональный подбор появятся, когда мы развернём сервер.
-          Пока вход работал бы только на вид: учётная запись оставалась бы в вашем браузере
-          и до нас не доходила, поэтому мы его отключили.
+          Profiles, saved opportunities and personal matching arrive once we deploy the server.
+          Until then signing in would only look like it worked: the account would stay in your
+          browser and never reach us, so we turned it off.
         </p>
         <p class="small muted" style="margin-bottom:18px">
-          Чтобы не пропустить запуск — подпишитесь на письмо с возможностями. Оно уже работает.
+          To hear about the launch, join the pilot list. Browsing opportunities already works.
         </p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <a class="btn btn-primary" href="index.html#pilot">Записаться в пилот</a>
-          <a class="btn btn-outline" href="opportunities.html">Смотреть возможности</a>
+          <a class="btn btn-primary" href="index.html#pilot">Join the pilot</a>
+          <a class="btn btn-outline" href="opportunities.html">Browse opportunities</a>
         </div>
       </div>`;
     return;
