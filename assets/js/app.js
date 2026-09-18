@@ -417,17 +417,17 @@ const QIST = {
      Пусто = приём откликов не подключён, и кнопка честно отключается.
      Поддерживается URL формы (Tally / Formspree / свой backend) либо
      "mailto:адрес". См. README.md, раздел «Приём откликов». */
-  INTEREST_ENDPOINT: '',
+  INTEREST_ENDPOINT: 'https://formspree.io/f/xyezzgdo',
 
   /* Контакт команды QIST. Используется на about.html для запросов
      «это мой профиль» и «удалите мои данные». Пока пусто — кнопки
      честно отключаются, а не ведут в никуда. */
-  CONTACT_EMAIL: '',
+  CONTACT_EMAIL: 'info@qista.org',
 
   /* Куда уходит запись в пилот и подписка на письмо.
      Может быть тем же URL, что INTEREST_ENDPOINT. Пусто — форма честно
      отключается и не делает вид, что собрала адрес. */
-  SIGNUP_ENDPOINT: '',
+  SIGNUP_ENDPOINT: 'https://formspree.io/f/xyezzgdo',
 
   async getOpportunities() {
     if (this.apiAlive) {
