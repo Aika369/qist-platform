@@ -215,9 +215,12 @@ const QIST = {
   /* ---------- shared chrome ---------- */
   renderHeader(active) {
     const u = this.currentUser();
+    // Публичное меню — только объекты, не аудитории. См. DECISIONS.md D-01.
+    // map.html и matching.html намеренно не в меню: карта — это вид внутри
+    // Researchers, подбор персонален и живёт за входом.
     const links = [
-      ['index.html', 'Home'], ['map.html', 'Map'], ['directory.html', 'People'],
-      ['channels.html', 'Channels'], ['matching.html', 'Matching'], ['newsletter.html', 'Newsletter']
+      ['index.html', 'Home'], ['opportunities.html', 'Opportunities'],
+      ['directory.html', 'Researchers'], ['about.html', 'About QIST']
     ];
     const nav = links.map(([href, label]) =>
       `<a href="${href}" class="${active === href ? 'active' : ''}">${label}</a>`).join('');
@@ -250,9 +253,9 @@ const QIST = {
           </div>
           <div>
             <h4>Platform</h4>
-            <a href="map.html">Researcher map</a>
+            <a href="directory.html?view=map">Researcher map</a>
             <a href="directory.html">People directory</a>
-            <a href="channels.html">Channels</a>
+            <a href="opportunities.html">Opportunities</a>
             <a href="matching.html">Academic matching</a>
           </div>
           <div>
@@ -391,6 +394,118 @@ const QIST = {
       counts[f] = (counts[f] || 0) + 1;
     }));
     return counts;
+  },
+
+  /* ================= ВОЗМОЖНОСТИ И ПРАВО УЧАСТИЯ =================
+     Данные: data/opportunities.json + data/eligibility.json
+     Вердикт никогда не придумывается — он берётся из таблицы programmes
+     и всегда сопровождается ссылкой на первоисточник.
+     ============================================================== */
+
+  OPPORTUNITY_TYPES: {
+    grant:           'Грант и конкурс',
+    consortium_role: 'Роль в консорциуме',
+    academic_job:    'Академическая вакансия',
+    industry_job:    'Индустриальная R&D-позиция',
+    coauthor:        'Поиск соавтора',
+    rnd_challenge:   'R&D-задача от компании',
+    expert_request:  'Запрос экспертизы',
+    conference:      'Конференция и публикация'
+  },
+
+  FUNDING_LABELS: {
+    confirmed:          'финансирование подтверждено',
+    not_confirmed:      'финансирование не подтверждено',
+    cofunding_required: 'требуется софинансирование'
+  },
+
+  // Ранги стадии карьеры: заявленная стадия должна быть не ниже требуемой.
+  STAGE_RANK: { any: 0, phd_student: 1, phd_plus: 2, postdoc_plus: 3, pi_only: 4 },
+
+  /* Куда уходит отклик «Интересно».
+     Пусто = приём откликов не подключён, и кнопка честно отключается.
+     Поддерживается URL формы (Tally / Formspree / свой backend) либо
+     "mailto:адрес". См. README.md, раздел «Приём откликов». */
+  INTEREST_ENDPOINT: '',
+
+  /* Контакт команды QIST. Используется на about.html для запросов
+     «это мой профиль» и «удалите мои данные». Пока пусто — кнопки
+     честно отключаются, а не ведут в никуда. */
+  CONTACT_EMAIL: '',
+
+  async getOpportunities() {
+    if (this.apiAlive) {
+      try {
+        const r = await fetch(this.apiBase + '/api/opportunities');
+        if (r.ok) return await r.json();
+      } catch (_) { /* падаем на статические данные */ }
+    }
+    const all = await this.loadJSON('opportunities');
+    return all.filter(o => o.status === 'published');
+  },
+
+  async getEligibility() { return this.loadJSON('eligibility'); },
+
+  /* Возвращает вердикт по стране. Никогда не бросает исключение:
+     неизвестный статус — это тоже честный ответ. */
+  checkCountry(opp, countryCode, elig) {
+    const key  = (opp.eligibility && opp.eligibility.programme) || 'open';
+    const prog = elig.programmes[key] || elig.programmes.open;
+    const status = prog.countries[countryCode] || prog.default || 'unknown';
+    const def = elig.statuses[status] || elig.statuses.unknown;
+    const countryName = elig.countries[countryCode] || 'Ваша страна';
+    return {
+      status, verdict: def.verdict, label: def.label,
+      text: def.text.replace('{country}', countryName),
+      programme: prog.name,
+      source: prog.source_url ? {
+        url: prog.source_url, name: prog.source_name,
+        version: prog.source_version, date: prog.source_date
+      } : null
+    };
+  },
+
+  checkStage(opp, userStage) {
+    const need = this.STAGE_RANK[opp.career_stage] ?? 0;
+    const have = this.STAGE_RANK[userStage] ?? 0;
+    return { ok: have >= need, need: opp.career_stage, have: userStage };
+  },
+
+  isExpired(opp) {
+    if (!opp.deadline) return false;
+    return new Date(opp.deadline) < new Date(new Date().toDateString());
+  },
+
+  daysLeft(opp) {
+    if (!opp.deadline) return null;
+    return Math.ceil((new Date(opp.deadline) - new Date()) / 86400000);
+  },
+
+  /* Отклик. Возвращает {ok, reason} — вызывающий код сам решает, что показать. */
+  async recordInterest(opp, ctx) {
+    const ep = this.INTEREST_ENDPOINT;
+    if (!ep) return { ok: false, reason: 'not_configured' };
+    const payload = {
+      opportunity_id: opp.id, opportunity_title: opp.title,
+      country: ctx.country, career_stage: ctx.stage,
+      user: (this.currentUser() || {}).email || '',
+      at: new Date().toISOString()
+    };
+    if (ep.startsWith('mailto:')) {
+      const subj = encodeURIComponent('Интерес к возможности: ' + opp.title);
+      const body = encodeURIComponent(JSON.stringify(payload, null, 2));
+      location.href = `${ep}?subject=${subj}&body=${body}`;
+      return { ok: true, reason: 'mailto' };
+    }
+    try {
+      const r = await fetch(ep, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      return r.ok ? { ok: true, reason: 'posted' } : { ok: false, reason: 'http_' + r.status };
+    } catch (_) {
+      return { ok: false, reason: 'network' };
+    }
   },
 
   async boot(active) {

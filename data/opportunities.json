@@ -1,0 +1,331 @@
+[
+  {
+    "id": "o-p1",
+    "migrated_from": "p1",
+    "type": "academic_job",
+    "status": "published",
+    "title": "Assistant/Associate Professor positions in Computer Science — Nazarbayev University",
+    "organization": "Nazarbayev University, School of Engineering and Digital Sciences",
+    "org_type": "university",
+    "country": "KZ",
+    "city": "Астана",
+    "remote": false,
+    "summary": "Позиции на факультете по направлениям AI/ML, data science, кибербезопасность и робототехника. Международно конкурентный пакет, англоязычная среда.",
+    "fields": [
+      "Artificial Intelligence",
+      "Computer Science",
+      "Cybersecurity, and Digital Technologies"
+    ],
+    "methods_required": [],
+    "career_stage": "phd_plus",
+    "eligibility": {
+      "programme": "open",
+      "note": "Ограничений по гражданству нет"
+    },
+    "funding_status": "confirmed",
+    "funding_amount": "",
+    "role_expected": "Преподавание и собственная исследовательская программа",
+    "workload": "Полная занятость",
+    "expected_output": "",
+    "deadline": "2026-09-30",
+    "source_url": "https://nu.edu.kz/careers",
+    "source_name": "Карьерный портал NU",
+    "curated_at": "2026-09-18"
+  },
+  {
+    "id": "o-p2",
+    "migrated_from": "p2",
+    "type": "academic_job",
+    "status": "published",
+    "title": "Postdoctoral researcher in Machine Learning — MBZUAI, Абу-Даби",
+    "organization": "Mohamed bin Zayed University of Artificial Intelligence",
+    "org_type": "university",
+    "country": "OTHER",
+    "city": "Абу-Даби",
+    "remote": false,
+    "summary": "Постдок-позиции в ML, NLP, CV и робототехнике. Ожидается сильный публикационный профиль уровня NeurIPS/ICML/ACL. Зарплата без налога, жильё, релокация.",
+    "fields": [
+      "Artificial Intelligence",
+      "Computer Science"
+    ],
+    "methods_required": [],
+    "career_stage": "phd_plus",
+    "eligibility": {
+      "programme": "open",
+      "note": "Ограничений по гражданству нет"
+    },
+    "funding_status": "confirmed",
+    "funding_amount": "",
+    "role_expected": "Постдок-исследователь",
+    "workload": "Полная занятость",
+    "expected_output": "Публикации",
+    "deadline": "",
+    "source_url": "https://mbzuai.ac.ae/careers/",
+    "source_name": "Карьерный портал MBZUAI",
+    "curated_at": "2026-09-18"
+  },
+  {
+    "id": "o-p3",
+    "migrated_from": "p3",
+    "type": "industry_job",
+    "status": "published",
+    "title": "ML Engineer (Kazakh NLP) — ISSAI, Назарбаев Университет",
+    "organization": "Institute of Smart Systems and AI (ISSAI)",
+    "org_type": "institute",
+    "country": "KZ",
+    "city": "Астана",
+    "remote": false,
+    "summary": "Разработка распознавания казахской речи и больших языковых моделей (экосистема KazLLM). Требуется PyTorch и опыт многоязычного NLP.",
+    "fields": [
+      "Artificial Intelligence",
+      "Computer Science"
+    ],
+    "methods_required": [
+      "PyTorch",
+      "NLP"
+    ],
+    "career_stage": "any",
+    "eligibility": {
+      "programme": "open",
+      "note": "Работа на месте в Астане"
+    },
+    "funding_status": "confirmed",
+    "funding_amount": "",
+    "role_expected": "ML-инженер",
+    "workload": "Полная занятость",
+    "expected_output": "",
+    "deadline": "2026-08-15",
+    "source_url": "https://issai.nu.edu.kz",
+    "source_name": "Сайт ISSAI",
+    "curated_at": "2026-09-18"
+  },
+  {
+    "id": "o-p4",
+    "migrated_from": "p4",
+    "type": "grant",
+    "status": "published",
+    "title": "Bolashak International Scholarship — конкурс 2026 для PhD и научных стажировок",
+    "organization": "Центр международных программ «Болашак»",
+    "org_type": "funder",
+    "country": "KZ",
+    "city": "",
+    "remote": false,
+    "summary": "Финансирование обучения в PhD и научных стажировок в ведущих университетах мира. Покрывает обучение, проживание и проезд. Для учёных — стажировки до 12 месяцев.",
+    "fields": [
+      "Interdisciplinary Research"
+    ],
+    "methods_required": [],
+    "career_stage": "any",
+    "eligibility": {
+      "programme": "kz_national",
+      "note": "Только граждане Республики Казахстан"
+    },
+    "funding_status": "confirmed",
+    "funding_amount": "Обучение + проживание + проезд",
+    "role_expected": "Стипендиат",
+    "workload": "До 12 месяцев (стажировка)",
+    "expected_output": "",
+    "deadline": "2026-10-01",
+    "source_url": "https://bolashak.gov.kz",
+    "source_name": "bolashak.gov.kz",
+    "curated_at": "2026-09-18"
+  },
+  {
+    "id": "o-p5",
+    "migrated_from": "p5",
+    "type": "grant",
+    "status": "published",
+    "title": "Грант «Жас ғалым» МНВО РК для молодых учёных — ежегодный конкурс",
+    "organization": "Министерство науки и высшего образования РК",
+    "org_type": "government",
+    "country": "KZ",
+    "city": "",
+    "remote": false,
+    "summary": "Проектные гранты для исследователей до 40 лет: проекты до 3 лет по всем направлениям науки, на базе казахстанских университетов и НИИ.",
+    "fields": [
+      "Interdisciplinary Research"
+    ],
+    "methods_required": [],
+    "career_stage": "phd_student",
+    "eligibility": {
+      "programme": "kz_national",
+      "note": "Принимающая организация должна быть в Казахстане; возраст до 40 лет"
+    },
+    "funding_status": "confirmed",
+    "funding_amount": "",
+    "role_expected": "Руководитель проекта",
+    "workload": "До 3 лет",
+    "expected_output": "Публикации и отчёты",
+    "deadline": "",
+    "source_url": "https://www.ncste.kz",
+    "source_name": "НЦГНТЭ",
+    "curated_at": "2026-09-18"
+  },
+  {
+    "id": "o-p6",
+    "migrated_from": "p6",
+    "type": "grant",
+    "status": "published",
+    "title": "Horizon Europe — MSCA Postdoctoral Fellowships 2026",
+    "organization": "European Commission — Marie Skłodowska-Curie Actions",
+    "org_type": "funder",
+    "country": "OTHER",
+    "city": "",
+    "remote": false,
+    "summary": "Гранты на 1–2 года в европейских принимающих организациях, все дисциплины. Любое гражданство, PhD и не более 8 лет исследовательского стажа.",
+    "fields": [
+      "Interdisciplinary Research"
+    ],
+    "methods_required": [],
+    "career_stage": "phd_plus",
+    "eligibility": {
+      "programme": "horizon_europe",
+      "note": "Требуется переезд в принимающую организацию в ЕС или ассоциированной стране"
+    },
+    "funding_status": "confirmed",
+    "funding_amount": "Стипендия + мобильность + исследовательские расходы",
+    "role_expected": "Fellow",
+    "workload": "12–24 месяца",
+    "expected_output": "Публикации",
+    "deadline": "2026-09-10",
+    "source_url": "https://marie-sklodowska-curie-actions.ec.europa.eu",
+    "source_name": "MSCA, Еврокомиссия",
+    "curated_at": "2026-09-18"
+  },
+  {
+    "id": "o-p7",
+    "migrated_from": "p7",
+    "type": "conference",
+    "status": "published",
+    "title": "Call for Papers: Central Asian Conference on AI & Data Science, Алматы",
+    "organization": "Central Asian Conference on AI & Data Science",
+    "org_type": "institute",
+    "country": "KZ",
+    "city": "Алматы",
+    "remote": false,
+    "summary": "Региональная площадка по AI/ML и data science. Принимаются полные статьи и постеры, есть студенческий трек.",
+    "fields": [
+      "Artificial Intelligence",
+      "Data Science, and Statistics"
+    ],
+    "methods_required": [],
+    "career_stage": "any",
+    "eligibility": {
+      "programme": "open",
+      "note": ""
+    },
+    "funding_status": "not_confirmed",
+    "funding_amount": "",
+    "role_expected": "Автор доклада",
+    "workload": "",
+    "expected_output": "Публикация в трудах конференции",
+    "deadline": "2026-09-05",
+    "source_url": "",
+    "source_name": "",
+    "curated_at": "2026-09-18"
+  },
+  {
+    "id": "o-p8",
+    "migrated_from": "p8",
+    "type": "conference",
+    "status": "published",
+    "title": "NeurIPS 2026 — сводка travel-грантов для студентов из Центральной Азии",
+    "organization": "NeurIPS",
+    "org_type": "institute",
+    "country": "OTHER",
+    "city": "",
+    "remote": false,
+    "summary": "Все известные способы профинансировать поездку: финансовая помощь конференции, волонтёрская программа, университетские travel-фонды.",
+    "fields": [
+      "Artificial Intelligence"
+    ],
+    "methods_required": [],
+    "career_stage": "any",
+    "eligibility": {
+      "programme": "open",
+      "note": "Условия зависят от конкретной программы поддержки"
+    },
+    "funding_status": "not_confirmed",
+    "funding_amount": "",
+    "role_expected": "Участник",
+    "workload": "",
+    "expected_output": "",
+    "deadline": "",
+    "source_url": "https://neurips.cc",
+    "source_name": "neurips.cc",
+    "curated_at": "2026-09-18"
+  },
+  {
+    "id": "o-p10",
+    "migrated_from": "p10",
+    "type": "coauthor",
+    "status": "published",
+    "title": "Ищем соавторов: обзор по NLP для казахского и малоресурсных тюркских языков",
+    "organization": "Сообщество QIST",
+    "org_type": "institute",
+    "country": "OTHER",
+    "city": "",
+    "remote": true,
+    "summary": "Планируется обзор датасетов, моделей и бенчмарков. Нужны 2–3 соавтора с опытом в машинном переводе, речи или построении корпусов.",
+    "fields": [
+      "Artificial Intelligence",
+      "Computer Science",
+      "Arts, and Humanities"
+    ],
+    "methods_required": [
+      "NLP",
+      "машинный перевод",
+      "корпусная лингвистика"
+    ],
+    "career_stage": "any",
+    "eligibility": {
+      "programme": "open",
+      "note": ""
+    },
+    "funding_status": "not_confirmed",
+    "funding_amount": "",
+    "role_expected": "Соавтор раздела",
+    "workload": "",
+    "expected_output": "Публикация в рецензируемом журнале",
+    "deadline": "",
+    "source_url": "",
+    "source_name": "",
+    "curated_at": "2026-09-18"
+  },
+  {
+    "id": "o-p11",
+    "migrated_from": "p11",
+    "type": "coauthor",
+    "status": "published",
+    "title": "Ищем клинического партнёра в Казахстане для исследования по медицинской визуализации",
+    "organization": "Сообщество QIST",
+    "org_type": "institute",
+    "country": "KZ",
+    "city": "",
+    "remote": false,
+    "summary": "Группа работает над глубоким обучением для радиологии (КТ/МРТ). Нужен партнёр — больница или медицинский вуз — для совместного ретроспективного исследования и совместного руководства студентами.",
+    "fields": [
+      "Artificial Intelligence",
+      "Biomedical Sciences, and Medicine"
+    ],
+    "methods_required": [
+      "КТ",
+      "МРТ",
+      "глубокое обучение"
+    ],
+    "career_stage": "any",
+    "eligibility": {
+      "programme": "open",
+      "note": "Нужна организация с доступом к клиническим данным в Казахстане"
+    },
+    "funding_status": "not_confirmed",
+    "funding_amount": "",
+    "role_expected": "Клинический партнёр / соруководитель",
+    "workload": "",
+    "expected_output": "Совместная публикация",
+    "deadline": "",
+    "source_url": "",
+    "source_name": "",
+    "curated_at": "2026-09-18"
+  }
+]

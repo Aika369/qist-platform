@@ -378,3 +378,89 @@ table.data tr:hover td { background: var(--paper); }
     border-left: 0; border-right: 0; max-height: 46vh; overflow-y: auto;
   }
 }
+
+/* ============================================================
+   Opportunities — итерация 1
+   ============================================================ */
+.opp-profile {
+  display: flex; flex-wrap: wrap; gap: 16px 22px; align-items: flex-end;
+  background: var(--navy); color: #dfe6f0; border-radius: var(--radius);
+  padding: 16px 20px; margin-bottom: 18px;
+}
+.opp-profile label {
+  display: block; font-size: .7rem; letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--gold-soft); margin-bottom: 5px; font-weight: 600;
+}
+.opp-profile select {
+  font: 500 .9rem var(--sans); padding: 8px 12px; border-radius: 7px; min-width: 200px;
+  border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08); color: #fff;
+}
+.opp-profile select:focus { border-color: var(--gold); }
+.opp-profile select option { color: var(--ink); background: #fff; }
+.opp-profile-note { flex: 1 1 260px; font-size: .78rem; color: #9eacc0; line-height: 1.5; }
+
+.opp-check { display: inline-flex; align-items: center; gap: 7px; font-size: .86rem; color: var(--ink-soft); cursor: pointer; }
+.opp-check input { width: 15px; height: 15px; accent-color: var(--gold); }
+
+.opp-card { padding: 0; overflow: hidden; margin-bottom: 16px; }
+.opp-card.is-expired { opacity: .6; }
+.opp-head { display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; padding: 17px 20px 0; }
+.opp-head h3 { flex: 1 1 300px; min-width: 0; font-size: 1.08rem; }
+.opp-type {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .66rem; letter-spacing: 1px; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 4px; background: var(--gold-soft); color: var(--gold); white-space: nowrap;
+}
+.opp-meta { display: flex; flex-wrap: wrap; gap: 7px 16px; padding: 9px 20px 0; font-size: .82rem; color: var(--ink-soft); }
+.opp-fund { font-weight: 600; }
+.opp-fund-confirmed { color: var(--teal); }
+.opp-fund-not_confirmed, .opp-fund-cofunding_required { color: var(--ink-faint); }
+.opp-expired { color: var(--ink-faint); font-weight: 600; }
+.opp-sum { padding: 11px 20px 0; font-size: .92rem; color: var(--ink-soft); }
+
+.opp-elig { margin: 14px 20px 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.opp-elig-row {
+  display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center;
+  padding: 9px 13px; border-bottom: 1px solid var(--paper-2); font-size: .85rem;
+}
+.opp-elig-row:last-child { border-bottom: 0; }
+.opp-elig-row .k {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .67rem; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-faint); white-space: nowrap;
+}
+.opp-elig-row .v { color: var(--ink-soft); min-width: 0; }
+.verdict {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .68rem; padding: 3px 9px; border-radius: 20px; white-space: nowrap; font-weight: 500;
+}
+.v-ok  { background: #e2efeb; color: var(--teal); }
+.v-bad { background: #f6e4e4; color: var(--red); }
+.v-unk { background: var(--paper-2); color: var(--ink-faint); }
+.opp-src { padding: 9px 13px; background: var(--paper); font-size: .74rem; color: var(--ink-faint); border-top: 1px solid var(--line); }
+
+.opp-role { padding: 12px 20px 0; font-size: .86rem; color: var(--ink-soft); }
+.opp-role span { color: var(--ink-faint); }
+.opp-card .tags { padding: 11px 20px 0; }
+.opp-actions {
+  display: flex; gap: 9px; align-items: center; flex-wrap: wrap;
+  padding: 14px 20px; margin-top: 15px; border-top: 1px solid var(--line); background: var(--paper);
+}
+.opp-empty { text-align: center; }
+.pad-lg { padding: 34px 26px; }
+.opp-empty h3 { margin-bottom: 8px; }
+.opp-empty p { margin-bottom: 14px; }
+
+/* переключатель вида: список / карта — карта это вид, а не раздел */
+.view-switch { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.view-switch a {
+  font-size: .86rem; font-weight: 600; padding: 7px 14px; border-radius: 7px;
+  border: 1px solid var(--line); background: var(--card); color: var(--ink-soft);
+}
+.view-switch a:hover { border-color: var(--gold); color: var(--gold); }
+.view-switch a.active { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+@media (max-width: 640px) {
+  .opp-elig-row { grid-template-columns: 1fr; gap: 4px; }
+  .opp-profile select { min-width: 0; width: 100%; }
+  .opp-profile > div { flex: 1 1 100%; }
+}

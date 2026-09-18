@@ -1,0 +1,97 @@
+{
+  "$comment": "Правила права участия. Куратор НЕ пишет их вручную — opportunity ссылается на programme.",
+  "updated_at": "2026-09-18",
+  "programmes": {
+    "horizon_europe": {
+      "name": "Horizon Europe",
+      "source_url": "https://ec.europa.eu/info/funding-tenders/opportunities/docs/2021-2027/common/guidance/list-3rd-country-participation_horizon-euratom_en.pdf",
+      "source_name": "European Commission — List of Participating Countries in Horizon Europe",
+      "source_version": "v4.0",
+      "source_date": "2026-07-31",
+      "countries": {
+        "KZ": "funded",
+        "UZ": "funded",
+        "KG": "funded",
+        "TJ": "funded",
+        "TM": "self_funded",
+        "AZ": "associated",
+        "GE": "associated",
+        "AM": "associated",
+        "MN": "unknown"
+      },
+      "default": "unknown"
+    },
+    "kz_national": {
+      "name": "Национальные программы Казахстана",
+      "source_url": "",
+      "source_name": "Условия программы",
+      "source_version": "",
+      "source_date": "",
+      "countries": {
+        "KZ": "eligible"
+      },
+      "default": "not_eligible",
+      "note": "Требуется гражданство или принимающая организация Казахстана"
+    },
+    "open": {
+      "name": "Без страновых ограничений",
+      "source_url": "",
+      "source_name": "",
+      "source_version": "",
+      "source_date": "",
+      "countries": {},
+      "default": "eligible"
+    }
+  },
+  "statuses": {
+    "associated": {
+      "verdict": "ok",
+      "label": "проходите — ассоциированный член",
+      "text": "{country}: ассоциированный член Horizon Europe. Можно не только участвовать, но и координировать проект."
+    },
+    "funded": {
+      "verdict": "ok",
+      "label": "проходите — финансирование доступно",
+      "text": "{country}: третья страна с автоматическим правом на финансирование ЕС."
+    },
+    "self_funded": {
+      "verdict": "bad",
+      "label": "финансирование недоступно",
+      "text": "{country}: в списке получателей финансирования отсутствует. Участие возможно, но за свой счёт."
+    },
+    "eligible": {
+      "verdict": "ok",
+      "label": "проходите",
+      "text": "{country}: условиям программы соответствует."
+    },
+    "not_eligible": {
+      "verdict": "bad",
+      "label": "не проходите",
+      "text": "{country}: программа ограничена другими странами."
+    },
+    "unknown": {
+      "verdict": "unk",
+      "label": "условие неизвестно",
+      "text": "{country}: статус не подтверждён в первоисточнике — проверьте вручную."
+    }
+  },
+  "countries": {
+    "KZ": "Казахстан",
+    "UZ": "Узбекистан",
+    "KG": "Кыргызстан",
+    "TJ": "Таджикистан",
+    "TM": "Туркменистан",
+    "AZ": "Азербайджан",
+    "GE": "Грузия",
+    "AM": "Армения",
+    "MN": "Монголия",
+    "OTHER": "Другая страна"
+  },
+  "career_stages": {
+    "any": "Любая",
+    "phd_student": "PhD-студент и выше",
+    "phd_plus": "PhD и выше",
+    "postdoc_plus": "Postdoc и выше",
+    "pi_only": "Только PI"
+  }
+}

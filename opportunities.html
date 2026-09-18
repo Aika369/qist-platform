@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Opportunities — ScienceBridge / QIST</title>
+<meta name="description" content="Grants, consortium roles, academic and industry positions and co-author calls — each with an explicit eligibility verdict for your country, checked against the published source.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<div class="container" style="padding-top:26px">
+
+  <div class="section-head">
+    <div>
+      <h2 class="rule">Opportunities</h2>
+      <p class="small muted" style="margin-top:6px;max-width:62ch">
+        Гранты, роли в консорциумах, академические и индустриальные позиции, поиск соавторов.
+        Для каждой возможности показан вердикт по праву участия для выбранной вами страны — со ссылкой на первоисточник.
+      </p>
+    </div>
+  </div>
+
+  <!-- профиль читателя: от него зависят вердикты -->
+  <div class="opp-profile">
+    <div>
+      <label for="of-country">Моя страна</label>
+      <select id="of-country"></select>
+    </div>
+    <div>
+      <label for="of-stage">Моя стадия карьеры</label>
+      <select id="of-stage">
+        <option value="any">Студент / магистрант</option>
+        <option value="phd_student">PhD-кандидат</option>
+        <option value="phd_plus" selected>PhD / Researcher</option>
+        <option value="postdoc_plus">Postdoc</option>
+        <option value="pi_only">Professor / PI</option>
+      </select>
+    </div>
+    <p class="opp-profile-note">
+      Пока это не сохранённый профиль, а выбор на время просмотра — он попадает в ссылку,
+      поэтому страницу можно переслать коллеге вместе с настройками.
+    </p>
+  </div>
+
+  <!-- фильтры -->
+  <div class="filters" id="opp-filters">
+    <input type="text" id="of-q" class="search-input" placeholder="Поиск по названию, организации, теме…">
+    <select id="of-type"><option value="">Все типы</option></select>
+    <select id="of-field"><option value="">Все области науки</option></select>
+    <label class="opp-check"><input type="checkbox" id="of-elig"> Только те, куда я прохожу</label>
+    <label class="opp-check"><input type="checkbox" id="of-open" checked> Скрыть истёкшие</label>
+  </div>
+
+  <p class="small muted" id="opp-count" style="margin-bottom:14px">Загружаем возможности…</p>
+
+  <div id="opp-list"></div>
+
+</div>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="assets/js/app.js"></script>
+<script>
+(async () => {
+  await QIST.boot('opportunities.html');
+
+  const $ = id => document.getElementById(id);
+  const list = $('opp-list'), count = $('opp-count');
+
+  /* ---------- загрузка данных: явные состояния загрузки и ошибки ---------- */
+  let opps, elig;
+  try {
+    [opps, elig] = await Promise.all([QIST.getOpportunities(), QIST.getEligibility()]);
+  } catch (err) {
+    console.error('Не удалось загрузить возможности:', err);
+    count.textContent = '';
+    list.innerHTML = `<div class="card pad-lg opp-empty">
+      <h3>Не удалось загрузить список</h3>
+      <p class="small muted">Проверьте соединение и обновите страницу. Если повторится — напишите нам, это ошибка на нашей стороне.</p>
+      <button class="btn btn-outline" onclick="location.reload()">Обновить</button></div>`;
+    return;
+  }
+
+  /* ---------- заполняем справочники ---------- */
+  Object.entries(elig.countries).forEach(([code, name]) =>
+    $('of-country').insertAdjacentHTML('beforeend', `<option value="${code}">${QIST.esc(name)}</option>`));
+
+  const usedTypes = [...new Set(opps.map(o => o.type))];
+  usedTypes.forEach(t => $('of-type').insertAdjacentHTML('beforeend',
+    `<option value="${t}">${QIST.esc(QIST.OPPORTUNITY_TYPES[t] || t)}</option>`));
+
+  [...new Set(opps.flatMap(o => o.fields || []))].sort().forEach(f =>
+    $('of-field').insertAdjacentHTML('beforeend', `<option value="${QIST.esc(f)}">${QIST.esc(f)}</option>`));
+
+  /* ---------- состояние живёт в адресной строке ---------- */
+  const IDS = { country:'of-country', stage:'of-stage', q:'of-q', type:'of-type', field:'of-field' };
+  function readUrl() {
+    const p = new URLSearchParams(location.search);
+    Object.entries(IDS).forEach(([k, id]) => { if (p.has(k)) $(id).value = p.get(k); });
+    if (p.has('elig')) $('of-elig').checked = p.get('elig') === '1';
+    if (p.has('open')) $('of-open').checked = p.get('open') === '1';
+  }
+  function writeUrl() {
+    const p = new URLSearchParams();
+    Object.entries(IDS).forEach(([k, id]) => { if ($(id).value) p.set(k, $(id).value); });
+    if ($('of-elig').checked) p.set('elig', '1');
+    if (!$('of-open').checked) p.set('open', '0');
+    history.replaceState(null, '', p.toString() ? '?' + p : location.pathname);
+  }
+  readUrl();
+
+  /* ---------- отрисовка ---------- */
+  const VERDICT_CLASS = { ok:'ok', bad:'bad', unk:'unk' };
+  const VERDICT_MARK  = { ok:'✓', bad:'✗', unk:'?' };
+
+  function card(o, country, stage) {
+    const c = QIST.checkCountry(o, country, elig);
+    const s = QIST.checkStage(o, stage);
+    const expired = QIST.isExpired(o);
+    const left = QIST.daysLeft(o);
+
+    const deadline = !o.deadline
+      ? '<span class="muted">без дедлайна</span>'
+      : expired
+        ? `<span class="opp-expired">дедлайн прошёл ${QIST.esc(o.deadline)}</span>`
+        : `дедлайн <b class="deadline">через ${left} дн.</b>`;
+
+    const src = c.source
+      ? `<div class="opp-src">Источник: <a href="${QIST.esc(c.source.url)}" target="_blank" rel="noopener">${QIST.esc(c.source.name)}</a>${c.source.version ? ', ' + QIST.esc(c.source.version) : ''}${c.source.date ? ' от ' + QIST.esc(c.source.date) : ''}</div>`
+      : '';
+
+    const stageLabel = elig.career_stages[o.career_stage] || o.career_stage;
+
+    return `<article class="card opp-card${expired ? ' is-expired' : ''}" id="opp-${QIST.esc(o.id)}">
+      <div class="opp-head">
+        <span class="opp-type">${QIST.esc(QIST.OPPORTUNITY_TYPES[o.type] || o.type)}</span>
+        <h3>${QIST.esc(o.title)}</h3>
+      </div>
+      <div class="opp-meta">
+        <span>${QIST.esc(o.organization)}</span>
+        ${o.city ? `<span>📍 ${QIST.esc(o.city)}</span>` : ''}
+        <span>${deadline}</span>
+        <span class="opp-fund opp-fund-${QIST.esc(o.funding_status)}">${QIST.esc(QIST.FUNDING_LABELS[o.funding_status] || o.funding_status)}</span>
+      </div>
+      <p class="opp-sum">${QIST.esc(o.summary)}</p>
+
+      <div class="opp-elig">
+        <div class="opp-elig-row">
+          <span class="k">Страна</span>
+          <span class="v">${QIST.esc(c.text)}${o.eligibility && o.eligibility.note ? ' ' + QIST.esc(o.eligibility.note) + '.' : ''}</span>
+          <span class="verdict v-${VERDICT_CLASS[c.verdict]}">${VERDICT_MARK[c.verdict]} ${QIST.esc(c.label)}</span>
+        </div>
+        <div class="opp-elig-row">
+          <span class="k">Стадия</span>
+          <span class="v">Требуется: ${QIST.esc(stageLabel)}.</span>
+          <span class="verdict v-${s.ok ? 'ok' : 'bad'}">${s.ok ? '✓ подходит' : '✗ не подходит'}</span>
+        </div>
+        ${src}
+      </div>
+
+      ${o.role_expected ? `<p class="opp-role"><span>Ожидаемая роль:</span> ${QIST.esc(o.role_expected)}${o.workload ? ' · ' + QIST.esc(o.workload) : ''}</p>` : ''}
+      ${(o.fields || []).length ? `<div class="tags">${o.fields.map(f => `<span class="tag">${QIST.esc(f)}</span>`).join('')}</div>` : ''}
+
+      <div class="opp-actions">
+        <button class="btn btn-primary" data-interest="${QIST.esc(o.id)}"${expired ? ' disabled' : ''}>Интересно</button>
+        ${o.source_url ? `<a class="btn btn-outline" href="${QIST.esc(o.source_url)}" target="_blank" rel="noopener">Первоисточник →</a>` : ''}
+        <button class="btn btn-ghost" data-dismiss="${QIST.esc(o.id)}">Не подходит</button>
+      </div>
+    </article>`;
+  }
+
+  const dismissed = new Set();
+
+  function render() {
+    writeUrl();
+    const country = $('of-country').value, stage = $('of-stage').value;
+    const q = $('of-q').value.trim().toLowerCase();
+    const type = $('of-type').value, field = $('of-field').value;
+    const onlyElig = $('of-elig').checked, hideExpired = $('of-open').checked;
+
+    const shown = opps.filter(o => {
+      if (dismissed.has(o.id)) return false;
+      if (type && o.type !== type) return false;
+      if (field && !(o.fields || []).includes(field)) return false;
+      if (hideExpired && QIST.isExpired(o)) return false;
+      if (onlyElig) {
+        if (QIST.checkCountry(o, country, elig).verdict !== 'ok') return false;
+        if (!QIST.checkStage(o, stage).ok) return false;
+      }
+      if (q) {
+        const hay = `${o.title} ${o.organization} ${o.summary} ${(o.fields || []).join(' ')} ${(o.methods_required || []).join(' ')}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+
+    count.innerHTML = shown.length
+      ? `<b>${shown.length}</b> из ${opps.length} возможностей`
+      : '';
+
+    list.innerHTML = shown.length
+      ? shown.map(o => card(o, country, stage)).join('')
+      : `<div class="card pad-lg opp-empty">
+           <h3>Под эти условия ничего не подошло</h3>
+           <p class="small muted">Сейчас в базе ${opps.length} возможностей — это мало, и мы это знаем.
+             Снимите часть фильтров или подпишитесь, чтобы получать новые по мере поступления.</p>
+           <button class="btn btn-outline" id="opp-reset">Сбросить фильтры</button>
+         </div>`;
+
+    const reset = $('opp-reset');
+    if (reset) reset.addEventListener('click', () => {
+      $('of-q').value = ''; $('of-type').value = ''; $('of-field').value = '';
+      $('of-elig').checked = false; $('of-open').checked = true;
+      render();
+    });
+  }
+
+  /* ---------- действия ---------- */
+  list.addEventListener('click', async (e) => {
+    const dis = e.target.closest('[data-dismiss]');
+    if (dis) { dismissed.add(dis.dataset.dismiss); render(); QIST.toast('Скрыто до конца сессии. Причины отказа начнут собираться, когда подключим приём откликов.'); return; }
+
+    const btn = e.target.closest('[data-interest]');
+    if (!btn) return;
+    const o = opps.find(x => x.id === btn.dataset.interest);
+    btn.disabled = true; btn.textContent = 'Отправляем…';
+    const res = await QIST.recordInterest(o, { country: $('of-country').value, stage: $('of-stage').value });
+    if (res.ok) {
+      btn.textContent = '✓ Отклик отправлен';
+      QIST.toast('Отклик записан. Куратор свяжется с вами по этой возможности.');
+    } else if (res.reason === 'not_configured') {
+      btn.disabled = false; btn.textContent = 'Интересно';
+      QIST.toast('Приём откликов ещё не подключён: задайте QIST.INTEREST_ENDPOINT в assets/js/app.js. Инструкция — в README.');
+    } else {
+      btn.disabled = false; btn.textContent = 'Интересно';
+      QIST.toast('Не удалось отправить отклик. Попробуйте ещё раз или откройте первоисточник.');
+    }
+  });
+
+  ['of-country','of-stage','of-type','of-field'].forEach(id => $(id).addEventListener('change', render));
+  ['of-elig','of-open'].forEach(id => $(id).addEventListener('change', render));
+  $('of-q').addEventListener('input', render);
+
+  render();
+})();
+</script>
+</body>
+</html>
