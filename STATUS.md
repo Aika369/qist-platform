@@ -1,6 +1,6 @@
 # STATUS
 
-Updated: 2026-09-19 · Iterations 1–4
+Updated: 2026-09-19 · Iterations 1–5
 
 ## Works
 
@@ -25,9 +25,33 @@ page, a country list cannot be saved without the source it came from, duplicate 
 unknown country codes are caught before saving — then hands back the finished
 `data/opportunities.json` to commit. It needs no backend. Linked from `admin.html`.
 
-**Navigation** — Home · Opportunities · Researchers · About QIST
+**Navigation** — Home · Opportunities · Researchers · For organizations · About QIST
 Map and globe are views inside Researchers, not sections. Matching is not in public
-navigation: it is personal and belongs behind sign-in.
+navigation: it is personal and belongs behind sign-in. "For organizations" is the only
+audience item on the site, and it is a deliberate exception (D-27).
+
+**For organizations** — `organizations.html`
+One page, two readings: a switch at the top rewrites the page for a university or a company
+and tags every submission with `audience`, so the data decides later whether to split it.
+Three things a visitor can actually do:
+
+1. **Post a need** — an R&D problem, a vacancy, a consortium partner or a single expert
+   question. It reaches a curator, who publishes it in Opportunities with the organisation
+   named. Nothing appears on the site automatically.
+2. **Find researchers** — a real search across all 497 directory records by field, country
+   and free text, not a mock-up. "Request an introduction" opens inline and states, before
+   anything is sent, that contact details are never passed on without that person's consent.
+   No researcher's email is in the payload, because we do not hold one.
+3. **Book 30 minutes** — a discovery call. The page says plainly there is nothing to buy.
+
+A block at the bottom lists what does not exist yet — no organisation accounts, no verified
+badges, no paid product — and its counters are computed from the data at load time, so they
+cannot rot into a lie.
+
+**Create profile** — `login.html`
+The header button says "Create profile" and now does it: without a backend it collects a real
+request through Formspree and a curator creates the profile by hand. It does not ask for a
+password, because there is nowhere to keep one.
 
 **Honesty fixes**
 - Hard-coded admin credentials removed from the public JS *and* from the sign-in page text.
@@ -67,8 +91,8 @@ Researchers' own names are left exactly as recorded.
 
 ## Verified
 
-102 automated checks in headless Chromium across `test.mjs` (21), `test2.mjs` (16),
-`test3.mjs` (19), `test4.mjs` (16) and `test5.mjs` (30). Covering: eligibility verdicts across two programmes and nine countries,
+137 automated checks in headless Chromium across `test.mjs` (21), `test2.mjs` (17),
+`test3.mjs` (19), `test4.mjs` (16), `test5.mjs` (30) and `test6.mjs` (34). Covering: eligibility verdicts across two programmes and nine countries,
 filters, empty and error states, expired entries, button behaviour with no endpoint
 configured, absence of the admin password anywhere in the build, honest counters, coordinate
 precision labels, the full 250-country selector, English-only interface text, and no
@@ -81,6 +105,12 @@ code caught, country list without a source rejected, record saved, draft survivi
 reset back to the committed file. It found three real defects on its first run: two records
 carrying `country: "OTHER"` instead of an ISO code, and 529px of horizontal scroll on the new
 screen at phone width. All three are fixed.
+
+`test6.mjs` covers the organizations page against a local receiver, because formspree.io is
+unreachable from the sandbox: it checks that all four submission kinds (`org_need`,
+`org_introduction`, `org_conversation`, `profile_request`) actually leave the browser with the
+right body and the `Accept: application/json` header Formspree needs, that a malformed email
+sends nothing at all, and that no researcher contact detail is in any payload.
 
 `L is not defined` on map.html appears only in the sandbox, where unpkg.com is blocked.
 Leaflet loads on the live site — checked 2026-09-14. **The country-marker logic on the map
@@ -115,6 +145,11 @@ message came from a browser cache holding the previous `app.js`.
 2. **Curate weekly, not once.** Open `curate.html`, add what you find, download the file, commit.
    Twenty records is a demo; a hundred with live deadlines is a product. Three entries are already
    expired — B-21 is the habit of checking them, not a feature.
-3. **B-18 is still open.** The nine countries' Horizon Europe statuses have not been checked by a
+3. **Answer the new inbox.** The organizations page promises a reply within two working days.
+   Decide who reads `org_need`, `org_introduction`, `org_conversation` and `profile_request`,
+   and how fast (B-25). An unanswered promise is noticed on the first submission.
+4. **Ten to fifteen conversations with universities** (B-26). That is what this page exists for,
+   and what the paid product has to be built on.
+5. **B-18 is still open.** The nine countries' Horizon Europe statuses have not been checked by a
    human against the EC PDF. One automated read of that document was already wrong about three of
    them.

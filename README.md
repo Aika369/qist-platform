@@ -162,6 +162,27 @@ Source: European Commission, *List of Participating Countries in Horizon Europe*
 countries against the source before a public launch**, and record who did it in
 `verification.reviewed_by`.
 
+## For organizations (итерация 5, 19.09.2026)
+
+`organizations.html` — единственная аудиторная страница сайта. Переключатель наверху
+(`?as=university` / `?as=company`) меняет тексты и проставляет поле `audience` в заявке;
+отдельных страниц для университетов и индустрии нет намеренно (DECISIONS.md D-28).
+
+Три действия, все через `QIST.submitOrgRequest(kind, subject, payload)` → `QIST.SIGNUP_ENDPOINT`:
+
+| `kind` | Откуда | Что внутри |
+|---|---|---|
+| `org_need` | форма «Post a need» | тип, заголовок, описание, область, стадия, страна, статус финансирования, дедлайн, организация, контакт |
+| `org_introduction` | карточка исследователя | `researcher_id`, `researcher_name`, `researcher_org`, `from_email` |
+| `org_conversation` | форма «Book 30 minutes» | организация, контакт, страна, цель разговора |
+| `profile_request` | кнопка «Create profile» в шапке (`login.html`) | имя, почта, должность, организация, страна, темы, публичная ссылка |
+
+**Контакты исследователей не передаются.** Запрос знакомства уходит в QIST, QIST спрашивает
+человека. В теле запроса нет и не может быть его почты — её нет в `data/people.json`.
+
+**Пароли не собираются нигде.** Пока бэкенд не развёрнут, `login.html` показывает форму заявки
+без поля пароля: хранить его негде (D-29).
+
 ## Структура разделов
 
 | Раздел | Файл | Что внутри |

@@ -6,7 +6,7 @@ not just the changed ones. Replace the repo contents with it and the mismatch ca
 
 ## Option A — GitHub in the browser (no tools)
 
-1. Unzip this archive. You get a folder with 33 files, including `assets/` and `data/`.
+1. Unzip this archive. You get a folder with 34 files, including `assets/` and `data/`.
 2. Open `https://github.com/Aika369/qist-platform`
 3. **Add file → Upload files**
 4. Open the unzipped folder on your computer, **select everything inside it**
@@ -31,7 +31,7 @@ Wait about a minute after committing, then open the live site and press `F12` �
 The first line should read:
 
 ```
-QIST build 2026-09-19a
+QIST build 2026-09-19b
 ```
 
 If it says anything else, or nothing, the JavaScript file did not reach the server.
@@ -50,6 +50,15 @@ country list beats our programme table:
   *not eligible*; with **Uzbekistan**, *eligible*. The source link under the verdict should
   point at the Schlumberger Foundation's own eligibility PDF, not at our table.
 - Open **TWAS–FAPESP**. Kazakhstan eligible, Georgia not.
+
+Then open **For organizations** in the menu. Check three things:
+
+- the switch at the top changes the headline between university and company;
+- **Find researchers** shows 12 cards and the filters change the count;
+- fill the **Post a need** form with anything and send it — the submission must appear in your
+  Formspree dashboard with `kind: org_need`. Do the same for **Book 30 minutes** and for
+  **Create profile** in the header. Four kinds of message now arrive in that one inbox:
+  `org_need`, `org_introduction`, `org_conversation`, `profile_request`.
 
 Then open `curate.html` (there is a link at the top of `admin.html`). It should list all 20
 records, and the **Add to the working list** button should be greyed out until you fill in a
@@ -75,7 +84,7 @@ HTML was new, but the browser was still running a cached copy of `app.js`. A har
 fixes that — `Ctrl+Shift+R` on Windows, `Cmd+Shift+R` on Mac.
 
 From this release the problem is handled in code: every local script and stylesheet is
-requested with a version marker, e.g. `assets/js/app.js?v=2026-09-19a`. A browser treats a
+requested with a version marker, e.g. `assets/js/app.js?v=2026-09-19b`. A browser treats a
 changed query string as a different file and must fetch it, so visitors stop getting a mix
 of new HTML and old JavaScript.
 

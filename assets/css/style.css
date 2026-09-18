@@ -545,3 +545,61 @@ table.data tr:hover td { background: var(--paper); }
 .cur-grid > *, .cur-form > *, .cur-fs > *, .cur-row-2 > *, .cur-side > * { min-width: 0; max-width: 100%; }
 .cur-form label, .cur-form select, .cur-fields, .cur-list { min-width: 0; max-width: 100%; }
 .cur-form select { text-overflow: ellipsis; }
+
+/* ================= For organizations (organizations.html) =================
+   The only audience page on the site. Its job is to collect three things — a posted need,
+   an introduction request and a discovery call — so the forms are the page, not decoration. */
+.org-hero { background: var(--navy); color: var(--gold-soft); padding: 40px 0 34px; border-bottom: 3px solid var(--gold); }
+.org-hero h1 { font-family: var(--serif); font-size: clamp(1.6rem, 3.4vw, 2.5rem); line-height: 1.2; color: #fff; margin: 16px 0 10px; max-width: 22ch; }
+.org-sub { color: rgba(244,233,210,.82); font-size: .98rem; line-height: 1.6; max-width: 62ch; }
+.org-jump { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+.org-jump .btn-ghost { color: var(--gold-soft); border: 1px solid rgba(181,138,46,.5); }
+.org-jump .btn-ghost:hover { background: rgba(181,138,46,.18); }
+
+.org-switch { display: inline-flex; border: 1px solid rgba(181,138,46,.55); border-radius: 999px; overflow: hidden; background: rgba(0,0,0,.18); }
+.org-switch button {
+  font: inherit; font-size: .82rem; font-weight: 600; padding: 7px 16px; border: 0;
+  background: transparent; color: rgba(244,233,210,.72); cursor: pointer;
+}
+.org-switch button[aria-selected="true"] { background: var(--gold); color: #fff; }
+
+.org-block { margin-bottom: 44px; scroll-margin-top: 20px; }
+
+.org-form { display: flex; flex-direction: column; gap: 14px; text-align: left; }
+.org-form label { display: flex; flex-direction: column; gap: 5px; font-size: .82rem; font-weight: 600; color: var(--ink); min-width: 0; }
+.org-form input[type=text], .org-form input[type=email], .org-form input[type=date],
+.org-form select, .org-form textarea {
+  font: inherit; font-size: .9rem; font-weight: 400; padding: 9px 11px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--paper);
+  color: var(--ink); width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box;
+}
+.org-form textarea { resize: vertical; line-height: 1.55; }
+.org-form input:focus, .org-form select:focus, .org-form textarea:focus { outline: 2px solid var(--gold); outline-offset: 1px; background: var(--card); }
+.org-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.org-row-2 > * { min-width: 0; }
+.org-note { font-size: .8rem; color: var(--ink-soft); line-height: 1.55; background: var(--paper-2); border-left: 3px solid var(--gold); padding: 10px 13px; border-radius: 0 8px 8px 0; }
+.org-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+.org-card-foot { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.org-intro { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.org-intro p { color: var(--ink-soft); line-height: 1.5; }
+.org-intro-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.org-intro-row .search-input { flex: 1; min-width: 150px; }
+.org-more { display: flex; justify-content: center; margin-top: 18px; }
+
+.org-honest { text-align: left; }
+.org-honest h3 { margin-bottom: 10px; }
+.org-honest ul { list-style: none; display: flex; flex-direction: column; gap: 9px; font-size: .86rem; color: var(--ink-soft); line-height: 1.55; }
+.org-honest li::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 9px; vertical-align: middle; }
+.org-honest.ok  { border-top: 3px solid var(--teal); }
+.org-honest.ok  li::before { background: var(--teal); }
+.org-honest.gap { border-top: 3px solid var(--red); }
+.org-honest.gap li::before { background: var(--red); }
+
+@media (max-width: 640px) {
+  .org-row-2 { grid-template-columns: 1fr; }
+  .org-switch { display: flex; width: 100%; }
+  .org-switch button { flex: 1; padding: 8px 10px; }
+  .org-jump { flex-direction: column; align-items: stretch; }
+  .org-jump .btn { text-align: center; }
+}

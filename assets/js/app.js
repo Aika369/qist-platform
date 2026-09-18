@@ -8,7 +8,7 @@
 const QIST = {
   /* Build stamp. Open the browser console on the live site: if this does not match the
      release you uploaded, the file did not reach the server. */
-  BUILD: '2026-09-19a',
+  BUILD: '2026-09-19b',
 
   // Set to a deployed FastAPI URL (e.g. "https://api.qist.org") to go live.
   // Can also be overridden without redeploy: localStorage.setItem('qist_api_url', '...')
@@ -210,12 +210,16 @@ const QIST = {
   /* ---------- shared chrome ---------- */
   renderHeader(active) {
     const u = this.currentUser();
-    // Public navigation lists objects, never audiences. See DECISIONS.md D-01.
-    // map.html and matching.html are deliberately absent: the map is a view inside
-    // Researchers, and matching is personal, so it lives behind sign-in.
+    /* Public navigation lists objects, never audiences — with one deliberate exception.
+       "For organizations" is the only audience item, because a university research office
+       and a company arrive with a different question from a researcher: they want to put
+       work in, not take opportunities out. See DECISIONS.md D-01 and D-27.
+       map.html and matching.html are still absent: the map is a view inside Researchers,
+       and matching is personal, so it lives behind sign-in. */
     const links = [
       ['index.html', 'Home'], ['opportunities.html', 'Opportunities'],
-      ['directory.html', 'Researchers'], ['about.html', 'About QIST']
+      ['directory.html', 'Researchers'], ['organizations.html', 'For organizations'],
+      ['about.html', 'About QIST']
     ];
     const nav = links.map(([href, label]) =>
       `<a href="${href}" class="${active === href ? 'active' : ''}">${label}</a>`).join('');
@@ -224,7 +228,7 @@ const QIST = {
          ${u.role === 'admin' ? '<a class="btn btn-primary btn-sm" href="admin.html">Admin</a>' : ''}
          <button class="btn btn-ghost btn-sm" onclick="QIST.logout()">Sign out</button>`
       : `<a class="btn btn-ghost btn-sm" href="login.html">Sign in</a>
-         <a class="btn btn-primary btn-sm" href="login.html#register">Join QIST</a>`;
+         <a class="btn btn-primary btn-sm" href="login.html#register">Create profile</a>`;
     document.getElementById('site-header').innerHTML = `
       <div class="container">
         <a class="brand" href="index.html"><span class="seal">Q</span> QIST</a>
@@ -662,6 +666,23 @@ const QIST = {
       `<optgroup label="All countries">${rest.map(opt).join('')}</optgroup>`;
   },
   hasPreciseGeo(person) { return (person.geo_precision || (person.city ? 'city' : 'country')) === 'city'; },
+
+  /* Everything an organization sends goes through one function, so every request lands in the
+     same inbox with a `kind` we can count later. Three kinds today:
+       org_need           — a posted R&D task, vacancy or consortium search (goes to the curator)
+       org_introduction   — a request to be introduced to a named researcher
+       org_conversation   — a request for a 30-minute discovery call
+     No contact detail of a researcher is ever returned by this call. An introduction request
+     reaches QIST, and QIST asks that person first: PRD, "контакт не раскрывается без согласия". */
+  async submitOrgRequest(kind, subject, payload) {
+    return this.submitForm(this.SIGNUP_ENDPOINT, {
+      _subject: subject,
+      kind,
+      ...payload,
+      page: 'organizations.html',
+      at: new Date().toISOString()
+    });
+  },
 
   async recordInterest(opp, ctx) {
     return this.submitForm(this.INTEREST_ENDPOINT, {

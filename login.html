@@ -6,7 +6,7 @@
 <title>Sign in — QIST</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-19a">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-19b">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
@@ -67,7 +67,7 @@
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/app.js?v=2026-09-19a"></script>
+<script src="assets/js/app.js?v=2026-09-19b"></script>
 <script>
 (async () => {
   await QIST.boot('login.html');
@@ -77,22 +77,73 @@
   // Accounts live on the server only. Until it is deployed we do not pretend registration
   // works: it used to write the account into the visitor's own localStorage.
   if (!QIST.authAvailable()) {
+    /* No server, so there is no account to create — but "Create profile" in the header must
+       still do what it says. It now collects a real request that reaches us by email, and a
+       curator creates the profile by hand until the backend is deployed (DECISIONS.md D-29).
+       No password field: asking for a password we have nowhere to store would be worse than
+       the dead end it replaces. */
     document.querySelector('.auth-wrap').innerHTML = `
-      <div class="card auth-card" style="padding:30px 32px">
-        <h2 style="margin-bottom:10px">Accounts are not connected yet</h2>
-        <p class="small muted" style="margin-bottom:14px">
-          Profiles, saved opportunities and personal matching arrive once we deploy the server.
-          Until then signing in would only look like it worked: the account would stay in your
-          browser and never reach us, so we turned it off.
+      <div class="card auth-card org-form" style="padding:30px 32px;text-align:left">
+        <h2 style="margin-bottom:8px">Create your profile</h2>
+        <p class="small muted" style="margin-bottom:16px">
+          Sign-in accounts arrive with the server. Until then a curator creates profiles by hand —
+          send this and we will write back from ${QIST.esc(QIST.CONTACT_EMAIL || 'the QIST team')}.
+          We do not ask for a password, because we have nowhere to keep it yet.
         </p>
-        <p class="small muted" style="margin-bottom:18px">
-          To hear about the launch, join the pilot list. Browsing opportunities already works.
+        <form id="req-form" style="display:flex;flex-direction:column;gap:13px">
+          <label>Full name<input type="text" id="q-name" required placeholder="Aigerim Bekova"></label>
+          <label>Email<input type="email" id="q-email" required placeholder="you@university.edu"></label>
+          <div class="org-row-2">
+            <label>Position / title<input type="text" id="q-title" placeholder="PhD Student"></label>
+            <label>Institution<input type="text" id="q-inst" placeholder="Nazarbayev University"></label>
+          </div>
+          <label>Country<select id="q-country"></select></label>
+          <label>Research topics, comma separated<input type="text" id="q-topics" placeholder="machine learning, optimization"></label>
+          <label>Link to a public profile — ORCID, Scholar, your university page
+            <input type="text" id="q-link" placeholder="https://orcid.org/…">
+          </label>
+          <p class="org-note">
+            We publish name, title, organisation, country, research fields and that public link.
+            <b>Email addresses are never published in the directory.</b> You can ask us to change or
+            delete the profile at any time, with no justification — see <a href="about.html#data">About QIST</a>.
+          </p>
+          <button class="btn btn-primary" type="submit" id="q-send">Send the request</button>
+          <span class="small muted" id="q-state"></span>
+        </form>
+        <p class="small muted" style="margin-top:16px">
+          From a university or a company? <a href="organizations.html">For organizations</a> has the
+          form for posting work, not a personal profile.
         </p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <a class="btn btn-primary" href="index.html#pilot">Join the pilot</a>
-          <a class="btn btn-outline" href="opportunities.html">Browse opportunities</a>
-        </div>
       </div>`;
+
+    const s = id => document.getElementById(id);
+    try { QIST.fillCountrySelect(s('q-country'), await QIST.getEligibility(), 'KZ'); } catch (_) {}
+
+    s('req-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = s('q-send'), state = s('q-state');
+      btn.disabled = true; btn.textContent = 'Sending…';
+      const res = await QIST.submitForm(QIST.SIGNUP_ENDPOINT, {
+        _subject: 'Profile request: ' + s('q-name').value.trim(),
+        kind: 'profile_request',
+        name: s('q-name').value.trim(), email: s('q-email').value.trim(),
+        title: s('q-title').value.trim(), institution: s('q-inst').value.trim(),
+        country: s('q-country').value,
+        topics: s('q-topics').value.split(',').map(x => x.trim()).filter(Boolean).join(', '),
+        public_link: s('q-link').value.trim(),
+        at: new Date().toISOString()
+      });
+      if (res.ok) {
+        btn.textContent = '✓ Sent';
+        state.textContent = 'We will write back within a few working days.';
+        s('req-form').reset();
+      } else {
+        btn.disabled = false; btn.textContent = 'Send the request';
+        state.textContent = res.reason === 'not_configured'
+          ? 'Submissions are not wired up yet: set QIST.SIGNUP_ENDPOINT in assets/js/app.js.'
+          : 'Could not send that. Try again, or write to ' + (QIST.CONTACT_EMAIL || 'the QIST team') + '.';
+      }
+    });
     return;
   }
 
