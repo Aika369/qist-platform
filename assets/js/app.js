@@ -8,7 +8,7 @@
 const QIST = {
   /* Build stamp. Open the browser console on the live site: if this does not match the
      release you uploaded, the file did not reach the server. */
-  BUILD: '2026-09-18d',
+  BUILD: '2026-09-18e',
 
   // Set to a deployed FastAPI URL (e.g. "https://api.qist.org") to go live.
   // Can also be overridden without redeploy: localStorage.setItem('qist_api_url', '...')

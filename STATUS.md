@@ -72,6 +72,13 @@ Two things changed because of it:
 - When you upload a release, upload **every file in the zip**, including the `assets/` and
   `data/` folders. Dragging only the changed HTML is what caused this.
 
+## Live check, 2026-09-18
+
+Verified directly against `aika369.github.io/qist-platform/opportunities.html`:
+build `2026-09-18d` served, 7 cards, 250 countries in two groups, 35 research fields,
+no deploy-guard message. The site works. The earlier "page is newer than the files"
+message came from a browser cache holding the previous `app.js`.
+
 ## Next
 
 Endpoints are configured (`formspree.io/f/xyezzgdo`, `info@qista.org`). After this release is

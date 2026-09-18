@@ -31,7 +31,7 @@ Wait about a minute after committing, then open the live site and press `F12` â†
 The first line should read:
 
 ```
-QIST build 2026-09-18d
+QIST build 2026-09-18e
 ```
 
 If it says anything else, or nothing, the JavaScript file did not reach the server.
@@ -55,3 +55,18 @@ INTEREST_ENDPOINT: 'https://formspree.io/f/xyezzgdo',
 SIGNUP_ENDPOINT:   'https://formspree.io/f/xyezzgdo',
 CONTACT_EMAIL:     'info@qista.org',
 ```
+
+## About the browser cache
+
+On 2026-09-18 the site looked broken while the server already held the correct files: the
+HTML was new, but the browser was still running a cached copy of `app.js`. A hard reload
+fixes that â€” `Ctrl+Shift+R` on Windows, `Cmd+Shift+R` on Mac.
+
+From this release the problem is handled in code: every local script and stylesheet is
+requested with a version marker, e.g. `assets/js/app.js?v=2026-09-18e`. A browser treats a
+changed query string as a different file and must fetch it, so visitors stop getting a mix
+of new HTML and old JavaScript.
+
+**When you next change `app.js`, `globe.js` or `style.css`, bump the version in two places:**
+`BUILD` at the top of `assets/js/app.js`, and every `?v=` value in the HTML files.
+Forget it, and returning visitors may keep the old file for up to ten minutes.
