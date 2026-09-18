@@ -471,3 +471,12 @@ table.data tr:hover td { background: var(--paper); }
   background: #6b7a8c; color: #fff; border: 2px dashed var(--gold-soft);
   font: 700 .82rem var(--sans); box-shadow: var(--shadow);
 }
+
+/* Long field names (e.g. "Politics, International Relations, and Public Policy") stretch
+   a <select> to its widest option and pushed the page sideways on a phone. */
+.filters select, .filters .search-input { max-width: 100%; min-width: 0; }
+@media (max-width: 640px) {
+  .filters { flex-direction: column; align-items: stretch; }
+  .filters select, .filters .search-input { width: 100%; }
+  .opp-check { justify-content: flex-start; }
+}

@@ -6,6 +6,10 @@
    functional on GitHub Pages.
    ============================================================ */
 const QIST = {
+  /* Build stamp. Open the browser console on the live site: if this does not match the
+     release you uploaded, the file did not reach the server. */
+  BUILD: '2026-09-18d',
+
   // Set to a deployed FastAPI URL (e.g. "https://api.qist.org") to go live.
   // Can also be overridden without redeploy: localStorage.setItem('qist_api_url', '...')
   apiBase: localStorage.getItem('qist_api_url') || '',
@@ -113,9 +117,9 @@ const QIST = {
     return h;
   },
 
-  /* Учётные записи существуют только на сервере.
-     Раньше здесь лежали демо-логин и пароль администратора прямо в публичном JS —
-     любой посетитель мог войти в админку. Удалено 2026-09-18, см. DECISIONS D-11. */
+  /* Accounts exist on the server only.
+     This used to hold a demo login and the administrator password in public JS, so any
+     visitor could sign into the admin console. Removed 2026-09-18, see DECISIONS D-11. */
   authAvailable() { return this.apiAlive; },
 
   async login(email, password) {
@@ -129,7 +133,7 @@ const QIST = {
       localStorage.setItem('qist_session', JSON.stringify(data));
       return data;
     }
-    // Бэкенд недоступен — честно говорим, что входа нет, вместо поддельной сессии.
+    // No backend: say so plainly instead of handing out a fake session.
     throw new Error('NO_BACKEND');
   },
 
@@ -144,8 +148,8 @@ const QIST = {
       localStorage.setItem('qist_session', JSON.stringify(data));
       return data;
     }
-    // Регистрация в localStorage создавала иллюзию аккаунта: данные оставались
-    // в браузере посетителя и до нас не доходили. Убрано 2026-09-18.
+    // Registering into localStorage created the illusion of an account: the data stayed
+    // in the visitor's browser and never reached us. Removed 2026-09-18.
     throw new Error('NO_BACKEND');
   },
 
@@ -195,7 +199,7 @@ const QIST = {
           <h3>${this.esc(p.name)}</h3>
           <div class="role">${this.esc(p.title || '')}${p.institution ? ' · ' + this.esc(p.institution) : ''}</div>
           ${(p.city || p.country) ? `<div class="loc">${this.hasPreciseGeo(p) ? '📍' : '🌐'} ${this.esc(this.geoLabel(p))}</div>` : ''}
-          ${p.possible_duplicate_of ? '<div class="loc" style="color:var(--red)">возможный дубликат записи — на проверке</div>' : ''}
+          ${p.possible_duplicate_of ? '<div class="loc" style="color:var(--red)">possible duplicate record — under review</div>' : ''}
         </div>
       </div>
       <div class="tags">${tags}</div>
@@ -206,9 +210,9 @@ const QIST = {
   /* ---------- shared chrome ---------- */
   renderHeader(active) {
     const u = this.currentUser();
-    // Публичное меню — только объекты, не аудитории. См. DECISIONS.md D-01.
-    // map.html и matching.html намеренно не в меню: карта — это вид внутри
-    // Researchers, подбор персонален и живёт за входом.
+    // Public navigation lists objects, never audiences. See DECISIONS.md D-01.
+    // map.html and matching.html are deliberately absent: the map is a view inside
+    // Researchers, and matching is personal, so it lives behind sign-in.
     const links = [
       ['index.html', 'Home'], ['opportunities.html', 'Opportunities'],
       ['directory.html', 'Researchers'], ['about.html', 'About QIST']
@@ -262,17 +266,16 @@ const QIST = {
   },
 
   /* ---------- QIST primary research fields ----------
-     The canonical list researchers pick from. Keep this array as the
-     single source of truth — the map, directory and matching pages all
-     read it from here.
+     The canonical list researchers pick from. Keep this array as the single source of
+     truth — the map, directory and matching pages all read it from here.
 
      Records may carry their own value:
        p.primaryField  = "Neuroscience"
        p.primaryFields = ["Neuroscience", "Biomedical Sciences, and Medicine"]
-     When neither is set, classify() infers fields from the free-text
-     `topics` and `title` already in data/people.json. That inference is a
-     bridge for the 497 legacy records, not a permanent answer: ask people
-     to choose their field at registration and store it on the record.
+     When neither is set, the rules below infer fields from the free-text `topics` and
+     `title` already in data/people.json. That inference is a bridge for the legacy
+     records, not a permanent answer: ask people to choose their field at registration
+     and store it on the record.
      ------------------------------------------------------------------ */
   PRIMARY_FIELDS: [
     'Artificial Intelligence',
@@ -387,46 +390,47 @@ const QIST = {
     return counts;
   },
 
-  /* ================= ВОЗМОЖНОСТИ И ПРАВО УЧАСТИЯ =================
-     Данные: data/opportunities.json + data/eligibility.json
-     Вердикт никогда не придумывается — он берётся из таблицы programmes
-     и всегда сопровождается ссылкой на первоисточник.
-     ============================================================== */
+  /* ================= OPPORTUNITIES AND ELIGIBILITY =================
+     Data: data/opportunities.json + data/eligibility.json
+     A verdict is never invented. It is read from the programmes table and always
+     carries a link to the source it came from.
+     ================================================================ */
 
   OPPORTUNITY_TYPES: {
-    grant:           'Грант и конкурс',
-    consortium_role: 'Роль в консорциуме',
-    academic_job:    'Академическая вакансия',
-    industry_job:    'Индустриальная R&D-позиция',
-    coauthor:        'Поиск соавтора',
-    rnd_challenge:   'R&D-задача от компании',
-    expert_request:  'Запрос экспертизы',
-    conference:      'Конференция и публикация'
+    grant:           'Grant / call',
+    consortium_role: 'Consortium role',
+    academic_job:    'Academic position',
+    industry_job:    'Industry R&D position',
+    coauthor:        'Co-author wanted',
+    rnd_challenge:   'Industry R&D challenge',
+    expert_request:  'Expertise request',
+    conference:      'Conference & publication'
   },
 
   FUNDING_LABELS: {
-    confirmed:          'финансирование подтверждено',
-    not_confirmed:      'финансирование не подтверждено',
-    cofunding_required: 'требуется софинансирование'
+    confirmed:          'funding confirmed',
+    not_confirmed:      'funding not confirmed',
+    cofunding_required: 'co-funding required'
   },
 
-  // Ранги стадии карьеры: заявленная стадия должна быть не ниже требуемой.
+  // Career-stage ranks: the declared stage must be at least the required one.
   STAGE_RANK: { any: 0, phd_student: 1, phd_plus: 2, postdoc_plus: 3, pi_only: 4 },
 
-  /* Куда уходит отклик «Интересно».
-     Пусто = приём откликов не подключён, и кнопка честно отключается.
-     Поддерживается URL формы (Tally / Formspree / свой backend) либо
-     "mailto:адрес". См. README.md, раздел «Приём откликов». */
+  /* Where an "Interested" response goes.
+     Empty means responses are not wired up and the button honestly disables itself.
+     Accepts a form endpoint that takes a JSON POST (Formspree, Web3Forms, Basin, or your
+     own backend) or "mailto:address". Tally does NOT work here: its API only creates
+     forms and needs a secret key. See README.md → "Wiring up responses". */
   INTEREST_ENDPOINT: 'https://formspree.io/f/xyezzgdo',
 
-  /* Контакт команды QIST. Используется на about.html для запросов
-     «это мой профиль» и «удалите мои данные». Пока пусто — кнопки
-     честно отключаются, а не ведут в никуда. */
+  /* QIST team contact. Used on about.html for the "this is my profile" and
+     "delete my data" requests. While empty, those buttons disable themselves
+     rather than leading nowhere. */
   CONTACT_EMAIL: 'info@qista.org',
 
-  /* Куда уходит запись в пилот и подписка на письмо.
-     Может быть тем же URL, что INTEREST_ENDPOINT. Пусто — форма честно
-     отключается и не делает вид, что собрала адрес. */
+  /* Where pilot sign-ups and digest subscriptions go.
+     May be the same URL as INTEREST_ENDPOINT. While empty, the form disables itself
+     instead of pretending it captured the address. */
   SIGNUP_ENDPOINT: 'https://formspree.io/f/xyezzgdo',
 
   async getOpportunities() {
@@ -434,7 +438,7 @@ const QIST = {
       try {
         const r = await fetch(this.apiBase + '/api/opportunities');
         if (r.ok) return await r.json();
-      } catch (_) { /* падаем на статические данные */ }
+      } catch (_) { /* fall back to the static data file */ }
     }
     const all = await this.loadJSON('opportunities');
     return all.filter(o => o.status === 'published');
@@ -442,14 +446,13 @@ const QIST = {
 
   async getEligibility() { return this.loadJSON('eligibility'); },
 
-  /* Возвращает вердикт по стране. Никогда не бросает исключение:
-     неизвестный статус — это тоже честный ответ. */
+  /* Returns the country verdict. Never throws: "unknown" is a legitimate answer. */
   checkCountry(opp, countryCode, elig) {
     const key  = (opp.eligibility && opp.eligibility.programme) || 'open';
     const prog = elig.programmes[key] || elig.programmes.open;
     const status = prog.countries[countryCode] || prog.default || 'unknown';
     const def = elig.statuses[status] || elig.statuses.unknown;
-    const countryName = elig.countries[countryCode] || 'Ваша страна';
+    const countryName = elig.countries[countryCode] || 'Your country';
     return {
       status, verdict: def.verdict, label: def.label,
       text: def.text.replace('{country}', countryName),
@@ -477,8 +480,8 @@ const QIST = {
     return Math.ceil((new Date(opp.deadline) - new Date()) / 86400000);
   },
 
-  /* Отклик. Возвращает {ok, reason} — вызывающий код сам решает, что показать. */
-  /* Общая отправка формы на настроенный endpoint. {ok, reason} */
+  /* Response. Returns {ok, reason}; the caller decides what to show. */
+  /* Generic form submit to a configured endpoint. Returns {ok, reason}. */
   async submitForm(endpoint, payload) {
     if (!endpoint) return { ok: false, reason: 'not_configured' };
     if (endpoint.startsWith('mailto:')) {
@@ -489,27 +492,41 @@ const QIST = {
     }
     try {
       const r = await fetch(endpoint, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(payload)
       });
       return r.ok ? { ok: true, reason: 'posted' } : { ok: false, reason: 'http_' + r.status };
     } catch (_) { return { ok: false, reason: 'network' }; }
   },
 
-  /* Как показывать координаты. 338 записей каталога имеют координаты центра
-     страны, а не места работы: города и организации в исходных данных нет.
-     Показывать их как точный адрес — значит выдумывать точность. */
+  /* How to present coordinates. 338 directory records hold a country centroid rather
+     than a workplace: the source data has neither city nor organisation for them.
+     Presenting those as a precise address would invent precision we do not have. */
   geoLabel(person) {
     const prec = person.geo_precision || (person.city ? 'city' : 'country');
     if (prec === 'city')    return [person.city, person.country].filter(Boolean).join(', ');
-    if (prec === 'country') return (person.country || '') + ' · город не указан';
-    return 'Местоположение не указано';
+    if (prec === 'country') return (person.country || '') + ' · city not recorded';
+    return 'Location not recorded';
+  },
+
+  /* Fills a <select> with countries: the nine priority ones first, then the rest. */
+  fillCountrySelect(sel, elig, selected) {
+    const names = elig.countries;
+    const pri = elig.priority_countries || [];
+    const esc = s => this.esc(s);
+    const opt = c => `<option value="${esc(c)}"${c === selected ? ' selected' : ''}>${esc(names[c])}</option>`;
+    const rest = Object.keys(names).filter(c => !pri.includes(c))
+      .sort((a, b) => names[a].localeCompare(names[b]));
+    sel.innerHTML =
+      `<optgroup label="Greater Central Asia">${pri.filter(c => names[c]).map(opt).join('')}</optgroup>` +
+      `<optgroup label="All countries">${rest.map(opt).join('')}</optgroup>`;
   },
   hasPreciseGeo(person) { return (person.geo_precision || (person.city ? 'city' : 'country')) === 'city'; },
 
   async recordInterest(opp, ctx) {
     return this.submitForm(this.INTEREST_ENDPOINT, {
-      _subject: 'Интерес к возможности: ' + opp.title,
+      _subject: 'Interested in: ' + opp.title,
       kind: 'opportunity_interest',
       opportunity_id: opp.id, opportunity_title: opp.title,
       country: ctx.country, career_stage: ctx.stage,
@@ -519,6 +536,7 @@ const QIST = {
   },
 
   async boot(active) {
+    console.info('QIST build', this.BUILD);
     this.renderHeader(active);
     this.renderFooter();
     await this.detectApi();
