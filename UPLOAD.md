@@ -6,7 +6,7 @@ not just the changed ones. Replace the repo contents with it and the mismatch ca
 
 ## Option A — GitHub in the browser (no tools)
 
-1. Unzip this archive. You get a folder with 32 files, including `assets/` and `data/`.
+1. Unzip this archive. You get a folder with 33 files, including `assets/` and `data/`.
 2. Open `https://github.com/Aika369/qist-platform`
 3. **Add file → Upload files**
 4. Open the unzipped folder on your computer, **select everything inside it**
@@ -31,17 +31,29 @@ Wait about a minute after committing, then open the live site and press `F12` �
 The first line should read:
 
 ```
-QIST build 2026-09-18e
+QIST build 2026-09-19a
 ```
 
 If it says anything else, or nothing, the JavaScript file did not reach the server.
 
 Then open **Opportunities**. You should see:
 
-- seven cards,
+- **17 cards** (20 entries, three with a passed deadline hidden by default),
 - **My country** with 250 countries, the nine priority ones at the top,
-- **All research fields** with all 35 QIST fields, counts next to the ones that have
-  opportunities and an em-dash next to the empty ones.
+- **All research fields** with all 35 QIST fields — every one of them now has a count,
+  because calls open to all disciplines count toward each field.
+
+Two cards are worth checking by hand, because they test the new rule that a funder's own
+country list beats our programme table:
+
+- Open **Faculty for the Future**. With **My country = Kazakhstan** it must say
+  *not eligible*; with **Uzbekistan**, *eligible*. The source link under the verdict should
+  point at the Schlumberger Foundation's own eligibility PDF, not at our table.
+- Open **TWAS–FAPESP**. Kazakhstan eligible, Georgia not.
+
+Then open `curate.html` (there is a link at the top of `admin.html`). It should list all 20
+records, and the **Add to the working list** button should be greyed out until you fill in a
+valid record — the panel on the right says exactly what is missing.
 
 Finally press **Interested** on any card. The button should change to **✓ Response sent**,
 and the submission should appear in your Formspree dashboard.
@@ -63,7 +75,7 @@ HTML was new, but the browser was still running a cached copy of `app.js`. A har
 fixes that — `Ctrl+Shift+R` on Windows, `Cmd+Shift+R` on Mac.
 
 From this release the problem is handled in code: every local script and stylesheet is
-requested with a version marker, e.g. `assets/js/app.js?v=2026-09-18e`. A browser treats a
+requested with a version marker, e.g. `assets/js/app.js?v=2026-09-19a`. A browser treats a
 changed query string as a different file and must fetch it, so visitors stop getting a mix
 of new HTML and old JavaScript.
 

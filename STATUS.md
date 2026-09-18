@@ -1,17 +1,29 @@
 # STATUS
 
-Updated: 2026-09-18 · Iterations 1–3
+Updated: 2026-09-19 · Iterations 1–4
 
 ## Works
 
 **Opportunities** — `opportunities.html`
-10 structured opportunities with filters, search, expiry handling and URL-shareable state.
+20 structured opportunities, 17 of them open, with filters, search, expiry handling and
+URL-shareable state.
 Every card carries an eligibility verdict for the visitor's country and career stage, with
 a link to the source the verdict came from. No match percentages: none are calibrated yet.
 
 **Eligibility engine** — `QIST.checkCountry()`
 All 250 ISO countries, four Horizon Europe statuses (EU member / associated / funded /
 self-funded). Verdicts are read from `data/eligibility.json`, never computed by a model.
+A funder that publishes its own country list now overrides the programme table, carrying
+its own source link: Faculty for the Future takes Uzbekistan, Kyrgyzstan, Tajikistan and
+Turkmenistan but **not** Kazakhstan; the TWAS developing-countries list has no Georgia or
+Armenia. Both were checked against the funders' own documents on 2026-09-18.
+
+**Curator screen** — `curate.html`
+Adding an opportunity no longer means editing JSON by hand. The screen validates against the
+same rules the site uses — an external call cannot be saved without a link to the funder's
+page, a country list cannot be saved without the source it came from, duplicate ids and
+unknown country codes are caught before saving — then hands back the finished
+`data/opportunities.json` to commit. It needs no backend. Linked from `admin.html`.
 
 **Navigation** — Home · Opportunities · Researchers · About QIST
 Map and globe are views inside Researchers, not sections. Matching is not in public
@@ -39,7 +51,15 @@ Researchers' own names are left exactly as recorded.
 3. **Eligibility lists were extracted by automated reading of the EC PDF.** One earlier read
    of the same document was wrong about three countries. Have a human spot-check the nine
    priority countries and record it in `eligibility.json` → `verification.reviewed_by` (B-18).
-4. **7 active opportunities.** This is the product's real bottleneck, not the code.
+4. **17 active opportunities, not 100.** Still the product's real bottleneck, not the code.
+   Ten calls were added on 2026-09-19, each read from the funder's own page: ERC Starting and
+   Consolidator 2027, MSCA Doctoral Networks 2026, COST Open Call 2026, Erasmus+ Capacity
+   Building, Faculty for the Future, Humboldt Research Fellowship, TWAS–FAPESP, NATO SPS and
+   IIE-SRF. Several strong candidates were checked and **left out** because they had already
+   closed (MSCA Postdoctoral Fellowships and COFUND, MSCA Staff Exchanges, Digital GreenTalents,
+   TÜBİTAK 2216, L'Oréal-UNESCO For Women in Science) or because none of the nine countries
+   qualify (TWAS-SISSA-Lincei is for least developed countries only). That filtering is the
+   slow part of curation, and it is what the curator screen exists to keep honest.
 5. **Backend is written but not deployed.** Opportunities are edited in a JSON file and reach
    the site by commit.
 6. **Cities for 338 records are not recovered** — no geocoder reachable from the dev sandbox.
@@ -47,12 +67,20 @@ Researchers' own names are left exactly as recorded.
 
 ## Verified
 
-56 automated checks in headless Chromium across `test.mjs` (21), `test2.mjs` (16),
-`test3.mjs` (19). Covering: eligibility verdicts across two programmes and nine countries,
+102 automated checks in headless Chromium across `test.mjs` (21), `test2.mjs` (16),
+`test3.mjs` (19), `test4.mjs` (16) and `test5.mjs` (30). Covering: eligibility verdicts across two programmes and nine countries,
 filters, empty and error states, expired entries, button behaviour with no endpoint
 configured, absence of the admin password anywhere in the build, honest counters, coordinate
 precision labels, the full 250-country selector, English-only interface text, and no
 horizontal scroll at 390px. No JavaScript errors.
+
+`test5.mjs` additionally runs every record in the data file through the site's own validator,
+checks that the funder country lists produce the right verdict with the right source link, and
+drives the curator screen end to end — empty form blocked, duplicate id caught, unknown country
+code caught, country list without a source rejected, record saved, draft surviving a reload,
+reset back to the committed file. It found three real defects on its first run: two records
+carrying `country: "OTHER"` instead of an ISO code, and 529px of horizontal scroll on the new
+screen at phone width. All three are fixed.
 
 `L is not defined` on map.html appears only in the sandbox, where unpkg.com is blocked.
 Leaflet loads on the live site — checked 2026-09-14. **The country-marker logic on the map
@@ -81,6 +109,12 @@ message came from a browser cache holding the previous `app.js`.
 
 ## Next
 
-Endpoints are configured (`formspree.io/f/xyezzgdo`, `info@qista.org`). After this release is
-fully uploaded: click **Interested** on the live site and confirm the submission appears in the
-Formspree dashboard. That is the first real metric this product has ever produced.
+1. **Confirm the response path works.** Click **Interested** on the live site and check that the
+   submission appears in the Formspree dashboard. That is the first real metric this product has
+   ever produced, and nothing else on this list matters until it works.
+2. **Curate weekly, not once.** Open `curate.html`, add what you find, download the file, commit.
+   Twenty records is a demo; a hundred with live deadlines is a product. Three entries are already
+   expired — B-21 is the habit of checking them, not a feature.
+3. **B-18 is still open.** The nine countries' Horizon Europe statuses have not been checked by a
+   human against the EC PDF. One automated read of that document was already wrong about three of
+   them.

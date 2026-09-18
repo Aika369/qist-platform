@@ -480,3 +480,68 @@ table.data tr:hover td { background: var(--paper); }
   .filters select, .filters .search-input { width: 100%; }
   .opp-check { justify-content: flex-start; }
 }
+
+/* ================= curator screen (curate.html) =================
+   Internal tool, not public navigation. Two columns on a desktop, one on a laptop lid
+   or a phone; the form is long, so the validation panel sticks to the top of the side
+   column and stays visible while you scroll through it. */
+.tag-all { background: var(--gold-soft); border-color: var(--gold); color: #6b5010; font-weight: 600; }
+
+.cur-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.cur-side { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 16px; }
+
+.cur-form { display: flex; flex-direction: column; gap: 14px; text-align: left; }
+.cur-form label { display: flex; flex-direction: column; gap: 5px; font-size: .82rem; font-weight: 600; color: var(--ink); min-width: 0; }
+.cur-form input[type=text], .cur-form input[type=url], .cur-form input[type=date],
+.cur-form select, .cur-form textarea {
+  font: inherit; font-size: .9rem; font-weight: 400; padding: 8px 10px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--paper);
+  color: var(--ink); width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box;
+}
+.cur-form textarea { resize: vertical; line-height: 1.5; }
+.cur-form input:focus, .cur-form select:focus, .cur-form textarea:focus {
+  outline: 2px solid var(--gold); outline-offset: 1px; background: var(--card);
+}
+.cur-hint { font-size: .74rem; font-weight: 400; color: var(--ink-faint); line-height: 1.45; }
+.cur-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.cur-fs { border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.cur-fs legend { font-size: .76rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-faint); padding: 0 6px; }
+.cur-check { flex-direction: row !important; align-items: center; gap: 7px; font-weight: 400 !important; font-size: .82rem; }
+.cur-check input { width: auto !important; }
+.cur-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 4px 12px; max-height: 260px; overflow-y: auto; padding-right: 6px; }
+
+.cur-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.btn-sm { padding: 4px 10px; font-size: .76rem; }
+
+.cur-err, .cur-warn, .cur-ok { border-radius: 8px; padding: 10px 12px; font-size: .82rem; line-height: 1.5; margin-bottom: 8px; }
+.cur-err  { background: #fbeceb; border: 1px solid #e6c2bf; color: #7a2626; }
+.cur-warn { background: #fdf6e6; border: 1px solid #e8d9ae; color: #6b5010; }
+.cur-ok   { background: #eaf4f1; border: 1px solid #bcdcd3; color: #1f4d44; }
+.cur-err ul, .cur-warn ul { margin: 6px 0 0 18px; display: flex; flex-direction: column; gap: 4px; }
+
+.cur-list { display: flex; flex-direction: column; gap: 6px; max-height: 420px; overflow-y: auto; text-align: left; }
+.cur-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+.cur-item-main { flex: 1; min-width: 0; }
+.cur-item-title { font-size: .84rem; font-weight: 600; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cur-item-sub { font-size: .73rem; color: var(--ink-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cur-badge { font-size: .68rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; white-space: nowrap; }
+.cur-badge.ok   { background: #eaf4f1; color: #1f4d44; }
+.cur-badge.warn { background: #fdf6e6; color: #6b5010; }
+.cur-badge.bad  { background: #fbeceb; color: #7a2626; }
+
+@media (max-width: 980px) {
+  .cur-grid { grid-template-columns: 1fr; }
+  .cur-side { position: static; }
+}
+@media (max-width: 640px) {
+  .cur-row-2 { grid-template-columns: 1fr; }
+  .cur-fields { grid-template-columns: 1fr; max-height: 200px; }
+}
+
+/* Grid and flex children default to min-width:auto, so one long option or an unbreakable
+   string stretches the whole track. On a 390px screen that turned into 529px of horizontal
+   scroll across the entire form. Every box in this screen is allowed to shrink. */
+.cur-grid > *, .cur-form > *, .cur-fs > *, .cur-row-2 > *, .cur-side > * { min-width: 0; max-width: 100%; }
+.cur-form label, .cur-form select, .cur-fields, .cur-list { min-width: 0; max-width: 100%; }
+.cur-form select { text-overflow: ellipsis; }

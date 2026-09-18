@@ -42,7 +42,15 @@ Backend: see [backend/README.md](backend/README.md).
 
 ### Как добавить возможность
 
-Отредактируйте `data/opportunities.json` и закоммитьте. Обязательные поля:
+**Обычный путь — экран куратора `curate.html`.** Откройте его на сайте (ссылка есть в
+`admin.html`), заполните форму, нажмите «Add to the working list», затем «Download
+opportunities.json» — и положите скачанный файл вместо `data/opportunities.json` в
+репозитории. Экран проверяет запись по тем же правилам, что использует сам сайт, и не даёт
+сохранить неполную: без ссылки на страницу фонда, с занятым `id`, с несуществующим кодом
+страны или со страновым списком без источника. Бэкенд для этого не нужен, ничего никуда не
+отправляется, черновик хранится в вашем браузере до коммита.
+
+Формат файла (если правите руками):
 
 ```json
 {
@@ -65,10 +73,31 @@ Backend: see [backend/README.md](backend/README.md).
 - `type`: `grant` · `consortium_role` · `academic_job` · `industry_job` · `coauthor` · `rnd_challenge` · `expert_request` · `conference`
 - `career_stage`: `any` · `phd_student` · `phd_plus` · `postdoc_plus` · `pi_only`
 - `funding_status`: `confirmed` · `not_confirmed` · `cofunding_required`
+- `origin`: `external` (конкурс с чужой страницы) · `community` (пост участника QIST)
 - `eligibility.programme`: `horizon_europe` · `kz_national` · `open`
+- `all_fields: true` — конкурс открыт для всех дисциплин; тогда `fields` оставляют пустым,
+  запись находится по любому фильтру области и показывает одну строку вместо 35 тегов
 
-**Правило источника:** `source_url` обязателен. Возможность без ссылки на первоисточник
-не публикуется — иначе нечем подтвердить условия.
+**Правило источника:** для `origin: "external"` поле `source_url` обязательно. Конкурс без
+ссылки на первоисточник не публикуется — иначе читателю нечем проверить условия и дедлайн.
+Пост, написанный внутри QIST, страницы фонда не имеет и выдумывать её не обязан.
+
+**Свой список стран у фонда.** Когда фонд публикует собственный перечень стран и он
+расходится с таблицей программы, перечень кладут на саму возможность — вместе со ссылкой
+на документ, откуда он взят:
+
+```json
+"eligibility": {
+  "programme": "open",
+  "countries_excluded": ["KZ", "AZ", "GE", "AM", "MN"],
+  "countries_source_url": "https://www.fftf.slb.com/docs/Summary_Eligibility_Criteria.pdf",
+  "countries_source_name": "Schlumberger Foundation — eligibility criteria",
+  "countries_source_date": "2026-09-18"
+}
+```
+
+Есть и `countries_allowed` — «только эти страны». Исключающий список проверяется первым.
+Без `countries_source_url` запись не сохраняется: вердикт без ссылки — это догадка.
 
 ### Откуда берётся вердикт
 

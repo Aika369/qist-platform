@@ -6,7 +6,7 @@
 <title>Admin — QIST</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-18e">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-19a">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
@@ -15,8 +15,19 @@
   <div class="container">
     <div class="section-head">
       <h2 class="rule">Admin panel</h2>
-      <button class="btn btn-primary" id="btn-add-person">＋ Add researcher</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn btn-outline" href="curate.html">Curate opportunities →</a>
+        <button class="btn btn-primary" id="btn-add-person">＋ Add researcher</button>
+      </div>
     </div>
+
+    <!-- The curator screen works without a backend: it edits data/opportunities.json in the
+         browser and hands the file back to commit. Everything below this line needs the API. -->
+    <p class="small muted" style="margin-bottom:18px;max-width:70ch">
+      Opportunities are curated on their own screen, which works with no server:
+      <a href="curate.html">curate.html</a>. The tables below read and write the QIST API and
+      stay disabled until a backend is deployed.
+    </p>
 
     <div class="tab-row" style="margin-bottom:24px">
       <button class="active" data-tab="people">Researchers</button>
@@ -60,7 +71,7 @@
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/app.js?v=2026-09-18e"></script>
+<script src="assets/js/app.js?v=2026-09-19a"></script>
 <script>
 (async () => {
   await QIST.boot('admin.html');

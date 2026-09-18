@@ -8,7 +8,7 @@
 const QIST = {
   /* Build stamp. Open the browser console on the live site: if this does not match the
      release you uploaded, the file did not reach the server. */
-  BUILD: '2026-09-18e',
+  BUILD: '2026-09-19a',
 
   // Set to a deployed FastAPI URL (e.g. "https://api.qist.org") to go live.
   // Can also be overridden without redeploy: localStorage.setItem('qist_api_url', '...')
@@ -446,13 +446,57 @@ const QIST = {
 
   async getEligibility() { return this.loadJSON('eligibility'); },
 
-  /* Returns the country verdict. Never throws: "unknown" is a legitimate answer. */
+  /* Returns the country verdict. Never throws: "unknown" is a legitimate answer.
+
+     Two layers, checked in this order:
+
+     1. The funder's own country list, carried on the opportunity itself as
+        eligibility.countries_excluded / eligibility.countries_allowed. Some calls do not
+        follow any programme-wide table: Faculty for the Future takes Uzbekistan, Kyrgyzstan,
+        Tajikistan and Turkmenistan but not Kazakhstan; the TWAS developing-countries list
+        omits Georgia and Armenia. A programme table cannot express that, and guessing it
+        wrong costs a researcher a week of work.
+     2. The programme table in data/eligibility.json (Horizon Europe, national schemes, open).
+
+     A list on the opportunity must bring its own source link, exactly like a programme does.
+     Empty or missing lists mean "no explicit list" and fall through to layer 2. */
   checkCountry(opp, countryCode, elig) {
-    const key  = (opp.eligibility && opp.eligibility.programme) || 'open';
+    const e    = opp.eligibility || {};
+    const key  = e.programme || 'open';
     const prog = elig.programmes[key] || elig.programmes.open;
+    const countryName = elig.countries[countryCode] || 'Your country';
+
+    const listSource = e.countries_source_url ? {
+      url: e.countries_source_url,
+      name: e.countries_source_name || 'Funder country list',
+      version: '', date: e.countries_source_date || ''
+    } : null;
+
+    const excluded = Array.isArray(e.countries_excluded) ? e.countries_excluded : [];
+    const allowed  = Array.isArray(e.countries_allowed)  ? e.countries_allowed  : [];
+
+    if (countryCode && excluded.includes(countryCode)) {
+      const def = elig.statuses.not_eligible;
+      return {
+        status: 'not_eligible', verdict: def.verdict, label: def.label,
+        text: `${countryName} is not on this funder's list of eligible countries.`,
+        programme: prog.name, source: listSource || null
+      };
+    }
+    if (allowed.length) {
+      const ok  = countryCode && allowed.includes(countryCode);
+      const def = ok ? elig.statuses.eligible : elig.statuses.not_eligible;
+      return {
+        status: ok ? 'eligible' : 'not_eligible', verdict: def.verdict, label: def.label,
+        text: ok
+          ? `${countryName} is on this funder's list of eligible countries.`
+          : `${countryName} is not on this funder's list of eligible countries.`,
+        programme: prog.name, source: listSource || null
+      };
+    }
+
     const status = prog.countries[countryCode] || prog.default || 'unknown';
     const def = elig.statuses[status] || elig.statuses.unknown;
-    const countryName = elig.countries[countryCode] || 'Your country';
     return {
       status, verdict: def.verdict, label: def.label,
       text: def.text.replace('{country}', countryName),
@@ -462,6 +506,101 @@ const QIST = {
         version: prog.source_version, date: prog.source_date
       } : null
     };
+  },
+
+  /* Does this opportunity belong under this research field?
+     A call that is open to every discipline carries all_fields: true instead of a copy of
+     the 35-item list, so the filter still finds it and the card does not show 35 tags. */
+  fieldsMatch(opp, field) {
+    if (!field) return true;
+    if (opp.all_fields) return true;
+    return (opp.fields || []).includes(field);
+  },
+
+  /* How many opportunities sit under each research field. Used to disable empty options
+     in the filter, so nobody picks a field and lands on an empty page. */
+  oppFieldCounts(opps) {
+    const counts = {};
+    this.PRIMARY_FIELDS.forEach(f => { counts[f] = 0; });
+    opps.forEach(o => {
+      if (o.all_fields) { this.PRIMARY_FIELDS.forEach(f => counts[f]++); return; }
+      (o.fields || []).forEach(f => { if (f in counts) counts[f]++; });
+    });
+    return counts;
+  },
+
+  /* ---------- curator validation ----------
+     One definition of a valid opportunity record, used by curate.html and by the tests.
+     Errors block publication; warnings are for the curator to judge.
+     `elig` is data/eligibility.json, `existing` the records already in the file. */
+  validateOpportunity(o, elig, existing) {
+    const errors = [], warnings = [];
+    const others = (existing || []).filter(x => x !== o);
+    const has = v => typeof v === 'string' && v.trim().length > 0;
+
+    if (!has(o.id)) errors.push('id is required');
+    else {
+      if (!/^[a-z0-9][a-z0-9-]*$/.test(o.id)) errors.push('id may contain only lowercase letters, digits and hyphens');
+      if (others.some(x => x.id === o.id)) errors.push(`id "${o.id}" is already used by another record`);
+    }
+
+    if (!(o.type in this.OPPORTUNITY_TYPES)) errors.push('type must be one of: ' + Object.keys(this.OPPORTUNITY_TYPES).join(', '));
+    if (!['published', 'draft'].includes(o.status)) errors.push('status must be "published" or "draft"');
+    if (!has(o.title) || o.title.trim().length < 10) errors.push('title is required and must say what the opportunity is (10 characters or more)');
+    if (!has(o.organization)) errors.push('organization is required — the reader needs to know who is offering this');
+    if (!has(o.summary) || o.summary.trim().length < 40) errors.push('summary is required and must be at least 40 characters');
+
+    /* Where the entry came from. An external call must link to the funder's page — a reader
+       who cannot check it has to take our word on a deadline. A post written by a QIST member
+       ("looking for a co-author") has no funder page and is not forced to invent one. */
+    const origin = o.origin || 'external';
+    if (!['external', 'community'].includes(origin)) errors.push('origin must be "external" or "community"');
+    if (origin === 'external') {
+      if (!has(o.source_url)) errors.push('source_url is required: an external call must link to the page it was taken from');
+      else if (!/^https:\/\/[^\s]+\.[^\s]+/.test(o.source_url)) errors.push('source_url must be a full https:// address');
+      if (!has(o.source_name)) warnings.push('source_name is empty — say which site the entry came from');
+    } else {
+      if (has(o.source_url) && !/^https:\/\/[^\s]+\.[^\s]+/.test(o.source_url)) errors.push('source_url must be a full https:// address');
+      if (!has(o.source_url)) warnings.push('posted inside QIST with no external link — the reader can only contact us about it');
+    }
+
+    if (!(o.career_stage in this.STAGE_RANK)) errors.push('career_stage must be one of: ' + Object.keys(this.STAGE_RANK).join(', '));
+    if (!(o.funding_status in this.FUNDING_LABELS)) errors.push('funding_status must be one of: ' + Object.keys(this.FUNDING_LABELS).join(', '));
+
+    if (has(o.deadline)) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(o.deadline) || isNaN(new Date(o.deadline).getTime())) {
+        errors.push('deadline must be a real date in YYYY-MM-DD form, or empty');
+      } else if (this.isExpired(o)) {
+        warnings.push('the deadline is in the past — the entry will be published as expired');
+      }
+    } else {
+      warnings.push('no deadline — the card will say "no deadline", so make sure the call really is rolling');
+    }
+
+    const fields = o.fields || [];
+    const unknown = fields.filter(f => !this.PRIMARY_FIELDS.includes(f));
+    if (unknown.length) errors.push('research fields not in the QIST list: ' + unknown.join(', '));
+    if (!o.all_fields && !fields.length) errors.push('choose at least one research field, or tick "open to all fields"');
+    if (o.all_fields && fields.length) warnings.push('"open to all fields" is ticked, so the individual fields chosen are ignored');
+
+    const e = o.eligibility || {};
+    if (elig) {
+      if (!has(e.programme) || !(e.programme in elig.programmes)) {
+        errors.push('eligibility.programme must be one of: ' + Object.keys(elig.programmes).join(', '));
+      }
+      const codes = [].concat(e.countries_allowed || [], e.countries_excluded || []);
+      const badCodes = codes.filter(c => !(c in elig.countries));
+      if (badCodes.length) errors.push('unknown country codes: ' + badCodes.join(', '));
+      if (codes.length && !has(e.countries_source_url)) {
+        errors.push('a country list needs countries_source_url — a verdict without a source is a guess');
+      }
+      if ((e.countries_allowed || []).length && (e.countries_excluded || []).length) {
+        warnings.push('both an allowed and an excluded list are set; the excluded list is checked first');
+      }
+      if (has(o.country) && !(o.country in elig.countries)) errors.push(`country "${o.country}" is not a known ISO code`);
+    }
+
+    return { ok: errors.length === 0, errors, warnings };
   },
 
   checkStage(opp, userStage) {

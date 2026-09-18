@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curator — add an opportunity · ScienceBridge</title>
+<meta name="description" content="Internal curator screen: turn a call for proposals into a valid ScienceBridge opportunity record.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,600;0,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-19a">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<div class="container" style="padding-top:22px;padding-bottom:60px">
+
+  <div class="section-head">
+    <div>
+      <h2 class="rule">Curator — opportunities</h2>
+      <p class="small muted" style="margin-top:6px;max-width:70ch">
+        This screen replaces editing <code>data/opportunities.json</code> by hand. It validates every
+        record against the same rules the site uses, then hands you the finished file to commit.
+        It runs entirely in your browser: nothing is uploaded, and nothing is published until you
+        commit the file yourself.
+      </p>
+    </div>
+  </div>
+
+  <div class="cur-grid">
+
+    <!-- ================= form ================= -->
+    <form class="card pad-lg cur-form" id="cur-form" autocomplete="off">
+      <div class="cur-row-2">
+        <label>Record id
+          <input type="text" id="f-id" placeholder="o-c11" required>
+          <span class="cur-hint">lowercase letters, digits and hyphens — this is the anchor in the page URL</span>
+        </label>
+        <label>Status
+          <select id="f-status">
+            <option value="published">published — visible on the site</option>
+            <option value="draft">draft — kept in the file, not shown</option>
+          </select>
+        </label>
+      </div>
+
+      <label>Title
+        <input type="text" id="f-title" placeholder="ERC Starting Grant 2027 — up to €1.5M to build your first research team" required>
+        <span class="cur-hint">say what it is and what it gives, not just the programme name</span>
+      </label>
+
+      <div class="cur-row-2">
+        <label>Type
+          <select id="f-type"></select>
+        </label>
+        <label>Career stage required
+          <select id="f-stage"></select>
+        </label>
+      </div>
+
+      <div class="cur-row-2">
+        <label>Organisation
+          <input type="text" id="f-org" placeholder="European Research Council (ERC)" required>
+        </label>
+        <label>Organisation type
+          <select id="f-orgtype">
+            <option value="funder">Funder</option>
+            <option value="university">University</option>
+            <option value="institute">Research institute</option>
+            <option value="company">Company</option>
+            <option value="ngo">NGO / association</option>
+            <option value="government">Government body</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="cur-row-2">
+        <label>Country of the position or host
+          <select id="f-country"></select>
+          <span class="cur-hint">leave empty for an international call with no single location</span>
+        </label>
+        <label>City
+          <input type="text" id="f-city" placeholder="Astana">
+        </label>
+      </div>
+
+      <label>Summary
+        <textarea id="f-summary" rows="5" placeholder="What it funds, who it is for, and the one condition that disqualifies most people. Write the thing a reader needs in order to decide not to apply."></textarea>
+        <span class="cur-hint">at least 40 characters — this is what the reader sees on the card</span>
+      </label>
+
+      <div class="cur-row-2">
+        <label>Deadline
+          <input type="date" id="f-deadline">
+          <span class="cur-hint">leave empty only if the call really is rolling</span>
+        </label>
+        <label>Funding status
+          <select id="f-funding"></select>
+        </label>
+      </div>
+
+      <label>Funding amount (free text)
+        <input type="text" id="f-amount" placeholder="Up to €1.5M over 5 years">
+      </label>
+
+      <div class="cur-row-2">
+        <label>Expected role
+          <input type="text" id="f-role" placeholder="Principal Investigator of your own five-year project">
+        </label>
+        <label>Workload
+          <input type="text" id="f-workload" placeholder="Full time">
+        </label>
+      </div>
+
+      <fieldset class="cur-fs">
+        <legend>Research fields</legend>
+        <label class="cur-check"><input type="checkbox" id="f-allfields"> Open to all research fields</label>
+        <div class="cur-fields" id="f-fields"></div>
+      </fieldset>
+
+      <fieldset class="cur-fs">
+        <legend>Eligibility</legend>
+        <label>Programme
+          <select id="f-programme"></select>
+          <span class="cur-hint">the country table this call follows, from data/eligibility.json</span>
+        </label>
+        <label>Note shown next to the verdict
+          <input type="text" id="f-note" placeholder="Any nationality; the host institution must be in an EU Member State">
+        </label>
+
+        <label>The funder publishes its own country list
+          <select id="f-listmode">
+            <option value="none">No — the programme table above decides</option>
+            <option value="excluded">Yes — these countries are excluded</option>
+            <option value="allowed">Yes — only these countries are allowed</option>
+          </select>
+          <span class="cur-hint">use this when the funder's list contradicts the programme table, as Faculty for the Future does</span>
+        </label>
+        <div id="f-listbox" hidden>
+          <label>Country codes, comma separated
+            <input type="text" id="f-listcodes" placeholder="KZ, AZ, GE, AM, MN">
+          </label>
+          <div class="cur-row-2">
+            <label>Link to that list
+              <input type="url" id="f-listurl" placeholder="https://…">
+            </label>
+            <label>Name of that source
+              <input type="text" id="f-listname" placeholder="Schlumberger Foundation — eligibility criteria">
+            </label>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="cur-fs">
+        <legend>Source</legend>
+        <label>Where this came from
+          <select id="f-origin">
+            <option value="external">An external call — a funder, university or employer page</option>
+            <option value="community">Posted inside QIST — a member looking for a co-author or partner</option>
+          </select>
+        </label>
+        <div class="cur-row-2">
+          <label>Source URL
+            <input type="url" id="f-srcurl" placeholder="https://erc.europa.eu/apply-grant/starting-grant">
+          </label>
+          <label>Source name
+            <input type="text" id="f-srcname" placeholder="European Research Council — Starting Grant">
+          </label>
+        </div>
+        <p class="cur-hint">An external call does not go in without the page it was read from. A reader who
+          cannot check the source has to trust us, and on a deadline that is worth nothing. A post written
+          inside QIST has no funder page and is not asked to invent one.</p>
+      </fieldset>
+
+      <div class="cur-actions">
+        <button type="submit" class="btn btn-primary" id="cur-save">Add to the working list</button>
+        <button type="button" class="btn btn-ghost" id="cur-clear">Clear the form</button>
+        <span class="small muted" id="cur-editing"></span>
+      </div>
+    </form>
+
+    <!-- ================= side ================= -->
+    <div class="cur-side">
+
+      <div class="card pad-lg" id="cur-validity">
+        <h3 style="margin-bottom:8px">Validation</h3>
+        <div id="cur-report" class="small muted">Fill the form — problems appear here as you type.</div>
+      </div>
+
+      <div class="card pad-lg">
+        <h3 style="margin-bottom:6px">Working list <span class="small muted" id="cur-count"></span></h3>
+        <p class="cur-hint" style="margin-bottom:10px">Loaded from <code>data/opportunities.json</code>, plus whatever you add here.</p>
+        <div id="cur-list" class="cur-list"></div>
+        <div class="cur-actions" style="margin-top:14px">
+          <button class="btn btn-primary" id="cur-download">Download opportunities.json</button>
+          <button class="btn btn-outline" id="cur-copy">Copy JSON</button>
+          <button class="btn btn-ghost" id="cur-reload">Reload from file</button>
+        </div>
+        <p class="cur-hint" style="margin-top:10px">
+          Then: replace <code>data/opportunities.json</code> in the repository with this file and commit.
+          Your draft is kept in this browser until you do.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="assets/js/app.js?v=2026-09-19a"></script>
+<script>
+(async () => {
+  await QIST.boot('curate.html');
+  const $ = id => document.getElementById(id);
+
+  /* Deploy guard — same idea as opportunities.html: say which file is stale
+     instead of throwing on a missing helper. */
+  if (typeof QIST.validateOpportunity !== 'function' || !QIST.PRIMARY_FIELDS) {
+    document.getElementById('cur-report').innerHTML =
+      '<b>assets/js/app.js is older than this page.</b> Upload the whole release together.';
+    return;
+  }
+
+  let elig, fileRecords = [];
+  try {
+    elig = await QIST.getEligibility();
+    fileRecords = await QIST.loadJSON('opportunities');
+  } catch (_) {
+    $('cur-report').innerHTML = '<b>Could not load data/opportunities.json or data/eligibility.json.</b> Open this page from the site, not from a local file.';
+    return;
+  }
+
+  const DRAFT_KEY = 'qist_curator_draft';
+
+  /* The working list starts as the committed file. A draft kept in this browser survives a
+     reload — losing an hour of curation to a stray refresh is the fastest way to stop curating.
+     It is per-browser and never leaves the machine, so the committed file stays the truth. */
+  let records = (() => {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) { const d = JSON.parse(raw); if (Array.isArray(d) && d.length) return d; }
+    } catch (_) { /* private mode, blocked storage — fall through */ }
+    return JSON.parse(JSON.stringify(fileRecords));
+  })();
+  function persist() {
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(records)); } catch (_) {}
+  }
+
+  let editingId = null;
+
+  /* ---------- populate the selects ---------- */
+  Object.entries(QIST.OPPORTUNITY_TYPES).forEach(([k, v]) =>
+    $('f-type').insertAdjacentHTML('beforeend', `<option value="${k}">${QIST.esc(v)}</option>`));
+  Object.entries(elig.career_stages).forEach(([k, v]) =>
+    $('f-stage').insertAdjacentHTML('beforeend', `<option value="${k}">${QIST.esc(v)}</option>`));
+  Object.entries(QIST.FUNDING_LABELS).forEach(([k, v]) =>
+    $('f-funding').insertAdjacentHTML('beforeend', `<option value="${k}">${QIST.esc(v)}</option>`));
+  Object.entries(elig.programmes).forEach(([k, v]) =>
+    $('f-programme').insertAdjacentHTML('beforeend', `<option value="${k}">${QIST.esc(v.name)} (${k})</option>`));
+  /* fillCountrySelect replaces the whole list, so the "no country" option goes in after it. */
+  QIST.fillCountrySelect($('f-country'), elig, '');
+  $('f-country').insertAdjacentHTML('afterbegin', '<option value="">— no single country —</option>');
+  $('f-country').value = '';
+
+  QIST.PRIMARY_FIELDS.forEach((f, i) =>
+    $('f-fields').insertAdjacentHTML('beforeend',
+      `<label class="cur-check"><input type="checkbox" class="f-field" value="${QIST.esc(f)}" id="ff${i}"> ${QIST.esc(f)}</label>`));
+
+  /* ---------- form <-> record ---------- */
+  function readForm() {
+    const mode = $('f-listmode').value;
+    const codes = $('f-listcodes').value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+    const e = { programme: $('f-programme').value, note: $('f-note').value.trim() };
+    if (mode !== 'none' && codes.length) {
+      e[mode === 'allowed' ? 'countries_allowed' : 'countries_excluded'] = codes;
+      e.countries_source_url  = $('f-listurl').value.trim();
+      e.countries_source_name = $('f-listname').value.trim();
+      e.countries_source_date = new Date().toISOString().slice(0, 10);
+    }
+    const allFields = $('f-allfields').checked;
+    return {
+      id: $('f-id').value.trim(),
+      origin: $('f-origin').value,
+      type: $('f-type').value,
+      status: $('f-status').value,
+      title: $('f-title').value.trim(),
+      organization: $('f-org').value.trim(),
+      org_type: $('f-orgtype').value,
+      country: $('f-country').value,
+      city: $('f-city').value.trim(),
+      remote: false,
+      summary: $('f-summary').value.trim(),
+      fields: allFields ? [] : [...document.querySelectorAll('.f-field:checked')].map(c => c.value),
+      all_fields: allFields,
+      methods_required: [],
+      career_stage: $('f-stage').value,
+      eligibility: e,
+      funding_status: $('f-funding').value,
+      funding_amount: $('f-amount').value.trim(),
+      role_expected: $('f-role').value.trim(),
+      workload: $('f-workload').value.trim(),
+      expected_output: '',
+      deadline: $('f-deadline').value,
+      source_url: $('f-srcurl').value.trim(),
+      source_name: $('f-srcname').value.trim(),
+      curated_at: new Date().toISOString().slice(0, 10)
+    };
+  }
+
+  function writeForm(o) {
+    $('f-id').value = o.id || ''; $('f-type').value = o.type || 'grant';
+    $('f-status').value = o.status || 'published'; $('f-title').value = o.title || '';
+    $('f-org').value = o.organization || ''; $('f-orgtype').value = o.org_type || 'funder';
+    $('f-country').value = o.country || ''; $('f-city').value = o.city || '';
+    $('f-summary').value = o.summary || ''; $('f-deadline').value = o.deadline || '';
+    $('f-funding').value = o.funding_status || 'confirmed'; $('f-amount').value = o.funding_amount || '';
+    $('f-role').value = o.role_expected || ''; $('f-workload').value = o.workload || '';
+    $('f-stage').value = o.career_stage || 'phd_plus';
+    $('f-srcurl').value = o.source_url || ''; $('f-srcname').value = o.source_name || '';
+    $('f-origin').value = o.origin || 'external';
+    $('f-allfields').checked = !!o.all_fields;
+    document.querySelectorAll('.f-field').forEach(c => { c.checked = (o.fields || []).includes(c.value); });
+    const e = o.eligibility || {};
+    $('f-programme').value = e.programme || 'open';
+    $('f-note').value = e.note || '';
+    const mode = (e.countries_allowed || []).length ? 'allowed'
+               : (e.countries_excluded || []).length ? 'excluded' : 'none';
+    $('f-listmode').value = mode;
+    $('f-listcodes').value = (e.countries_allowed || e.countries_excluded || []).join(', ');
+    $('f-listurl').value = e.countries_source_url || '';
+    $('f-listname').value = e.countries_source_name || '';
+    syncListBox(); syncFieldBox(); report();
+  }
+
+  function syncListBox() { $('f-listbox').hidden = $('f-listmode').value === 'none'; }
+  function syncFieldBox() {
+    const off = $('f-allfields').checked;
+    $('f-fields').style.opacity = off ? .4 : 1;
+    document.querySelectorAll('.f-field').forEach(c => { c.disabled = off; });
+  }
+
+  /* ---------- live validation ---------- */
+  function report() {
+    const o = readForm();
+    const others = records.filter(r => r.id !== editingId);
+    const v = QIST.validateOpportunity(o, elig, others.concat([o]));
+    const box = $('cur-report');
+    const bits = [];
+    if (v.errors.length) bits.push(`<div class="cur-err"><b>${v.errors.length} problem${v.errors.length > 1 ? 's' : ''} to fix</b><ul>${v.errors.map(e => `<li>${QIST.esc(e)}</li>`).join('')}</ul></div>`);
+    if (v.warnings.length) bits.push(`<div class="cur-warn"><b>Worth a look</b><ul>${v.warnings.map(e => `<li>${QIST.esc(e)}</li>`).join('')}</ul></div>`);
+    if (!v.errors.length && !v.warnings.length) bits.push('<div class="cur-ok"><b>✓ Valid</b> — nothing to fix.</div>');
+    else if (!v.errors.length) bits.push('<div class="cur-ok"><b>✓ Valid</b> — the warnings above do not block it.</div>');
+    box.innerHTML = bits.join('');
+    $('cur-save').disabled = v.errors.length > 0;
+    return v;
+  }
+
+  $('cur-form').addEventListener('input', report);
+  $('cur-form').addEventListener('change', () => { syncListBox(); syncFieldBox(); report(); });
+
+  /* ---------- working list ---------- */
+  function drawList() {
+    $('cur-count').textContent = `· ${records.length} records, ${records.filter(r => r.status === 'published' && !QIST.isExpired(r)).length} published and open`;
+    $('cur-list').innerHTML = records.map(r => {
+      const v = QIST.validateOpportunity(r, elig, records);
+      const flag = v.errors.length ? '<span class="cur-badge bad">invalid</span>'
+                 : QIST.isExpired(r) ? '<span class="cur-badge warn">expired</span>'
+                 : r.status === 'draft' ? '<span class="cur-badge warn">draft</span>'
+                 : '<span class="cur-badge ok">open</span>';
+      return `<div class="cur-item">
+        <div class="cur-item-main">
+          <div class="cur-item-title">${QIST.esc(r.title || r.id)}</div>
+          <div class="cur-item-sub">${QIST.esc(r.id)} · ${QIST.esc(r.organization || '')} · ${r.deadline ? QIST.esc(r.deadline) : 'no deadline'}</div>
+        </div>
+        ${flag}
+        <button class="btn btn-ghost btn-sm" data-edit="${QIST.esc(r.id)}">Edit</button>
+        <button class="btn btn-ghost btn-sm" data-del="${QIST.esc(r.id)}">Remove</button>
+      </div>`;
+    }).join('');
+  }
+
+  $('cur-list').addEventListener('click', (e) => {
+    const ed = e.target.closest('[data-edit]');
+    if (ed) {
+      const r = records.find(x => x.id === ed.dataset.edit);
+      if (r) { editingId = r.id; writeForm(r); $('cur-editing').textContent = `editing ${r.id}`; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+      return;
+    }
+    const del = e.target.closest('[data-del]');
+    if (del) {
+      records = records.filter(x => x.id !== del.dataset.del);
+      if (editingId === del.dataset.del) { editingId = null; $('cur-editing').textContent = ''; }
+      persist(); drawList(); report();
+      QIST.toast('Removed from the working list. The committed file is unchanged until you download and commit.');
+    }
+  });
+
+  $('cur-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = report();
+    if (!v.ok) return;
+    const o = readForm();
+    const i = records.findIndex(r => r.id === (editingId || o.id));
+    if (i >= 0) records[i] = o; else records.push(o);
+    editingId = null; $('cur-editing').textContent = '';
+    persist(); drawList();
+    QIST.toast(i >= 0 ? 'Record updated in the working list.' : 'Record added to the working list.');
+    $('cur-form').reset(); $('f-country').value = ''; syncListBox(); syncFieldBox(); report();
+  });
+
+  $('cur-clear').addEventListener('click', () => {
+    editingId = null; $('cur-editing').textContent = '';
+    $('cur-form').reset(); $('f-country').value = ''; syncListBox(); syncFieldBox(); report();
+  });
+
+  function fileText() { return JSON.stringify(records, null, 2) + '\n'; }
+
+  $('cur-download').addEventListener('click', () => {
+    const blob = new Blob([fileText()], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'opportunities.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  $('cur-copy').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(fileText()); QIST.toast('JSON copied to the clipboard.'); }
+    catch (_) { QIST.toast('The browser refused clipboard access — use Download instead.'); }
+  });
+
+  $('cur-reload').addEventListener('click', () => {
+    records = JSON.parse(JSON.stringify(fileRecords));
+    try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+    editingId = null; $('cur-editing').textContent = '';
+    drawList(); report();
+    QIST.toast('Working list reset to the committed file.');
+  });
+
+  syncListBox(); syncFieldBox(); drawList(); report();
+})();
+</script>
+</body>
+</html>
