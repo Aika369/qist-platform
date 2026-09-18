@@ -72,6 +72,23 @@
   const $ = id => document.getElementById(id);
   const list = $('opp-list'), count = $('opp-count');
 
+  /* Deploy guard. This page needs helpers and data files that ship together with it.
+     When only part of a release reaches the server, a missing helper used to throw and
+     leave a blank page with no explanation. Now we say what is out of date. */
+  function outOfDate(what) {
+    count.textContent = '';
+    list.innerHTML = `<div class="card pad-lg opp-empty">
+      <h3>This page is newer than the files on the server</h3>
+      <p class="small muted">Missing or outdated: <code>${QIST.esc(what)}</code>.
+        Upload the whole release together — <code>assets/js/app.js</code>,
+        <code>data/eligibility.json</code> and <code>data/opportunities.json</code> must match this page.</p>
+    </div>`;
+  }
+  if (typeof QIST.fillCountrySelect !== 'function' || !QIST.PRIMARY_FIELDS) {
+    console.error('opportunities.html: assets/js/app.js is older than this page');
+    return outOfDate('assets/js/app.js');
+  }
+
   /* ---------- data loading: explicit loading and error states ---------- */
   let opps, elig;
   try {
@@ -87,14 +104,26 @@
   }
 
   /* ---------- populate the lookups ---------- */
+  if (!elig.priority_countries || Object.keys(elig.countries || {}).length < 50) {
+    console.error('opportunities.html: data/eligibility.json is older than this page');
+    return outOfDate('data/eligibility.json');
+  }
   QIST.fillCountrySelect($('of-country'), elig, 'KZ');
 
   const usedTypes = [...new Set(opps.map(o => o.type))];
   usedTypes.forEach(t => $('of-type').insertAdjacentHTML('beforeend',
     `<option value="${t}">${QIST.esc(QIST.OPPORTUNITY_TYPES[t] || t)}</option>`));
 
-  [...new Set(opps.flatMap(o => o.fields || []))].sort().forEach(f =>
-    $('of-field').insertAdjacentHTML('beforeend', `<option value="${QIST.esc(f)}">${QIST.esc(f)}</option>`));
+  /* All 35 QIST primary research fields, always in the same order, so the filter looks
+     the same on every visit. Fields with nothing behind them are shown disabled with an
+     em-dash rather than hidden: that makes the gaps in our coverage visible. */
+  const fieldCounts = {};
+  opps.forEach(o => (o.fields || []).forEach(f => { fieldCounts[f] = (fieldCounts[f] || 0) + 1; }));
+  QIST.PRIMARY_FIELDS.forEach(f => {
+    const n = fieldCounts[f] || 0;
+    $('of-field').insertAdjacentHTML('beforeend',
+      `<option value="${QIST.esc(f)}"${n ? '' : ' disabled'}>${QIST.esc(f)}${n ? ` (${n})` : ' —'}</option>`);
+  });
 
   /* ---------- state lives in the URL ---------- */
   const IDS = { country:'of-country', stage:'of-stage', q:'of-q', type:'of-type', field:'of-field' };

@@ -58,7 +58,22 @@ horizontal scroll at 390px. No JavaScript errors.
 Leaflet loads on the live site — checked 2026-09-14. **The country-marker logic on the map
 is therefore not covered by automated tests; please look at it after deploying.**
 
+## Deploy — read this first
+
+A release is **one set of files that must go up together**. The 2026-09-18 incident: the three
+HTML files reached the server but `assets/js/app.js`, `data/eligibility.json` and
+`data/opportunities.json` did not. The page called a helper that was not there, threw, and
+rendered blank with no explanation.
+
+Two things changed because of it:
+
+- `opportunities.html` now checks its dependencies and, if they are stale, says which file is
+  out of date instead of showing an empty page.
+- When you upload a release, upload **every file in the zip**, including the `assets/` and
+  `data/` folders. Dragging only the changed HTML is what caused this.
+
 ## Next
 
-Set the three endpoint fields. Everything else in iterations 1–3 is already working and
-produces no measurement until they exist.
+Endpoints are configured (`formspree.io/f/xyezzgdo`, `info@qista.org`). After this release is
+fully uploaded: click **Interested** on the live site and confirm the submission appears in the
+Formspree dashboard. That is the first real metric this product has ever produced.
