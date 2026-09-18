@@ -35,6 +35,19 @@
     badgeInk: '#16263d'
   };
 
+  // Двухбуквенный код страны для кластеров, у которых координата — центр страны.
+  var CC = {
+    'Kazakhstan':'KZ','USA':'US','United States':'US','UK':'UK','United Kingdom':'UK',
+    'Germany':'DE','Japan':'JP','France':'FR','Switzerland':'CH','Austria':'AT',
+    'Finland':'FI','South Korea':'KR','UAE':'AE','China':'CN','Canada':'CA',
+    'Hungary':'HU','Italy':'IT','Norway':'NO','Uzbekistan':'UZ','Kyrgyzstan':'KG',
+    'Turkmenistan':'TM','Azerbaijan':'AZ','Georgia':'GE','Armenia':'AM','Mongolia':'MN'
+  };
+  function countryCode(name) {
+    if (!name) return '??';
+    return CC[name] || name.replace(/[^A-Za-zА-Яа-я]/g, '').slice(0, 2).toUpperCase();
+  }
+
   function initials(name) {
     var parts = String(name || '').trim().split(/\s+/).filter(Boolean);
     if (!parts.length) return '?';
@@ -82,8 +95,15 @@
       });
       c.count = c.people.length;
       c.lead = c.people[0];
-      c.initials = initials(c.lead.name);
-      c.place = c.lead.city || c.lead.country || '';
+      /* Если у записей нет города, координата — центр страны. Показывать инициалы
+         одного человека над серединой Канзаса вместо 60 исследователей значит врать
+         о том, где они работают. Такие кластеры подписываем кодом страны. */
+      var precise = c.people.filter(function (x) {
+        return (x.geo_precision || (x.city ? 'city' : 'country')) === 'city';
+      }).length;
+      c.vague = precise * 2 < c.people.length;
+      c.initials = c.vague ? countryCode(c.lead.country) : initials(c.lead.name);
+      c.place = c.vague ? (c.lead.country || '') : (c.lead.city || c.lead.country || '');
       c.v = vec(c.lat, c.lng);
       return c;
     });
@@ -320,7 +340,9 @@
 
         ctx.strokeStyle = hovered === cl ? '#f4e9d2' : COLORS.ring;
         ctx.lineWidth = hovered === cl ? 3 : 2;
+        if (cl.vague) ctx.setLineDash([4, 3]);   // пунктир = точность «страна»
         ctx.beginPath(); ctx.arc(b2.x, b2.y, rad, 0, 6.2832); ctx.stroke();
+        ctx.setLineDash([]);
 
         ctx.fillStyle = COLORS.badgeInk;
         ctx.font = '700 ' + Math.round(rad * 0.82) + 'px "Source Serif 4", Georgia, serif';
@@ -375,8 +397,9 @@
         var c = found.c;
         var names = c.people.slice(0, 3).map(function (p) { return p.name; }).join(' &middot; ');
         tipEl.innerHTML =
-          '<strong>' + (c.place || 'Unknown location') + '</strong>' +
-          '<span>' + c.count + (c.count === 1 ? ' researcher' : ' researchers') + '</span>' +
+          '<strong>' + (c.place || 'Место не указано') + '</strong>' +
+          '<span>' + c.count + (c.count === 1 ? ' исследователь' : ' исследователей') +
+            (c.vague ? ' · город не указан' : '') + '</span>' +
           '<span class="names">' + names + (c.count > 3 ? ' &hellip;' : '') + '</span>';
         tipEl.style.left = Math.round(found.x) + 'px';
         tipEl.style.top = Math.round(found.y - found.r - 10) + 'px';

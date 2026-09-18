@@ -464,3 +464,10 @@ table.data tr:hover td { background: var(--paper); }
   .opp-profile select { min-width: 0; width: 100%; }
   .opp-profile > div { flex: 1 1 100%; }
 }
+
+/* Страновая метка на карте: координата = центр страны, а не место работы */
+.country-badge {
+  width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center;
+  background: #6b7a8c; color: #fff; border: 2px dashed var(--gold-soft);
+  font: 700 .82rem var(--sans); box-shadow: var(--shadow);
+}

@@ -113,12 +113,10 @@ const QIST = {
     return h;
   },
 
-  seededAccounts() {
-    return [
-      { email: 'admin@qist.kz', password: 'qist-admin-2026', name: 'QIST Admin', role: 'admin' },
-      { email: 'member@qist.kz', password: 'qist-member-2026', name: 'Demo Member', role: 'member' }
-    ];
-  },
+  /* Учётные записи существуют только на сервере.
+     Раньше здесь лежали демо-логин и пароль администратора прямо в публичном JS —
+     любой посетитель мог войти в админку. Удалено 2026-09-18, см. DECISIONS D-11. */
+  authAvailable() { return this.apiAlive; },
 
   async login(email, password) {
     if (this.apiAlive) {
@@ -131,12 +129,8 @@ const QIST = {
       localStorage.setItem('qist_session', JSON.stringify(data));
       return data;
     }
-    const users = [...this.seededAccounts(), ...this.overlay('accounts')];
-    const u = users.find(x => x.email.toLowerCase() === email.toLowerCase() && x.password === password);
-    if (!u) throw new Error('Invalid email or password.');
-    const session = { email: u.email, name: u.name, role: u.role || 'member' };
-    localStorage.setItem('qist_session', JSON.stringify(session));
-    return session;
+    // Бэкенд недоступен — честно говорим, что входа нет, вместо поддельной сессии.
+    throw new Error('NO_BACKEND');
   },
 
   async register(fields) {
@@ -150,13 +144,9 @@ const QIST = {
       localStorage.setItem('qist_session', JSON.stringify(data));
       return data;
     }
-    const users = [...this.seededAccounts(), ...this.overlay('accounts')];
-    if (users.some(x => x.email.toLowerCase() === fields.email.toLowerCase()))
-      throw new Error('An account with this email already exists.');
-    this.pushOverlay('accounts', { ...fields, role: 'member' });
-    const session = { email: fields.email, name: fields.name, role: 'member' };
-    localStorage.setItem('qist_session', JSON.stringify(session));
-    return session;
+    // Регистрация в localStorage создавала иллюзию аккаунта: данные оставались
+    // в браузере посетителя и до нас не доходили. Убрано 2026-09-18.
+    throw new Error('NO_BACKEND');
   },
 
   logout() {
@@ -204,7 +194,8 @@ const QIST = {
         <div>
           <h3>${this.esc(p.name)}</h3>
           <div class="role">${this.esc(p.title || '')}${p.institution ? ' · ' + this.esc(p.institution) : ''}</div>
-          ${(p.city || p.country) ? `<div class="loc">📍 ${this.esc([p.city, p.country].filter(Boolean).join(', '))}</div>` : ''}
+          ${(p.city || p.country) ? `<div class="loc">${this.hasPreciseGeo(p) ? '📍' : '🌐'} ${this.esc(this.geoLabel(p))}</div>` : ''}
+          ${p.possible_duplicate_of ? '<div class="loc" style="color:var(--red)">возможный дубликат записи — на проверке</div>' : ''}
         </div>
       </div>
       <div class="tags">${tags}</div>
@@ -433,6 +424,11 @@ const QIST = {
      честно отключаются, а не ведут в никуда. */
   CONTACT_EMAIL: '',
 
+  /* Куда уходит запись в пилот и подписка на письмо.
+     Может быть тем же URL, что INTEREST_ENDPOINT. Пусто — форма честно
+     отключается и не делает вид, что собрала адрес. */
+  SIGNUP_ENDPOINT: '',
+
   async getOpportunities() {
     if (this.apiAlive) {
       try {
@@ -482,30 +478,44 @@ const QIST = {
   },
 
   /* Отклик. Возвращает {ok, reason} — вызывающий код сам решает, что показать. */
-  async recordInterest(opp, ctx) {
-    const ep = this.INTEREST_ENDPOINT;
-    if (!ep) return { ok: false, reason: 'not_configured' };
-    const payload = {
-      opportunity_id: opp.id, opportunity_title: opp.title,
-      country: ctx.country, career_stage: ctx.stage,
-      user: (this.currentUser() || {}).email || '',
-      at: new Date().toISOString()
-    };
-    if (ep.startsWith('mailto:')) {
-      const subj = encodeURIComponent('Интерес к возможности: ' + opp.title);
+  /* Общая отправка формы на настроенный endpoint. {ok, reason} */
+  async submitForm(endpoint, payload) {
+    if (!endpoint) return { ok: false, reason: 'not_configured' };
+    if (endpoint.startsWith('mailto:')) {
+      const subj = encodeURIComponent(payload._subject || 'ScienceBridge');
       const body = encodeURIComponent(JSON.stringify(payload, null, 2));
-      location.href = `${ep}?subject=${subj}&body=${body}`;
+      location.href = `${endpoint}?subject=${subj}&body=${body}`;
       return { ok: true, reason: 'mailto' };
     }
     try {
-      const r = await fetch(ep, {
+      const r = await fetch(endpoint, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       return r.ok ? { ok: true, reason: 'posted' } : { ok: false, reason: 'http_' + r.status };
-    } catch (_) {
-      return { ok: false, reason: 'network' };
-    }
+    } catch (_) { return { ok: false, reason: 'network' }; }
+  },
+
+  /* Как показывать координаты. 338 записей каталога имеют координаты центра
+     страны, а не места работы: города и организации в исходных данных нет.
+     Показывать их как точный адрес — значит выдумывать точность. */
+  geoLabel(person) {
+    const prec = person.geo_precision || (person.city ? 'city' : 'country');
+    if (prec === 'city')    return [person.city, person.country].filter(Boolean).join(', ');
+    if (prec === 'country') return (person.country || '') + ' · город не указан';
+    return 'Местоположение не указано';
+  },
+  hasPreciseGeo(person) { return (person.geo_precision || (person.city ? 'city' : 'country')) === 'city'; },
+
+  async recordInterest(opp, ctx) {
+    return this.submitForm(this.INTEREST_ENDPOINT, {
+      _subject: 'Интерес к возможности: ' + opp.title,
+      kind: 'opportunity_interest',
+      opportunity_id: opp.id, opportunity_title: opp.title,
+      country: ctx.country, career_stage: ctx.stage,
+      user: (this.currentUser() || {}).email || '',
+      at: new Date().toISOString()
+    });
   },
 
   async boot(active) {

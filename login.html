@@ -77,6 +77,28 @@
   const $ = id => document.getElementById(id);
   const next = new URLSearchParams(location.search).get('next') || 'index.html';
 
+  // Учётные записи живут только на сервере. Пока он не развёрнут, не делаем вид,
+  // что регистрация работает: раньше она писала аккаунт в localStorage посетителя.
+  if (!QIST.authAvailable()) {
+    document.querySelector('.auth-wrap').innerHTML = `
+      <div class="card auth-card" style="padding:30px 32px">
+        <h2 style="margin-bottom:10px">Личные кабинеты ещё не подключены</h2>
+        <p class="small muted" style="margin-bottom:14px">
+          Профили, сохранённые возможности и персональный подбор появятся, когда мы развернём сервер.
+          Пока вход работал бы только на вид: учётная запись оставалась бы в вашем браузере
+          и до нас не доходила, поэтому мы его отключили.
+        </p>
+        <p class="small muted" style="margin-bottom:18px">
+          Чтобы не пропустить запуск — подпишитесь на письмо с возможностями. Оно уже работает.
+        </p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn btn-primary" href="index.html#pilot">Записаться в пилот</a>
+          <a class="btn btn-outline" href="opportunities.html">Смотреть возможности</a>
+        </div>
+      </div>`;
+    return;
+  }
+
   function show(which) {
     $('login-form').style.display = which === 'login' ? '' : 'none';
     $('register-form').style.display = which === 'register' ? '' : 'none';
@@ -109,14 +131,6 @@
         title: $('r-title').value.trim(),
         institution: $('r-inst').value.trim(),
         topics
-      });
-      // also add the new member to the local people overlay so they appear in the directory
-      QIST.pushOverlay('people', {
-        name: $('r-name').value.trim(),
-        title: $('r-title').value.trim() || 'Researcher',
-        institution: $('r-inst').value.trim(),
-        city: '', country: 'Kazakhstan', topics,
-        bio: 'New QIST member.', experience: null
       });
       location.href = next;
     } catch (ex) { err(ex.message); }

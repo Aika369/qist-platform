@@ -55,7 +55,7 @@
     <div class="stat"><b id="st-people">—</b><span>Researchers</span></div>
     <div class="stat"><b id="st-countries">—</b><span>Countries</span></div>
     <div class="stat"><b id="st-topics">—</b><span>Research fields</span></div>
-    <div class="stat"><b id="st-posts">—</b><span>Opportunities posted</span></div>
+    <div class="stat"><b id="st-posts">—</b><span>Active opportunities</span></div>
   </div>
 </section>
 
@@ -106,8 +106,8 @@
 <section class="section" style="padding-top:0">
   <div class="container">
     <div class="section-head">
-      <h2 class="rule">Recently on the channels</h2>
-      <a href="channels.html">All channels →</a>
+      <h2 class="rule">Свежие возможности</h2>
+      <a href="opportunities.html">Все возможности →</a>
     </div>
     <div id="recent-posts" class="grid grid-3"></div>
   </div>
@@ -125,7 +125,7 @@
 
 <section class="section" style="padding-top:0">
   <div class="container">
-    <div class="newsletter-cta">
+    <div class="newsletter-cta" id="pilot">
       <div>
         <h3>Stay in the loop</h3>
         <p class="small">Get the QIST digest: jobs, grants, conferences and community news.</p>
@@ -146,7 +146,7 @@
 (async () => {
   await QIST.boot('index.html');
 
-  const [people, posts] = await Promise.all([QIST.getPeople(), QIST.getPosts()]);
+  const [people, opps] = await Promise.all([QIST.getPeople(), QIST.getOpportunities()]);
 
   // hero globe — fails quietly so a bad fetch never takes the hero down
   try {
@@ -162,20 +162,35 @@
     document.querySelector('.science-globe').style.display = 'none';
   }
 
-  document.getElementById('st-people').textContent = people.length;
-  document.getElementById('st-countries').textContent = new Set(people.map(p => p.country)).size;
-  document.getElementById('st-topics').textContent = new Set(people.flatMap(p => p.topics || [])).size;
-  document.getElementById('st-posts').textContent = posts.length;
+  /* Честные счётчики.
+     Было: «902 research fields» — это темы из биографий, разбитые по запятым,
+     и «13 opportunities posted», где часть уже с прошедшим дедлайном.
+     Стало: направления по классификатору QIST и только активные возможности. */
+  const unique = people.filter(p => !p.possible_duplicate_of);
+  const fieldsWithPeople = Object.keys(QIST.fieldCounts(unique))
+    .filter(f => f !== 'Other Research Area').length;
+  const active = opps.filter(o => !QIST.isExpired(o));
 
-  const chan = Object.fromEntries(QIST.channels().map(c => [c.id, c]));
-  document.getElementById('recent-posts').innerHTML = posts.slice(0, 3).map(p => `
+  document.getElementById('st-people').textContent = unique.length;
+  document.getElementById('st-countries').textContent =
+    new Set(unique.map(p => p.country).filter(Boolean)).size;
+  document.getElementById('st-topics').textContent = fieldsWithPeople;
+  document.getElementById('st-posts').textContent = active.length;
+
+  const soon = [...active].sort((a, b) => {
+    if (!a.deadline) return 1; if (!b.deadline) return -1;
+    return a.deadline.localeCompare(b.deadline);
+  }).slice(0, 3);
+  document.getElementById('recent-posts').innerHTML = soon.length ? soon.map(o => `
     <div class="card">
       <div class="post" style="border:0;box-shadow:none;padding:0;margin:0">
-        <div class="meta"><span class="badge">${chan[p.channel] ? chan[p.channel].em + ' ' + chan[p.channel].name : p.channel}</span><span>${QIST.esc(p.date || '')}</span></div>
-        <h3><a href="channels.html?c=${QIST.esc(p.channel)}">${QIST.esc(p.title)}</a></h3>
-        <p class="small muted">${QIST.esc((p.body || '').slice(0, 130))}…</p>
+        <div class="meta"><span class="badge">${QIST.esc(QIST.OPPORTUNITY_TYPES[o.type] || o.type)}</span>${
+          o.deadline ? `<span class="deadline">до ${QIST.esc(o.deadline)}</span>` : '<span>без дедлайна</span>'}</div>
+        <h3><a href="opportunities.html">${QIST.esc(o.title)}</a></h3>
+        <p class="small muted">${QIST.esc((o.summary || '').slice(0, 130))}…</p>
       </div>
-    </div>`).join('');
+    </div>`).join('')
+    : `<div class="card"><p class="small muted">Активных возможностей сейчас нет — мы их добавляем.</p></div>`;
 
   const featured = [...people].sort((a, b) => (b.featured || 0) - (a.featured || 0)).slice(0, 6);
   document.getElementById('featured-people').innerHTML =
@@ -183,12 +198,40 @@
   document.querySelectorAll('#featured-people .person-card').forEach(el =>
     el.addEventListener('click', () => location.href = 'directory.html?person=' + el.dataset.id));
 
-  document.getElementById('cta-subscribe').addEventListener('submit', e => {
-    e.preventDefault();
-    QIST.pushOverlay('subscribers', { email: document.getElementById('cta-email').value });
-    document.getElementById('cta-email').value = '';
-    QIST.toast('Subscribed! You will receive the next QIST digest.');
-  });
+  /* Запись в пилот. Раньше адрес сохранялся в localStorage посетителя,
+     то есть до нас не доходил вообще. Теперь — на настроенный endpoint,
+     а если он не задан, форма честно об этом говорит. */
+  const form = document.getElementById('cta-subscribe');
+  const emailInput = document.getElementById('cta-email');
+  const btn = form.querySelector('button');
+
+  if (!QIST.SIGNUP_ENDPOINT) {
+    emailInput.disabled = true;
+    emailInput.placeholder = 'приём заявок ещё не подключён';
+    btn.disabled = true;
+    btn.textContent = 'Скоро';
+    form.insertAdjacentHTML('afterend',
+      '<p class="small" style="color:#9eacc0;margin-top:10px;flex-basis:100%">' +
+      'Приём заявок ещё не подключён — мы не хотим собирать адреса туда, откуда не сможем их достать. ' +
+      'Настройка: <code>QIST.SIGNUP_ENDPOINT</code> в <code>assets/js/app.js</code>, инструкция в README.</p>');
+  } else {
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+      if (!email) return;
+      btn.disabled = true; btn.textContent = 'Отправляем…';
+      const res = await QIST.submitForm(QIST.SIGNUP_ENDPOINT, {
+        _subject: 'Запись в пилот ScienceBridge',
+        kind: 'pilot_signup', email, at: new Date().toISOString()
+      });
+      if (res.ok) {
+        form.innerHTML = '<p style="color:#f4e9d2;margin:0">Готово. Первое письмо придёт, когда наберём подборку под ваш профиль.</p>';
+      } else {
+        btn.disabled = false; btn.textContent = 'Subscribe';
+        QIST.toast('Не удалось отправить. Попробуйте ещё раз.');
+      }
+    });
+  }
 
   const openDirectorySearch = query => {
     const value = String(query || '').trim();
