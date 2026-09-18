@@ -1,6 +1,6 @@
 # STATUS
 
-Updated: 2026-09-19 · Iterations 1–5
+Updated: 2026-09-19 · Iterations 1–6
 
 ## Works
 
@@ -9,6 +9,20 @@ Updated: 2026-09-19 · Iterations 1–5
 URL-shareable state.
 Every card carries an eligibility verdict for the visitor's country and career stage, with
 a link to the source the verdict came from. No match percentages: none are calibrated yet.
+
+**Match analysis** — `QIST.matchOpportunity()`
+Every opportunity card now carries a score, a sentence and the rows the score was counted from.
+The number is **requirements met out of requirements this call actually states** — counted, not
+predicted, and every line is checkable against the funder's page. A requirement the call does not
+state (no deadline, open to all fields) is not counted, so a three-condition call is scored out of
+three. Country, career stage and an open deadline are blocking: fail one and the verdict says you
+cannot apply, whatever the percentage looks like. The card says in plain words that this is **not**
+a chance of winning — we have no response data, so a weighted prediction would be a guess dressed
+as a number (D-07, D-33). A language model can sit on top of this breakdown once the backend
+exists; it will not replace the count.
+
+The separate "Academic matching" page is gone from the footer: matching is a property of the
+search, not a section of the site (D-37).
 
 **Eligibility engine** — `QIST.checkCountry()`
 All 250 ISO countries, four Horizon Europe statuses (EU member / associated / funded /
@@ -31,17 +45,23 @@ navigation: it is personal and belongs behind sign-in. "For organizations" is th
 audience item on the site, and it is a deliberate exception (D-27).
 
 **For organizations** — `organizations.html`
-One page, two readings: a switch at the top rewrites the page for a university or a company
-and tags every submission with `audience`, so the data decides later whether to split it.
+One page, two readings: a switch at the top — **company first** — rewrites the page and tags every
+submission with `audience`, so the data decides later whether to split it.
+
+Researchers appear here **anonymously**: research field, seniority band, country. Name, title,
+organisation, city and public link are not rendered and are not in the DOM, and searching by name
+returns nothing. An open named list would hand over the only asset QIST has — an organisation reads
+it once, finds those people elsewhere and never comes back (D-34). A name reaches an organisation
+only after that member agrees to a specific introduction.
 Three things a visitor can actually do:
 
 1. **Post a need** — an R&D problem, a vacancy, a consortium partner or a single expert
    question. It reaches a curator, who publishes it in Opportunities with the organisation
    named. Nothing appears on the site automatically.
-2. **Find researchers** — a real search across all 497 directory records by field, country
-   and free text, not a mock-up. "Request an introduction" opens inline and states, before
-   anything is sent, that contact details are never passed on without that person's consent.
-   No researcher's email is in the payload, because we do not hold one.
+2. **See what expertise is in the network** — a real search across all 497 records by field,
+   country and topic, returning anonymous capability cards. "Request an introduction" opens
+   inline and states, before anything is sent, that the name and contact reach the organisation
+   only if that researcher agrees.
 3. **Book 30 minutes** — a discovery call. The page says plainly there is nothing to buy.
 
 A block at the bottom lists what does not exist yet — no organisation accounts, no verified
@@ -52,6 +72,24 @@ cannot rot into a lie.
 The header button says "Create profile" and now does it: without a backend it collects a real
 request through Formspree and a curator creates the profile by hand. It does not ask for a
 password, because there is nowhere to keep one.
+
+**Home page** — `index.html`
+Rebuilt. "What you can do here" repeated the navigation, "Latest opportunities" was a weaker copy
+of the real page without verdicts, and "Featured researchers" paraded six names chosen by an
+unexplained flag — which contradicted the rule that organizations see no names at all. In their
+place: a live eligibility check on three open calls that reacts to the country and stage you pick,
+two clearly separated doors (researcher / organization), and the depth of the network by research
+field with no names. The three calls are chosen to exercise different edges of the check, because
+the three closing soonest all happened to be open to any nationality and the demonstration
+demonstrated nothing (D-39).
+
+**Data provenance — corrected**
+The site used to say the directory was "compiled from public sources: university pages, Google
+Scholar and open researcher profiles". That was **wrong**, and wrong in an expensive direction: it
+described collection without consent where consent exists. Everyone in the directory is a QIST
+member who joined the association themselves and supplied these details. Fixed on `about.html`,
+`organizations.html`, the README and here (D-35). B-34 is to reconcile the 497 records against the
+membership register and record a joining date, so the claim can be backed up.
 
 **Honesty fixes**
 - Hard-coded admin credentials removed from the public JS *and* from the sign-in page text.
@@ -91,8 +129,8 @@ Researchers' own names are left exactly as recorded.
 
 ## Verified
 
-137 automated checks in headless Chromium across `test.mjs` (21), `test2.mjs` (17),
-`test3.mjs` (19), `test4.mjs` (16), `test5.mjs` (30) and `test6.mjs` (34). Covering: eligibility verdicts across two programmes and nine countries,
+183 automated checks in headless Chromium across `test.mjs` (22), `test2.mjs` (18),
+`test3.mjs` (19), `test4.mjs` (16), `test5.mjs` (30), `test6.mjs` (38) and `test7.mjs` (40). Covering: eligibility verdicts across two programmes and nine countries,
 filters, empty and error states, expired entries, button behaviour with no endpoint
 configured, absence of the admin password anywhere in the build, honest counters, coordinate
 precision labels, the full 250-country selector, English-only interface text, and no
@@ -110,7 +148,16 @@ screen at phone width. All three are fixed.
 unreachable from the sandbox: it checks that all four submission kinds (`org_need`,
 `org_introduction`, `org_conversation`, `profile_request`) actually leave the browser with the
 right body and the `Accept: application/json` header Formspree needs, that a malformed email
-sends nothing at all, and that no researcher contact detail is in any payload.
+sends nothing at all, and that no researcher contact detail is in any payload. It also proves the
+anonymity by comparing the rendered DOM against the source data — no name, organisation, city or
+link of any shown researcher appears anywhere in the markup, and a search for a real name returns
+nothing.
+
+`test7.mjs` runs 80 score calculations across four reader profiles and asserts that the numerator,
+the denominator and the percentage agree, that a requirement the call does not state never enters
+the denominator, and that a blocking failure overrides a high percentage. It also checks the brand
+lockup by computed style rather than by eye, the footer links against the header, and that the
+corrected provenance wording is actually on the pages.
 
 `L is not defined` on map.html appears only in the sandbox, where unpkg.com is blocked.
 Leaflet loads on the live site — checked 2026-09-14. **The country-marker logic on the map
@@ -136,6 +183,19 @@ Verified directly against `aika369.github.io/qist-platform/opportunities.html`:
 build `2026-09-18d` served, 7 cards, 250 countries in two groups, 35 research fields,
 no deploy-guard message. The site works. The earlier "page is newer than the files"
 message came from a browser cache holding the previous `app.js`.
+
+## What is blocked on the backend
+
+Three things asked for in the last review cannot be built on GitHub Pages, because there is nowhere
+to keep files or passwords:
+
+- **Organization sign-up and sign-in** with a stored profile (B-31).
+- **Researcher profile editing, avatar upload, CV upload** and building a profile from the CV
+  (B-30). CV parsing is server-side by necessity: a model key cannot live in the browser.
+- **A language model on top of the match breakdown** (B-32).
+
+Everything else from that review is done. The backend (B-29) is now the single blocker for the
+rest, and it needs decisions only you can make: hosting account, who pays for it, which domain.
 
 ## Next
 

@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-19b">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-19c">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
@@ -16,9 +16,9 @@
 <section class="hero">
   <div class="container hero-grid">
     <div class="hero-copy">
-      <span class="kicker">Science Bridge Project <span class="kicker-divider" aria-hidden="true">|</span> Qazaq International Science &amp; Technology Association</span>
+      <span class="kicker">ScienceBridge AI <span class="kicker-divider" aria-hidden="true">|</span> an initiative of the Qazaq International Science &amp; Technology Association</span>
       <h1>Find the <em class="hl">scientists</em><br>to solve your <em class="hl">R&amp;D needs</em>.</h1>
-      <p class="lead">An AI-powered scientific intelligence platform connecting scientists, universities, industry, startups, and governments. Discover experts. Build collaborations.</p>
+      <p class="lead">Researchers, universities, industry and funders across Central Asia, the Caucasus and Mongolia — and colleagues from the region working anywhere in the world. Nine countries in this first phase, built to go wider.</p>
 
       <form class="hero-search" id="hero-search" role="search">
         <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
@@ -59,67 +59,91 @@
   </div>
 </section>
 
+<!-- ================= the promise, demonstrated on real data =================
+     What replaced "What you can do here": a menu that repeated the navigation and told nobody
+     why to care. This section is the product doing its job on the calls that are open right
+     now. Change the country and the verdicts change, because they are read from the same
+     published sources the Opportunities page uses. -->
 <section class="section">
   <div class="container">
-    <div class="section-head"><h2 class="rule">What you can do here</h2></div>
-    <div class="grid grid-3">
-      <div class="card feature-card">
-        <div class="icon">🗺️</div>
-        <h3>Researcher map</h3>
-        <p class="small muted">See where Kazakhstani scholars work — from Astana to Boston to Tokyo — and discover who is near you.</p>
-        <p style="margin-top:10px"><a href="map.html">Open the map →</a></p>
+    <div class="section-head">
+      <div>
+        <h2 class="rule">Before you spend a week on an application</h2>
+        <p class="small muted" style="margin-top:6px;max-width:64ch">
+          Every call carries a verdict for <i>your</i> country and career stage, counted from the
+          conditions the funder itself publishes — with the link it came from. Pick a country and
+          watch these three change.
+        </p>
       </div>
-      <div class="card feature-card">
-        <div class="icon">🔎</div>
-        <h3>Find people</h3>
-        <p class="small muted">Search the directory by research topic, institution, country of work or years of experience.</p>
-        <p style="margin-top:10px"><a href="directory.html">Search the directory →</a></p>
+    </div>
+
+    <div class="demo-bar">
+      <label for="demo-country">I am based in</label>
+      <select id="demo-country" aria-label="Country"></select>
+      <label for="demo-stage">and I am a</label>
+      <select id="demo-stage">
+        <option value="phd_student">PhD candidate</option>
+        <option value="phd_plus" selected>PhD / Researcher</option>
+        <option value="postdoc_plus">Postdoc</option>
+        <option value="pi_only">Professor / PI</option>
+      </select>
+      <span class="demo-note">Three of <b id="demo-total">—</b> open calls, picked to show different sides of the check</span>
+    </div>
+
+    <div id="demo-list" class="grid grid-3"></div>
+    <p style="margin-top:16px"><a class="btn btn-primary" href="opportunities.html">See all open calls →</a></p>
+  </div>
+</section>
+
+<!-- ================= two doors ================= -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="grid grid-2">
+      <div class="card pad-lg door">
+        <h3>If you do research</h3>
+        <ul>
+          <li>Calls you can actually enter, with the disqualifying condition stated up front.</li>
+          <li>One place for grants, positions, consortium roles and co-author searches.</li>
+          <li>Your profile stays yours: your name never reaches a company until you say yes.</li>
+        </ul>
+        <div class="door-actions">
+          <a class="btn btn-primary" href="opportunities.html">Find your next call</a>
+          <a class="btn btn-ghost" href="login.html#register">Create a profile</a>
+        </div>
       </div>
-      <div class="card feature-card">
-        <div class="icon">🤝</div>
-        <h3>Academic matching</h3>
-        <p class="small muted">Describe your research interests and get matched with potential collaborators, mentors and co-authors.</p>
-        <p style="margin-top:10px"><a href="matching.html">Get matched →</a></p>
-      </div>
-      <div class="card feature-card">
-        <div class="icon">💼</div>
-        <h3>Jobs &amp; vacancies</h3>
-        <p class="small muted">Faculty openings, postdoc positions, PhD studentships and industry roles curated for our community.</p>
-        <p style="margin-top:10px"><a href="channels.html?c=jobs">Browse jobs →</a></p>
-      </div>
-      <div class="card feature-card">
-        <div class="icon">🏛️</div>
-        <h3>Grants &amp; funding</h3>
-        <p class="small muted">National and international funding calls, fellowships and travel grants — with deadlines at a glance.</p>
-        <p style="margin-top:10px"><a href="channels.html?c=grants">See open calls →</a></p>
-      </div>
-      <div class="card feature-card">
-        <div class="icon">📮</div>
-        <h3>QIST newsletter</h3>
-        <p class="small muted">A digest of community news, member achievements and the best opportunities, delivered regularly.</p>
-        <p style="margin-top:10px"><a href="newsletter.html">Read &amp; subscribe →</a></p>
+      <div class="card pad-lg door">
+        <h3>If you run a lab, a company or a research office</h3>
+        <ul>
+          <li>Post an R&amp;D problem, a vacancy or a search for a consortium partner.</li>
+          <li>See what expertise the network holds — by field, seniority and country.</li>
+          <li>Ask for an introduction; we put the question to the researcher, never the reverse.</li>
+        </ul>
+        <div class="door-actions">
+          <a class="btn btn-primary" href="organizations.html">For organizations</a>
+          <a class="btn btn-ghost" href="organizations.html#talk">Book 30 minutes</a>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- ================= what is in the network =================
+     Replaces "Featured researchers". Six names chosen by an unexplained flag proved nothing,
+     and parading names here contradicts the rule that organizations see no names at all
+     (DECISIONS.md D-34). Depth by field is the thing a visitor actually wants to know. -->
 <section class="section" style="padding-top:0">
   <div class="container">
     <div class="section-head">
-      <h2 class="rule">Latest opportunities</h2>
-      <a href="opportunities.html">All opportunities →</a>
+      <div>
+        <h2 class="rule">What is in the network</h2>
+        <p class="small muted" style="margin-top:6px;max-width:64ch">
+          Members who joined QIST themselves, counted by their own stated research field.
+          Where a column is short, we say so rather than padding it.
+        </p>
+      </div>
+      <a href="directory.html">Open the directory →</a>
     </div>
-    <div id="recent-posts" class="grid grid-3"></div>
-  </div>
-</section>
-
-<section class="section" style="padding-top:0">
-  <div class="container">
-    <div class="section-head">
-      <h2 class="rule">Featured researchers</h2>
-      <a href="directory.html">Full directory →</a>
-    </div>
-    <div id="featured-people" class="grid grid-3"></div>
+    <div id="depth" class="depth"></div>
   </div>
 </section>
 
@@ -140,8 +164,8 @@
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/app.js?v=2026-09-19b"></script>
-<script src="assets/js/globe.js?v=2026-09-19b"></script>
+<script src="assets/js/app.js?v=2026-09-19c"></script>
+<script src="assets/js/globe.js?v=2026-09-19c"></script>
 <script>
 (async () => {
   await QIST.boot('index.html');
@@ -177,26 +201,78 @@
   document.getElementById('st-topics').textContent = fieldsWithPeople;
   document.getElementById('st-posts').textContent = active.length;
 
-  const soon = [...active].sort((a, b) => {
+  /* ---------- the live demo ----------
+     Three calls closing soonest, scored against whatever country and stage the visitor picks.
+     This is the same QIST.matchOpportunity() the Opportunities page uses — if it is wrong here
+     it is wrong there, which is the point of showing it on the front page. */
+  const elig = await QIST.getEligibility();
+  const demoCountry = document.getElementById('demo-country');
+  const demoStage = document.getElementById('demo-stage');
+  QIST.fillCountrySelect(demoCountry, elig, 'KZ');
+  document.getElementById('demo-total').textContent = active.length;
+
+  /* Which three calls to show.
+     Sorting purely by deadline gave three calls that are open to any nationality, so the
+     country selector changed nothing and the demonstration demonstrated nothing — while being
+     perfectly correct. So: the soonest overall, then the soonest whose verdict actually depends
+     on the country, then the soonest with a career-stage bar. Each is a real open call and each
+     shows a different edge of the check. */
+  const byDeadline = [...active].sort((a, b) => {
     if (!a.deadline) return 1; if (!b.deadline) return -1;
     return a.deadline.localeCompare(b.deadline);
-  }).slice(0, 3);
-  document.getElementById('recent-posts').innerHTML = soon.length ? soon.map(o => `
-    <div class="card">
-      <div class="post" style="border:0;box-shadow:none;padding:0;margin:0">
-        <div class="meta"><span class="badge">${QIST.esc(QIST.OPPORTUNITY_TYPES[o.type] || o.type)}</span>${
-          o.deadline ? `<span class="deadline">by ${QIST.esc(o.deadline)}</span>` : '<span>no deadline</span>'}</div>
-        <h3><a href="opportunities.html">${QIST.esc(o.title)}</a></h3>
-        <p class="small muted">${QIST.esc((o.summary || '').slice(0, 130))}…</p>
-      </div>
-    </div>`).join('')
-    : `<div class="card"><p class="small muted">No active opportunities right now — we are adding them.</p></div>`;
+  });
+  const countrySensitive = o => {
+    const e = o.eligibility || {};
+    return (e.programme && e.programme !== 'open') ||
+           (e.countries_allowed || []).length > 0 || (e.countries_excluded || []).length > 0;
+  };
+  const soon = [];
+  const take = pred => { const o = byDeadline.find(x => pred(x) && !soon.includes(x)); if (o) soon.push(o); };
+  take(() => true);
+  take(countrySensitive);
+  take(o => o.career_stage && o.career_stage !== 'any');
+  while (soon.length < 3 && soon.length < byDeadline.length) take(() => true);
 
-  const featured = [...people].sort((a, b) => (b.featured || 0) - (a.featured || 0)).slice(0, 6);
-  document.getElementById('featured-people').innerHTML =
-    featured.map(p => QIST.personCard(p)).join('');
-  document.querySelectorAll('#featured-people .person-card').forEach(el =>
-    el.addEventListener('click', () => location.href = 'directory.html?person=' + el.dataset.id));
+  function drawDemo() {
+    const profile = { country: demoCountry.value, stage: demoStage.value, fields: [], methods: [] };
+    document.getElementById('demo-list').innerHTML = soon.length ? soon.map(o => {
+      const m = QIST.matchOpportunity(o, profile, elig);
+      const blocker = m.criteria.find(x => x.blocking && !x.ok && !x.unknown);
+      return `<div class="card demo-card demo-${m.tone}">
+        <div class="meta">
+          <span class="badge">${QIST.esc(QIST.OPPORTUNITY_TYPES[o.type] || o.type)}</span>
+          ${o.deadline ? `<span class="deadline">in ${QIST.daysLeft(o)} days</span>` : '<span>no deadline</span>'}
+        </div>
+        <h3><a href="opportunities.html?country=${encodeURIComponent(profile.country)}&stage=${encodeURIComponent(profile.stage)}#opp-${QIST.esc(o.id)}">${QIST.esc(o.title)}</a></h3>
+        <p class="small muted">${QIST.esc(o.organization)}</p>
+        <div class="demo-score">
+          <div class="match-bar"><i style="width:${m.pct}%"></i></div>
+          <b>${m.met}/${m.total}</b>
+        </div>
+        <p class="demo-line">${QIST.esc(blocker ? blocker.detail : m.verdict)}</p>
+      </div>`;
+    }).join('')
+      : '<div class="card"><p class="small muted">No open calls right now — we are adding them.</p></div>';
+  }
+  [demoCountry, demoStage].forEach(el => el.addEventListener('change', drawDemo));
+  drawDemo();
+
+  /* ---------- depth of the network, by field, no names ---------- */
+  const counts = QIST.fieldCounts(unique);
+  const top = Object.entries(counts)
+    .filter(([f]) => f !== 'Other Research Area')
+    .sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const max = top.length ? top[0][1] : 1;
+  document.getElementById('depth').innerHTML = top.map(([f, n]) => `
+    <div class="depth-row">
+      <span class="depth-label">${QIST.esc(f)}</span>
+      <span class="depth-bar"><i style="width:${Math.round((n / max) * 100)}%"></i></span>
+      <span class="depth-n">${n}</span>
+    </div>`).join('') +
+    `<p class="small muted" style="margin-top:12px">
+       ${new Set(unique.map(p => p.country).filter(Boolean)).size} countries ·
+       ${unique.length} members · names are not shown to organizations until the member agrees
+       to an introduction.</p>`;
 
   /* Pilot sign-up. This used to save the address into the visitor's own localStorage,
      which meant it never reached us. Now it posts to the configured endpoint, and if

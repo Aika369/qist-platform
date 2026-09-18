@@ -8,7 +8,15 @@
 const QIST = {
   /* Build stamp. Open the browser console on the live site: if this does not match the
      release you uploaded, the file did not reach the server. */
-  BUILD: '2026-09-19b',
+  BUILD: '2026-09-19c',
+
+  /* Positioning, in one place, so it cannot drift between pages.
+     MVP phase 1: nine countries of Central Asia, the Caucasus and Mongolia, plus their
+     researchers anywhere in the world. Later phases: worldwide. */
+  BRAND: 'ScienceBridge AI',
+  BRAND_BY: 'by QIST',
+  REGION_SHORT: 'Central Asia, the Caucasus and Mongolia',
+  REGION_LONG: 'Kazakhstan, Uzbekistan, Kyrgyzstan, Tajikistan, Turkmenistan, Azerbaijan, Georgia, Armenia and Mongolia',
 
   // Set to a deployed FastAPI URL (e.g. "https://api.qist.org") to go live.
   // Can also be overridden without redeploy: localStorage.setItem('qist_api_url', '...')
@@ -97,7 +105,7 @@ const QIST = {
 
   channels() {
     return [
-      { id: 'jobs',       name: 'Jobs & Vacancies',        em: '💼', desc: 'Academic and industry positions relevant to Kazakhstani researchers — faculty openings, postdocs, PhD studentships, industry R&D roles.' },
+      { id: 'jobs',       name: 'Jobs & Vacancies',        em: '💼', desc: 'Academic and industry positions relevant to researchers of the region — faculty openings, postdocs, PhD studentships, industry R&D roles.' },
       { id: 'grants',     name: 'Research Grants',         em: '🏛️', desc: 'Funding calls, fellowships and grant programmes — national (Kazakhstan MSHE), international (Horizon Europe, NSF, DFG) and private foundations.' },
       { id: 'conferences',name: 'Conferences & Events',    em: '🎓', desc: 'Calls for papers, upcoming conferences, workshops, summer schools and QIST community meetups.' },
       { id: 'collab',     name: 'Collaboration Requests',  em: '🤝', desc: 'Looking for a co-author, a dataset, lab access or a project partner? Post here and find collaborators across the diaspora.' },
@@ -229,9 +237,18 @@ const QIST = {
          <button class="btn btn-ghost btn-sm" onclick="QIST.logout()">Sign out</button>`
       : `<a class="btn btn-ghost btn-sm" href="login.html">Sign in</a>
          <a class="btn btn-primary btn-sm" href="login.html#register">Create profile</a>`;
+    /* Brand lockup: the product name on the first line, the association under it in small
+       capitals. "by QIST" used to sit in a bordered pill, which read as a separate badge
+       stuck onto the name. It is an attribution line, so it is set as one. */
     document.getElementById('site-header').innerHTML = `
       <div class="container">
-        <a class="brand" href="index.html"><span class="seal">Q</span> QIST</a>
+        <a class="brand" href="index.html">
+          <span class="seal">Q</span>
+          <span class="brand-lockup">
+            <span class="brand-name">${this.BRAND}</span>
+            <span class="brand-by">${this.BRAND_BY}</span>
+          </span>
+        </a>
         <button class="nav-toggle" onclick="document.querySelector('.main-nav').classList.toggle('open')">☰</button>
         <nav class="main-nav">${nav}</nav>
         <div class="nav-auth">${auth}</div>
@@ -245,27 +262,29 @@ const QIST = {
       <div class="container">
         <div class="cols">
           <div>
-            <h4>QIST — Qazaq International Science and Technology Association</h4>
-            <p class="small">The global community of researchers, PhD students, postdocs, professors and
-            industry experts from Kazakhstan working in 30+ countries. We connect scholars, share
-            opportunities and promote Qazaq science worldwide. <a href="https://qista.org" style="display:inline" target="_blank" rel="noopener">qista.org</a></p>
+            <h4>${this.BRAND} — an initiative of QIST</h4>
+            <p class="small">Qazaq International Science and Technology Association. ScienceBridge
+            connects researchers, universities, industry and funders across ${this.REGION_SHORT} —
+            ${this.REGION_LONG} — together with researchers from the region working anywhere in the
+            world. Nine countries in this first phase; the platform is built to go wider.
+            <a href="https://qista.org" style="display:inline" target="_blank" rel="noopener">qista.org</a></p>
           </div>
           <div>
             <h4>Platform</h4>
-            <a href="directory.html?view=map">Researcher map</a>
-            <a href="directory.html">People directory</a>
             <a href="opportunities.html">Opportunities</a>
-            <a href="matching.html">Academic matching</a>
+            <a href="directory.html">Researchers</a>
+            <a href="map.html">Researcher map</a>
+            <a href="organizations.html">For organizations</a>
           </div>
           <div>
             <h4>Community</h4>
+            <a href="about.html">About QIST</a>
             <a href="newsletter.html">Newsletter</a>
-            <a href="channels.html?c=jobs">Jobs board</a>
-            <a href="channels.html?c=grants">Grants</a>
-            <a href="login.html#register">Become a member</a>
+            <a href="channels.html">Discussions</a>
+            <a href="login.html#register">Create profile</a>
           </div>
         </div>
-        <div class="fine">© ${new Date().getFullYear()} QIST community · Built by and for Kazakhstani researchers · <a href="https://github.com/Zangir/qist-platform" style="display:inline">Source on GitHub</a></div>
+        <div class="fine">© ${new Date().getFullYear()} QIST · Built with and for researchers of ${this.REGION_SHORT} and their colleagues abroad · <a href="https://github.com/Aika369/qist-platform" style="display:inline">Source on GitHub</a></div>
       </div>`;
   },
 
@@ -605,6 +624,118 @@ const QIST = {
     }
 
     return { ok: errors.length === 0, errors, warnings };
+  },
+
+  /* ================= MATCH ANALYSIS =================
+     What this number is: the share of the opportunity's own stated requirements that you meet.
+     Nothing else. It is counted, not predicted, and every line can be checked against the
+     funder's page.
+
+     What it is NOT: a probability of winning. We have no response data yet, so any weighted
+     model would be a guess wearing the costume of mathematics (DECISIONS.md D-07). When
+     `match_event` has real outcomes in it, a calibrated model can sit on top of this breakdown
+     without changing what the reader sees.
+
+     Two kinds of requirement:
+       blocking — country eligibility, career stage, an open deadline. Fail one and the
+                  application cannot be submitted, whatever the other lines say.
+       soft     — research field, required methods. A mismatch costs you nothing to try.
+     A requirement that the opportunity does not state is not counted at all, so a call with
+     three conditions is scored out of three and not diluted to look weaker than it is. */
+  matchOpportunity(opp, profile, elig) {
+    const criteria = [];
+    const c = this.checkCountry(opp, profile.country, elig);
+    const countryName = (elig.countries || {})[profile.country] || 'your country';
+
+    criteria.push({
+      key: 'country', label: 'Country eligibility', blocking: true,
+      ok: c.verdict === 'ok', unknown: c.verdict === 'unk',
+      detail: c.text,
+      source: c.source
+    });
+
+    const s = this.checkStage(opp, profile.stage);
+    const need = (elig.career_stages || {})[opp.career_stage] || opp.career_stage;
+    const have = (elig.career_stages || {})[profile.stage] || profile.stage;
+    criteria.push({
+      key: 'stage', label: 'Career stage', blocking: true, ok: s.ok, unknown: false,
+      detail: s.ok
+        ? `This call asks for "${need}", and you selected "${have}".`
+        : `This call asks for "${need}". You selected "${have}", which is below it.`,
+      source: null
+    });
+
+    if (opp.deadline) {
+      const expired = this.isExpired(opp), left = this.daysLeft(opp);
+      criteria.push({
+        key: 'deadline', label: 'Deadline', blocking: true, ok: !expired, unknown: false,
+        detail: expired
+          ? `The deadline passed on ${opp.deadline}. Nothing can be submitted now.`
+          : `${left} days left — the deadline is ${opp.deadline}.`,
+        source: null
+      });
+    }
+
+    if (!opp.all_fields && (opp.fields || []).length) {
+      const mine = profile.fields || [];
+      const hit = (opp.fields || []).filter(f => mine.includes(f));
+      criteria.push({
+        key: 'field', label: 'Research field', blocking: false,
+        ok: mine.length ? hit.length > 0 : false,
+        unknown: mine.length === 0,
+        detail: !mine.length
+          ? 'You have not told us your research field, so this line cannot be judged.'
+          : hit.length
+            ? `Overlap in ${hit.join(', ')}.`
+            : `This call is for ${(opp.fields || []).join(', ')}, which is not one of your fields.`,
+        source: null
+      });
+    }
+
+    if ((opp.methods_required || []).length) {
+      const mine = (profile.methods || []).map(m => m.toLowerCase());
+      const hit = opp.methods_required.filter(m => mine.includes(m.toLowerCase()));
+      criteria.push({
+        key: 'methods', label: 'Methods and equipment', blocking: false,
+        ok: hit.length === opp.methods_required.length,
+        unknown: !mine.length,
+        detail: !mine.length
+          ? `The call asks for ${opp.methods_required.join(', ')}. We do not know what you have access to.`
+          : hit.length === opp.methods_required.length
+            ? `You have all of: ${opp.methods_required.join(', ')}.`
+            : `The call asks for ${opp.methods_required.join(', ')}; we have ${hit.length} of ${opp.methods_required.length} on your side.`,
+        source: null
+      });
+    }
+
+    const counted  = criteria.filter(x => !x.unknown);
+    const met      = counted.filter(x => x.ok).length;
+    const total    = counted.length;
+    const unknown  = criteria.length - counted.length;
+    const blockers = criteria.filter(x => x.blocking && !x.ok && !x.unknown);
+    const pct      = total ? Math.round((met / total) * 100) : 0;
+
+    /* The sentence a reader actually acts on. A blocking failure is stated first and plainly,
+       because "84%" next to "you are not eligible" is how people waste a week. */
+    let verdict, tone;
+    if (blockers.length) {
+      tone = 'bad';
+      const names = blockers.map(b => b.label.toLowerCase()).join(' and ');
+      verdict = `You cannot apply to this one: ${names} ${blockers.length > 1 ? 'do' : 'does'} not work out. ` +
+                `The other lines do not change that.`;
+    } else if (met === total && !unknown) {
+      tone = 'ok';
+      verdict = 'You meet every condition this call states. What is left is the quality of the application itself.';
+    } else if (met === total) {
+      tone = 'ok';
+      verdict = `You meet every condition we can check. ${unknown} more ${unknown > 1 ? 'depend' : 'depends'} on details we do not have about you — fill them in above and this gets sharper.`;
+    } else {
+      tone = 'warn';
+      const soft = criteria.filter(x => !x.blocking && !x.ok && !x.unknown).map(x => x.label.toLowerCase());
+      verdict = `Nothing blocks you from applying. The weak spot is ${soft.join(' and ')} — worth a look before you spend a week on it.`;
+    }
+
+    return { met, total, unknown, pct, tone, verdict, criteria, blocked: blockers.length > 0 };
   },
 
   checkStage(opp, userStage) {

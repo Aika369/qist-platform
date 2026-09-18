@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-19b">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-19c">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
@@ -17,14 +17,14 @@
 <section class="org-hero">
   <div class="container">
     <div class="org-switch" role="tablist" aria-label="Who you are">
-      <button id="as-university" role="tab" aria-selected="true">I am from a university</button>
-      <button id="as-company" role="tab" aria-selected="false">I am from a company</button>
+      <button id="as-company" role="tab" aria-selected="true">I am from a company</button>
+      <button id="as-university" role="tab" aria-selected="false">I am from a university</button>
     </div>
-    <h1 id="org-h1">Put your work in front of researchers who can do it</h1>
+    <h1 id="org-h1">Put your R&amp;D problem in front of researchers who can solve it</h1>
     <p id="org-sub" class="org-sub"></p>
     <div class="org-jump">
       <a class="btn btn-primary" href="#post">Post a need</a>
-      <a class="btn btn-outline" href="#find">Find researchers</a>
+      <a class="btn btn-outline" href="#find">See the expertise</a>
       <a class="btn btn-ghost" href="#talk">Book 30 minutes</a>
     </div>
   </div>
@@ -111,24 +111,25 @@
     </form>
   </section>
 
-  <!-- ================= 2. find researchers ================= -->
+  <!-- ================= 2. what expertise is in the network ================= -->
   <section id="find" class="org-block">
     <div class="section-head"><div>
-      <h2 class="rule">2 · Find researchers</h2>
+      <h2 class="rule">2 · See what expertise is in the network</h2>
       <p class="small muted" style="margin-top:6px;max-width:66ch">
-        The directory holds <b id="find-total">…</b> researchers with roots in Kazakhstan, working in
-        30+ countries. It was built from public sources — university pages, Google Scholar, open
-        profiles. Search it here; ask us for an introduction and we will ask that person first.
+        <b id="find-total">…</b> researchers who joined QIST themselves and gave us their own details.
+        Search by field and country to see who is there. <b>Names, organisations and links are not
+        shown here</b> — they belong to the researchers, not to us, and each person decides whether
+        to be introduced to you. Ask for an introduction and we put the question to them.
       </p>
     </div></div>
 
     <div class="filters" id="find-filters">
-      <input type="text" id="fd-q" class="search-input" placeholder="Search by name, topic or organisation…">
+      <input type="text" id="fd-q" class="search-input" placeholder="Search by research topic…">
       <select id="fd-field"></select>
       <select id="fd-country"></select>
     </div>
 
-    <p class="small muted" id="find-count" style="margin-bottom:14px">Loading the directory…</p>
+    <p class="small muted" id="find-count" style="margin-bottom:14px">Loading…</p>
     <div class="grid grid-3" id="find-list"></div>
     <div class="org-more"><button class="btn btn-outline" id="find-more" hidden>Show more</button></div>
   </section>
@@ -178,7 +179,7 @@
       <div class="card pad-lg org-honest ok">
         <h3>Working now</h3>
         <ul>
-          <li>A directory of <b id="honest-people">…</b> researchers, searchable by field and country.</li>
+          <li><b id="honest-people">…</b> researchers who joined QIST themselves, searchable by field and country — without names, until they agree to an introduction.</li>
           <li><b id="honest-opps">…</b> curated opportunities open right now, each with an eligibility verdict for your country and a link to the funder's own page.</li>
           <li>Eligibility checked against the published source for all 250 countries — including the cases where a funder's own list overrides the programme rules.</li>
           <li>Posted needs reviewed by a curator and published with your organisation named.</li>
@@ -201,7 +202,7 @@
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/app.js?v=2026-09-19b"></script>
+<script src="assets/js/app.js?v=2026-09-19c"></script>
 <script>
 (async () => {
   await QIST.boot('organizations.html');
@@ -211,7 +212,7 @@
      rendering a half-broken screen. */
   if (typeof QIST.submitOrgRequest !== 'function' || !QIST.PRIMARY_FIELDS) {
     $('find-count').innerHTML =
-      '<b>assets/js/app.js is older than this page.</b> Upload the whole release together — this page expects build 2026-09-19b.';
+      '<b>assets/js/app.js is older than this page.</b> Upload the whole release together — this page expects build 2026-09-19c.';
     return;
   }
 
@@ -230,8 +231,9 @@
     university: {
       h1: 'Put your department’s work in front of researchers who can do it',
       sub: 'Open positions, joint applications, co-authors abroad, partners for a consortium. ' +
-           'QIST reaches researchers with roots in Kazakhstan working in 30+ countries — the people ' +
-           'a Kazakhstani university is usually trying to reach and usually cannot.',
+           'QIST reaches researchers across Central Asia, the Caucasus and Mongolia, and from ' +
+           'those countries working abroad — the people a university in the region is usually ' +
+           'trying to reach and usually cannot.',
       post: 'A vacancy, a PhD place, a co-author search or a partner for a Horizon Europe or ' +
             'Erasmus+ consortium. Written once, published where researchers already look for calls.',
       talk: 'Thirty minutes with the QIST team about how your research office works now: where ' +
@@ -240,9 +242,9 @@
     },
     company: {
       h1: 'Put your R&D problem in front of researchers who can solve it',
-      sub: 'A concrete technical problem, a hire, or one expert opinion. The directory holds ' +
-           'researchers in engineering, materials, AI, energy, biotech and life sciences, in ' +
-           'Kazakhstan and abroad.',
+      sub: 'A concrete technical problem, a hire, or one expert opinion. The network covers ' +
+           'engineering, materials, AI, energy, biotech and life sciences across Central Asia, ' +
+           'the Caucasus and Mongolia, and among researchers from the region working abroad.',
       post: 'An R&D problem, a position, or a single question you need an expert answer to. ' +
             'The clearer the problem, the faster someone recognises it as theirs.',
       talk: 'Thirty minutes about the problem you are trying to staff or solve. We will tell you ' +
@@ -265,8 +267,9 @@
       history.replaceState(null, '', '?' + p + location.hash);
     }
   }
-  let audience = 'university';
-  setAudience(new URLSearchParams(location.search).get('as') === 'company' ? 'company' : 'university', false);
+  // Company first: the switch order follows the page, and the page opens on company.
+  let audience = 'company';
+  setAudience(new URLSearchParams(location.search).get('as') === 'university' ? 'university' : 'company', false);
   $('as-university').addEventListener('click', () => setAudience('university', true));
   $('as-company').addEventListener('click', () => setAudience('company', true));
 
@@ -312,8 +315,10 @@
     matches = people.filter(p => {
       if (country && p.country !== country) return false;
       if (field && !QIST.primaryFields(p).includes(field)) return false;
+      // Search only over what this view shows. Searching names here would leak them back:
+      // type a name, get one card, and the anonymity is gone.
       if (q) {
-        const hay = `${p.name} ${p.title || ''} ${p.institution || ''} ${(p.topics || []).join(' ')} ${p.bio || ''}`.toLowerCase();
+        const hay = QIST.primaryFields(p).concat(p.topics || []).join(' ').toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
@@ -322,16 +327,46 @@
     drawPeople();
   }
 
+  /* Anonymous capability card.
+     The directory is the only asset QIST has. A named, linked, searchable list handed to any
+     visitor is an asset given away: an organisation reads it once, finds those people on
+     LinkedIn and never comes back. So this view shows what a person can do — field, seniority
+     band, country — and never who they are. Name, title, organisation, city and public link
+     are not rendered and are not in the DOM. They appear after the person agrees to an
+     introduction, which is the moment QIST is actually useful. See DECISIONS.md D-34. */
+  function seniority(p) {
+    const y = Number(p.experience);
+    if (!Number.isFinite(y) || y <= 0) return 'experience not stated';
+    if (y < 5)  return 'early career · under 5 years';
+    if (y < 10) return '5–10 years of experience';
+    if (y < 20) return '10–20 years of experience';
+    return '20+ years of experience';
+  }
+
+  function anonCard(p) {
+    const fields = QIST.primaryFields(p).slice(0, 2);
+    const topics = (p.topics || []).slice(0, 3);
+    return `<div class="card anon-card" data-id="${QIST.esc(p.id)}">
+      <div class="anon-top">
+        <span class="anon-mask" aria-hidden="true">•••</span>
+        <div>
+          <h3>${QIST.esc(fields[0] || 'Researcher')}</h3>
+          <div class="anon-meta">${QIST.esc(seniority(p))}${p.country ? ' · ' + QIST.esc(p.country) : ''}</div>
+        </div>
+      </div>
+      ${topics.length ? `<div class="tags">${topics.map(t => `<span class="tag">${QIST.esc(t)}</span>`).join('')}</div>` : ''}
+      <p class="anon-note">Name and organisation are shown once this person agrees to an introduction.</p>
+      <div class="org-card-foot">
+        <button class="btn btn-outline btn-sm" data-intro="${QIST.esc(p.id)}">Request an introduction</button>
+      </div>
+    </div>`;
+  }
+
   function drawPeople() {
     $('find-count').innerHTML = matches.length
       ? `<b>${matches.length}</b> of ${people.length} researchers match`
-      : 'Nobody in the directory matches that. Try a broader field, or post the need above and let a curator look.';
-    $('find-list').innerHTML = matches.slice(0, shown).map(p => QIST.personCard(p, {
-      footer: `<div class="org-card-foot">
-        <button class="btn btn-outline btn-sm" data-intro="${QIST.esc(p.id)}">Request an introduction</button>
-        ${p.link ? `<a class="btn btn-ghost btn-sm" href="${QIST.esc(p.link)}" target="_blank" rel="noopener">Public profile →</a>` : ''}
-      </div>`
-    })).join('');
+      : 'Nobody in the network matches that. Try a broader field, or post the need above and let a curator look.';
+    $('find-list').innerHTML = matches.slice(0, shown).map(anonCard).join('');
     $('find-more').hidden = matches.length <= shown;
   }
 
@@ -349,7 +384,8 @@
       const p = people.find(x => x.id === open.dataset.intro);
       const box = open.closest('.org-card-foot');
       box.innerHTML = `<div class="org-intro">
-        <p class="small">We will ask <b>${QIST.esc(p.name)}</b> first. Contact details are never passed on without that person's consent to your specific request.</p>
+        <p class="small">We will put your request to this researcher first. Their name, organisation
+          and contact details reach you only if they say yes to your specific request.</p>
         <div class="org-intro-row">
           <input type="email" class="search-input" data-intro-email="${QIST.esc(p.id)}" placeholder="your work email" aria-label="Your work email">
           <button class="btn btn-primary btn-sm" data-intro-send="${QIST.esc(p.id)}">Send request</button>
@@ -375,7 +411,7 @@
     });
     if (res.ok) {
       send.textContent = '✓ Sent'; input.disabled = true;
-      state.textContent = `We will ask ${p.name} and come back to you either way.`;
+      state.textContent = 'We will ask this researcher and come back to you either way.';
     } else {
       send.disabled = false; send.textContent = 'Send request';
       state.textContent = explain(res.reason);

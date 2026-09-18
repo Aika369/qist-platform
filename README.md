@@ -1,6 +1,8 @@
 # QIST Platform
 
-The community platform of **QIST — Qazaq International Science and Technology Association** ([qista.org](https://qista.org)): the global network of PhD students, postdocs, professors and industry scientists from Kazakhstan.
+**ScienceBridge AI** — an initiative of **QIST, the Qazaq International Science and Technology Association** ([qista.org](https://qista.org)).
+
+MVP phase 1 covers nine countries — Kazakhstan, Uzbekistan, Kyrgyzstan, Tajikistan, Turkmenistan, Azerbaijan, Georgia, Armenia and Mongolia — plus researchers from those countries working anywhere in the world. Later phases are intended to be worldwide. The nine are what the eligibility data, the curated opportunities and the directory actually cover today, so the nine are what the site claims.
 
 **Live site:** https://zangir.github.io/qist-platform/
 
@@ -31,7 +33,12 @@ Backend: see [backend/README.md](backend/README.md).
 
 ## Data
 
-`data/people.json` seeds the directory/map with publicly known Kazakhstani researchers compiled from public sources (university pages, Google Scholar). To add, correct or remove an entry, open an issue or PR — or use the admin panel.
+`data/people.json` holds **QIST members who joined the association themselves** and supplied their own details. It is not scraped from university pages or Google Scholar, and nothing in the code or the interface may say that it is. To add, correct or remove an entry, open an issue or PR — or use the admin panel.
+
+Two rules follow from that and are enforced in the interface:
+
+- Email addresses are never published in the directory and never sent to an organisation.
+- On `organizations.html`, researchers appear **anonymously** — research field, seniority band, country. Names, titles, organisations and public links are not rendered and are not in the DOM. A name reaches an organisation only after that member agrees to a specific introduction (DECISIONS.md D-34).
 
 ---
 
@@ -98,6 +105,19 @@ opportunities.json» — и положите скачанный файл вме�
 
 Есть и `countries_allowed` — «только эти страны». Исключающий список проверяется первым.
 Без `countries_source_url` запись не сохраняется: вердикт без ссылки — это догадка.
+
+### Разбор соответствия — `QIST.matchOpportunity(opp, profile, elig)`
+
+Возвращает `{ met, total, pct, tone, verdict, criteria, blocked }`.
+
+- `met / total` — сколько требований конкурса выполнено из тех, которые конкурс **ставит**.
+  Требования, которых нет (пустой `deadline`, `all_fields: true`), в знаменатель не попадают.
+- `criteria[]` — по строке на требование: `{ key, label, blocking, ok, unknown, detail, source }`.
+  `blocking: true` у страны, стадии и дедлайна; `unknown` — когда о читателе нет данных
+  (не указал свою область), такая строка не считается ни в числителе, ни в знаменателе.
+- `blocked` — есть ли проваленное блокирующее требование. Если да, `verdict` говорит об этом
+  первой фразой: процент рядом со словами «вы не проходите» — это то, как теряют неделю.
+- Это **не вероятность победы**, и в карточке так и написано. См. DECISIONS.md D-07 и D-33.
 
 ### Откуда берётся вердикт
 

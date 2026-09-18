@@ -31,7 +31,7 @@ Wait about a minute after committing, then open the live site and press `F12` �
 The first line should read:
 
 ```
-QIST build 2026-09-19b
+QIST build 2026-09-19c
 ```
 
 If it says anything else, or nothing, the JavaScript file did not reach the server.
@@ -51,10 +51,21 @@ country list beats our programme table:
   point at the Schlumberger Foundation's own eligibility PDF, not at our table.
 - Open **TWAS–FAPESP**. Kazakhstan eligible, Georgia not.
 
+First look at the header: it must read **ScienceBridge AI** with **BY QIST** as a small line
+underneath, not in a box.
+
+On the **home page**, change "I am based in" from Kazakhstan to the United States. The middle card
+(Bolashak) must flip to a red verdict saying the United States is not on that programme's list.
+If nothing changes, the JavaScript did not update.
+
+On **Opportunities**, open any card's "Why this number" and check that each row gives a reason, and
+that rows read from a published list carry a "source →" link.
+
 Then open **For organizations** in the menu. Check three things:
 
 - the switch at the top changes the headline between university and company;
-- **Find researchers** shows 12 cards and the filters change the count;
+- **See what expertise is in the network** shows cards with ••• instead of names — that is
+  deliberate: organizations never see who a researcher is until that person agrees;
 - fill the **Post a need** form with anything and send it — the submission must appear in your
   Formspree dashboard with `kind: org_need`. Do the same for **Book 30 minutes** and for
   **Create profile** in the header. Four kinds of message now arrive in that one inbox:
@@ -84,7 +95,7 @@ HTML was new, but the browser was still running a cached copy of `app.js`. A har
 fixes that — `Ctrl+Shift+R` on Windows, `Cmd+Shift+R` on Mac.
 
 From this release the problem is handled in code: every local script and stylesheet is
-requested with a version marker, e.g. `assets/js/app.js?v=2026-09-19b`. A browser treats a
+requested with a version marker, e.g. `assets/js/app.js?v=2026-09-19c`. A browser treats a
 changed query string as a different file and must fetch it, so visitors stop getting a mix
 of new HTML and old JavaScript.
 
