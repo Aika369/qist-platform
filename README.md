@@ -22,10 +22,6 @@ Two modes, one data contract:
 
 ## Demo accounts (static mode)
 
-| Role   | Email             | Password           |
-|--------|-------------------|--------------------|
-| Admin  | `admin@qist.kz`   | `qist-admin-2026`  |
-| Member | `member@qist.kz`  | `qist-member-2026` |
 
 ## Local development
 
