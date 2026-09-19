@@ -1,6 +1,6 @@
 # STATUS
 
-Updated: 2026-09-19 · Iterations 1–6
+Updated: 2026-09-19 · Iterations 1–7
 
 ## Works
 
@@ -9,6 +9,27 @@ Updated: 2026-09-19 · Iterations 1–6
 URL-shareable state.
 Every card carries an eligibility verdict for the visitor's country and career stage, with
 a link to the source the verdict came from. No match percentages: none are calibrated yet.
+
+**Three languages** — қазақша · русский · English
+The whole interface is translated: menus, buttons, forms, headings and every sentence the match
+engine generates. 285 keys in three dictionaries, in `assets/js/i18n.js`, loaded before `app.js`
+so no page shows English and then swaps under the reader. The switcher sits in the header; the
+choice goes into the URL and is remembered, and a new visitor gets their browser's language with
+English as the fallback.
+
+**The conditions a funder publishes are not translated.** An opportunity's title, summary and
+eligibility note stay in the funder's own words, with a line next to them saying why: a
+machine-translated eligibility rule is exactly the harm this product exists to prevent. A curator
+can add `title_kk` or `summary_ru` by hand and those are used when present (D-42).
+
+Country names come from the browser's own CLDR data, with 69 names written out by hand — the nine
+priority countries and every EU member and Horizon Europe associated country — because Kazakh
+region names are missing from some browsers' ICU, and a verdict that says "Қазақстан" in one
+browser and "Kazakhstan" in another is a bug the reader sees (D-44).
+
+The Kazakh and Russian text was written for this release and **has not been reviewed by a native
+speaker in the scientific register** — B-35. `curate.html` and `admin.html` stay in English on
+purpose: they are curator screens, not visitor screens.
 
 **Match analysis** — `QIST.matchOpportunity()`
 Every opportunity card now carries a score, a sentence and the rows the score was counted from.
@@ -43,6 +64,13 @@ unknown country codes are caught before saving — then hands back the finished
 Map and globe are views inside Researchers, not sections. Matching is not in public
 navigation: it is personal and belongs behind sign-in. "For organizations" is the only
 audience item on the site, and it is a deliberate exception (D-27).
+
+**Discussions** — two channels, not five
+Jobs, Research Grants and Collaboration Requests were removed: every post in them was already a
+structured entry in Opportunities, with an eligibility verdict and a source link. Two places for
+one call is one too many. Nothing was deleted — the ten migrated posts keep their records and
+carry `superseded_by` pointing at the entry that replaced them, and an old `?c=jobs` link now
+opens a live channel and says where that one went instead of throwing (D-45, D-46).
 
 **For organizations** — `organizations.html`
 One page, two readings: a switch at the top — **company first** — rewrites the page and tags every
@@ -129,8 +157,9 @@ Researchers' own names are left exactly as recorded.
 
 ## Verified
 
-183 automated checks in headless Chromium across `test.mjs` (22), `test2.mjs` (18),
-`test3.mjs` (19), `test4.mjs` (16), `test5.mjs` (30), `test6.mjs` (38) and `test7.mjs` (40). Covering: eligibility verdicts across two programmes and nine countries,
+224 automated checks in headless Chromium across `test.mjs` (22), `test2.mjs` (18),
+`test3.mjs` (19), `test4.mjs` (16), `test5.mjs` (30), `test6.mjs` (38), `test7.mjs` (40) and
+`test8.mjs` (41). Covering: eligibility verdicts across two programmes and nine countries,
 filters, empty and error states, expired entries, button behaviour with no endpoint
 configured, absence of the admin password anywhere in the build, honest counters, coordinate
 precision labels, the full 250-country selector, English-only interface text, and no
@@ -158,6 +187,14 @@ the denominator and the percentage agree, that a requirement the call does not s
 the denominator, and that a blocking failure overrides a high percentage. It also checks the brand
 lockup by computed style rather than by eye, the footer links against the header, and that the
 corrected provenance wording is actually on the pages.
+
+`test8.mjs` loads all eight public pages in all three languages and fails on a raw key left
+visible, a missing `<html lang>`, a missing dictionary entry, a mismatched `{placeholder}` between
+languages, or any JavaScript error. It also proves the funder's own title is untouched on the
+Kazakh version, that the retired channels are gone while none of the 13 posts were deleted, and
+that no page scrolls sideways at 390px in Kazakh. It found three real defects on its first run: a
+crash on old `?c=jobs` links, 137px of horizontal scroll from the new header, and a key that a
+regeneration had dropped.
 
 `L is not defined` on map.html appears only in the sandbox, where unpkg.com is blocked.
 Leaflet loads on the live site — checked 2026-09-14. **The country-marker logic on the map
@@ -208,8 +245,8 @@ rest, and it needs decisions only you can make: hosting account, who pays for it
 3. **Answer the new inbox.** The organizations page promises a reply within two working days.
    Decide who reads `org_need`, `org_introduction`, `org_conversation` and `profile_request`,
    and how fast (B-25). An unanswered promise is noticed on the first submission.
-4. **Ten to fifteen conversations with universities** (B-26). That is what this page exists for,
+5. **Ten to fifteen conversations with universities** (B-26). That is what this page exists for,
    and what the paid product has to be built on.
-5. **B-18 is still open.** The nine countries' Horizon Europe statuses have not been checked by a
+6. **B-18 is still open.** The nine countries' Horizon Europe statuses have not been checked by a
    human against the EC PDF. One automated read of that document was already wrong about three of
    them.

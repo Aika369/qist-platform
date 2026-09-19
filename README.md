@@ -203,6 +203,29 @@ countries against the source before a public launch**, and record who did it in
 **Пароли не собираются нигде.** Пока бэкенд не развёрнут, `login.html` показывает форму заявки
 без поля пароля: хранить его негде (D-29).
 
+## Языки (итерация 7, 19.09.2026)
+
+Три языка: `kk`, `ru`, `en`. Словари — `assets/js/i18n.js`, грузится **до** `app.js`.
+
+```html
+<h2 data-i18n="opp.h2"></h2>                          <!-- textContent -->
+<p  data-i18n-html="about.data.p1"></p>               <!-- innerHTML, только наша разметка -->
+<input data-i18n-attr="placeholder:opp.search.ph">    <!-- атрибуты, через ; несколько -->
+```
+
+В JS — `QIST.t('key', { n: 5 })`. Подстановки в фигурных скобках: `{n}`, `{country}`, `{email}`.
+
+**Как добавить строку:** впишите ключ во все три словаря в `assets/js/i18n.js`. Ключ, который
+есть в `en`, но отсутствует в `kk` или `ru`, откатывается к английскому и пишет предупреждение
+в консоль — а `test8.mjs` на этом падает.
+
+**Что не переводится:** условия конкурсов. `title`, `summary` и `eligibility.note` остаются
+словами фонда; куратор может добавить `title_kk`, `summary_kk`, `title_ru`, `summary_ru` — тогда
+используются они. Имена исследователей не транслитерируются. См. DECISIONS.md D-42.
+
+**Названия стран:** `QIST.countryName(code, elig)` — сначала `countries_kk` из
+`data/eligibility.json`, затем `Intl.DisplayNames` браузера, затем английское название.
+
 ## Структура разделов
 
 | Раздел | Файл | Что внутри |

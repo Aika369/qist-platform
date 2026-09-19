@@ -7,7 +7,8 @@
     "link": "https://nu.edu.kz/careers",
     "deadline": "2026-09-30",
     "author": "QIST",
-    "date": "2026-07-14"
+    "date": "2026-07-14",
+    "superseded_by": "o-p1"
   },
   {
     "id": "p2",
@@ -17,7 +18,8 @@
     "link": "https://mbzuai.ac.ae/careers/",
     "deadline": "",
     "author": "QIST",
-    "date": "2026-07-10"
+    "date": "2026-07-10",
+    "superseded_by": "o-p2"
   },
   {
     "id": "p3",
@@ -27,7 +29,8 @@
     "link": "https://issai.nu.edu.kz",
     "deadline": "2026-08-15",
     "author": "QIST",
-    "date": "2026-07-05"
+    "date": "2026-07-05",
+    "superseded_by": "o-p3"
   },
   {
     "id": "p4",
@@ -37,7 +40,8 @@
     "link": "https://bolashak.gov.kz",
     "deadline": "2026-10-01",
     "author": "QIST",
-    "date": "2026-07-12"
+    "date": "2026-07-12",
+    "superseded_by": "o-p4"
   },
   {
     "id": "p5",
@@ -47,7 +51,8 @@
     "link": "https://www.ncste.kz",
     "deadline": "",
     "author": "QIST",
-    "date": "2026-07-08"
+    "date": "2026-07-08",
+    "superseded_by": "o-p5"
   },
   {
     "id": "p6",
@@ -57,7 +62,8 @@
     "link": "https://marie-sklodowska-curie-actions.ec.europa.eu",
     "deadline": "2026-09-10",
     "author": "QIST",
-    "date": "2026-06-30"
+    "date": "2026-06-30",
+    "superseded_by": "o-p6"
   },
   {
     "id": "p7",
@@ -67,7 +73,8 @@
     "link": "",
     "deadline": "2026-09-05",
     "author": "QIST",
-    "date": "2026-07-02"
+    "date": "2026-07-02",
+    "superseded_by": "o-p7"
   },
   {
     "id": "p8",
@@ -77,7 +84,8 @@
     "link": "https://neurips.cc",
     "deadline": "",
     "author": "QIST",
-    "date": "2026-06-25"
+    "date": "2026-06-25",
+    "superseded_by": "o-p8"
   },
   {
     "id": "p9",
@@ -97,7 +105,8 @@
     "link": "",
     "deadline": "",
     "author": "QIST",
-    "date": "2026-07-11"
+    "date": "2026-07-11",
+    "superseded_by": "o-p10"
   },
   {
     "id": "p11",
@@ -107,7 +116,8 @@
     "link": "",
     "deadline": "",
     "author": "QIST",
-    "date": "2026-07-06"
+    "date": "2026-07-06",
+    "superseded_by": "o-p11"
   },
   {
     "id": "p12",

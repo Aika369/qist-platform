@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sign in — QIST</title>
+<title data-i18n-title="login.h">Create profile — ScienceBridge AI by QIST</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-19c">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-20a">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
@@ -67,7 +67,8 @@
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/app.js?v=2026-09-19c"></script>
+<script src="assets/js/i18n.js?v=2026-09-20a"></script>
+<script src="assets/js/app.js?v=2026-09-20a"></script>
 <script>
 (async () => {
   await QIST.boot('login.html');
@@ -84,36 +85,25 @@
        the dead end it replaces. */
     document.querySelector('.auth-wrap').innerHTML = `
       <div class="card auth-card org-form" style="padding:30px 32px;text-align:left">
-        <h2 style="margin-bottom:8px">Create your profile</h2>
-        <p class="small muted" style="margin-bottom:16px">
-          Sign-in accounts arrive with the server. Until then a curator creates profiles by hand —
-          send this and we will write back from ${QIST.esc(QIST.CONTACT_EMAIL || 'the QIST team')}.
-          We do not ask for a password, because we have nowhere to keep it yet.
-        </p>
+        <h2 style="margin-bottom:8px">${QIST.t('login.h')}</h2>
+        <p class="small muted" style="margin-bottom:16px">${QIST.t('login.p', { email: QIST.esc(QIST.CONTACT_EMAIL || 'QIST') })}</p>
         <form id="req-form" style="display:flex;flex-direction:column;gap:13px">
-          <label>Full name<input type="text" id="q-name" required placeholder="Aigerim Bekova"></label>
-          <label>Email<input type="email" id="q-email" required placeholder="you@university.edu"></label>
+          <label>${QIST.t('login.name')}<input type="text" id="q-name" required placeholder="Aigerim Bekova"></label>
+          <label>${QIST.t('common.email')}<input type="email" id="q-email" required placeholder="you@university.edu"></label>
           <div class="org-row-2">
-            <label>Position / title<input type="text" id="q-title" placeholder="PhD Student"></label>
-            <label>Institution<input type="text" id="q-inst" placeholder="Nazarbayev University"></label>
+            <label>${QIST.t('login.title')}<input type="text" id="q-title" placeholder="PhD Student"></label>
+            <label>${QIST.t('login.inst')}<input type="text" id="q-inst" placeholder="Nazarbayev University"></label>
           </div>
-          <label>Country<select id="q-country"></select></label>
-          <label>Research topics, comma separated<input type="text" id="q-topics" placeholder="machine learning, optimization"></label>
-          <label>Link to a public profile — ORCID, Scholar, your university page
+          <label>${QIST.t('common.country')}<select id="q-country"></select></label>
+          <label>${QIST.t('login.topics')}<input type="text" id="q-topics" placeholder="machine learning, optimization"></label>
+          <label>${QIST.t('login.link')}
             <input type="text" id="q-link" placeholder="https://orcid.org/…">
           </label>
-          <p class="org-note">
-            We publish name, title, organisation, country, research fields and that public link.
-            <b>Email addresses are never published in the directory.</b> You can ask us to change or
-            delete the profile at any time, with no justification — see <a href="about.html#data">About QIST</a>.
-          </p>
-          <button class="btn btn-primary" type="submit" id="q-send">Send the request</button>
+          <p class="org-note">${QIST.t('login.privacy')} <a href="about.html#data">${QIST.t('nav.about')}</a>.</p>
+          <button class="btn btn-primary" type="submit" id="q-send">${QIST.t('login.send')}</button>
           <span class="small muted" id="q-state"></span>
         </form>
-        <p class="small muted" style="margin-top:16px">
-          From a university or a company? <a href="organizations.html">For organizations</a> has the
-          form for posting work, not a personal profile.
-        </p>
+        <p class="small muted" style="margin-top:16px">${QIST.t('login.org')}</p>
       </div>`;
 
     const s = id => document.getElementById(id);
@@ -122,7 +112,7 @@
     s('req-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = s('q-send'), state = s('q-state');
-      btn.disabled = true; btn.textContent = 'Sending…';
+      btn.disabled = true; btn.textContent = QIST.t('common.sending');
       const res = await QIST.submitForm(QIST.SIGNUP_ENDPOINT, {
         _subject: 'Profile request: ' + s('q-name').value.trim(),
         kind: 'profile_request',
@@ -134,14 +124,14 @@
         at: new Date().toISOString()
       });
       if (res.ok) {
-        btn.textContent = '✓ Sent';
-        state.textContent = 'We will write back within a few working days.';
+        btn.textContent = QIST.t('common.sent');
+        state.textContent = QIST.t('login.ok');
         s('req-form').reset();
       } else {
-        btn.disabled = false; btn.textContent = 'Send the request';
+        btn.disabled = false; btn.textContent = QIST.t('login.send');
         state.textContent = res.reason === 'not_configured'
-          ? 'Submissions are not wired up yet: set QIST.SIGNUP_ENDPOINT in assets/js/app.js.'
-          : 'Could not send that. Try again, or write to ' + (QIST.CONTACT_EMAIL || 'the QIST team') + '.';
+          ? QIST.t('org.state.noendpoint')
+          : QIST.t('org.state.fail', { email: QIST.CONTACT_EMAIL || 'QIST' });
       }
     });
     return;

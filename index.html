@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-19c">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-20a">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
@@ -16,46 +16,46 @@
 <section class="hero">
   <div class="container hero-grid">
     <div class="hero-copy">
-      <span class="kicker">ScienceBridge AI <span class="kicker-divider" aria-hidden="true">|</span> an initiative of the Qazaq International Science &amp; Technology Association</span>
-      <h1>Find the <em class="hl">scientists</em><br>to solve your <em class="hl">R&amp;D needs</em>.</h1>
-      <p class="lead">Researchers, universities, industry and funders across Central Asia, the Caucasus and Mongolia — and colleagues from the region working anywhere in the world. Nine countries in this first phase, built to go wider.</p>
+      <span class="kicker" data-i18n="home.kicker"></span>
+      <h1 data-i18n-html="home.h1"></h1>
+      <p class="lead" data-i18n="home.lead"></p>
 
       <form class="hero-search" id="hero-search" role="search">
         <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
-        <label class="sr-only" for="hero-query">Describe the R&amp;D problem you want to solve</label>
-        <input id="hero-query" name="q" type="text" placeholder="Describe the R&amp;D problem you want to solve…" autocomplete="off">
-        <button type="submit" aria-label="Search for scientists">→</button>
+        <label class="sr-only" for="hero-query" data-i18n="home.search.ph"></label>
+        <input id="hero-query" name="q" type="text" data-i18n-attr="placeholder:home.search.ph" autocomplete="off">
+        <button type="submit" data-i18n-attr="aria-label:home.search.aria">→</button>
       </form>
 
-      <div class="hero-suggestions" aria-label="Suggested research areas">
-        <span>Suggested:</span>
-        <button type="button" data-query="Oil &amp; gas engineering">Oil &amp; gas engineering</button>
-        <button type="button" data-query="Mining &amp; metallurgy">Mining &amp; metallurgy</button>
-        <button type="button" data-query="Energy transition">Energy transition</button>
-        <button type="button" data-query="Biomedical engineering">Biomedical engineering</button>
-        <button type="button" data-query="Artificial intelligence smart systems">AI &amp; smart systems</button>
-        <button type="button" data-query="Medicine">Medicine</button>
-        <button type="button" data-query="Logistics supply chain">Logistics &amp; supply chain</button>
+      <div class="hero-suggestions">
+        <span data-i18n="home.suggested">Suggested:</span>
+        <button type="button" data-query="Oil &amp; gas engineering" data-i18n="home.chip.oil"></button>
+        <button type="button" data-query="Mining &amp; metallurgy" data-i18n="home.chip.mining"></button>
+        <button type="button" data-query="Energy transition" data-i18n="home.chip.energy"></button>
+        <button type="button" data-query="Biomedical engineering" data-i18n="home.chip.biomed"></button>
+        <button type="button" data-query="Artificial intelligence smart systems" data-i18n="home.chip.ai"></button>
+        <button type="button" data-query="Medicine" data-i18n="home.chip.med"></button>
+        <button type="button" data-query="Logistics supply chain" data-i18n="home.chip.log"></button>
       </div>
     </div>
 
     <div class="science-globe" id="globe-view">
       <div class="globe-stage">
         <canvas id="globe" role="img"
-                aria-label="Rotating globe showing where researchers in the QIST network are based"></canvas>
+                aria-label="ScienceBridge AI"></canvas>
         <div class="globe-tip" id="globe-tip"></div>
       </div>
-      <p class="globe-hint">Drag to spin &middot; hover a circle for names</p>
+      <p class="globe-hint" data-i18n="home.globe.hint"></p>
     </div>
   </div>
 </section>
 
 <section class="stats-band">
   <div class="container" id="stats">
-    <div class="stat"><b id="st-people">—</b><span>Researchers</span></div>
-    <div class="stat"><b id="st-countries">—</b><span>Countries</span></div>
-    <div class="stat"><b id="st-topics">—</b><span>Research fields</span></div>
-    <div class="stat"><b id="st-posts">—</b><span>Active opportunities</span></div>
+    <div class="stat"><b id="st-people">—</b><span data-i18n="home.stat.people">Researchers</span></div>
+    <div class="stat"><b id="st-countries">—</b><span data-i18n="home.stat.countries">Countries</span></div>
+    <div class="stat"><b id="st-topics">—</b><span data-i18n="home.stat.fields">Research fields</span></div>
+    <div class="stat"><b id="st-posts">—</b><span data-i18n="home.stat.opps">Active opportunities</span></div>
   </div>
 </section>
 
@@ -68,30 +68,26 @@
   <div class="container">
     <div class="section-head">
       <div>
-        <h2 class="rule">Before you spend a week on an application</h2>
-        <p class="small muted" style="margin-top:6px;max-width:64ch">
-          Every call carries a verdict for <i>your</i> country and career stage, counted from the
-          conditions the funder itself publishes — with the link it came from. Pick a country and
-          watch these three change.
-        </p>
+        <h2 class="rule" data-i18n="home.demo.h2"></h2>
+        <p class="small muted" style="margin-top:6px;max-width:64ch" data-i18n="home.demo.lede"></p>
       </div>
     </div>
 
     <div class="demo-bar">
-      <label for="demo-country">I am based in</label>
-      <select id="demo-country" aria-label="Country"></select>
-      <label for="demo-stage">and I am a</label>
+      <label for="demo-country" data-i18n="home.demo.basedin"></label>
+      <select id="demo-country" data-i18n-attr="aria-label:common.country"></select>
+      <label for="demo-stage" data-i18n="home.demo.andiam"></label>
       <select id="demo-stage">
-        <option value="phd_student">PhD candidate</option>
-        <option value="phd_plus" selected>PhD / Researcher</option>
-        <option value="postdoc_plus">Postdoc</option>
-        <option value="pi_only">Professor / PI</option>
+        <option value="phd_student" data-i18n="opp.stage.phd_student"></option>
+        <option value="phd_plus" selected data-i18n="opp.stage.phd_plus"></option>
+        <option value="postdoc_plus" data-i18n="opp.stage.postdoc_plus"></option>
+        <option value="pi_only" data-i18n="opp.stage.pi_only"></option>
       </select>
-      <span class="demo-note">Three of <b id="demo-total">—</b> open calls, picked to show different sides of the check</span>
+      <span class="demo-note" id="demo-note"></span>
     </div>
 
     <div id="demo-list" class="grid grid-3"></div>
-    <p style="margin-top:16px"><a class="btn btn-primary" href="opportunities.html">See all open calls →</a></p>
+    <p style="margin-top:16px"><a class="btn btn-primary" href="opportunities.html" data-i18n="home.demo.all"></a></p>
   </div>
 </section>
 
@@ -100,27 +96,27 @@
   <div class="container">
     <div class="grid grid-2">
       <div class="card pad-lg door">
-        <h3>If you do research</h3>
+        <h3 data-i18n="home.door1.h"></h3>
         <ul>
-          <li>Calls you can actually enter, with the disqualifying condition stated up front.</li>
-          <li>One place for grants, positions, consortium roles and co-author searches.</li>
-          <li>Your profile stays yours: your name never reaches a company until you say yes.</li>
+          <li data-i18n="home.door1.a"></li>
+          <li data-i18n="home.door1.b"></li>
+          <li data-i18n="home.door1.c"></li>
         </ul>
         <div class="door-actions">
-          <a class="btn btn-primary" href="opportunities.html">Find your next call</a>
-          <a class="btn btn-ghost" href="login.html#register">Create a profile</a>
+          <a class="btn btn-primary" href="opportunities.html" data-i18n="home.door1.cta"></a>
+          <a class="btn btn-ghost" href="login.html#register" data-i18n="home.door1.cta2"></a>
         </div>
       </div>
       <div class="card pad-lg door">
-        <h3>If you run a lab, a company or a research office</h3>
+        <h3 data-i18n="home.door2.h"></h3>
         <ul>
-          <li>Post an R&amp;D problem, a vacancy or a search for a consortium partner.</li>
-          <li>See what expertise the network holds — by field, seniority and country.</li>
-          <li>Ask for an introduction; we put the question to the researcher, never the reverse.</li>
+          <li data-i18n="home.door2.a"></li>
+          <li data-i18n="home.door2.b"></li>
+          <li data-i18n="home.door2.c"></li>
         </ul>
         <div class="door-actions">
-          <a class="btn btn-primary" href="organizations.html">For organizations</a>
-          <a class="btn btn-ghost" href="organizations.html#talk">Book 30 minutes</a>
+          <a class="btn btn-primary" href="organizations.html" data-i18n="home.door2.cta"></a>
+          <a class="btn btn-ghost" href="organizations.html#talk" data-i18n="home.door2.cta2"></a>
         </div>
       </div>
     </div>
@@ -135,13 +131,10 @@
   <div class="container">
     <div class="section-head">
       <div>
-        <h2 class="rule">What is in the network</h2>
-        <p class="small muted" style="margin-top:6px;max-width:64ch">
-          Members who joined QIST themselves, counted by their own stated research field.
-          Where a column is short, we say so rather than padding it.
-        </p>
+        <h2 class="rule" data-i18n="home.depth.h2"></h2>
+        <p class="small muted" style="margin-top:6px;max-width:64ch" data-i18n="home.depth.lede"></p>
       </div>
-      <a href="directory.html">Open the directory →</a>
+      <a href="directory.html" data-i18n="home.depth.open"></a>
     </div>
     <div id="depth" class="depth"></div>
   </div>
@@ -151,12 +144,12 @@
   <div class="container">
     <div class="newsletter-cta" id="pilot">
       <div>
-        <h3>Stay in the loop</h3>
-        <p class="small">Get the QIST digest: jobs, grants, conferences and community news.</p>
+        <h3 data-i18n="home.cta.h"></h3>
+        <p class="small" data-i18n="home.cta.p"></p>
       </div>
       <form id="cta-subscribe" style="display:flex;gap:10px;flex-wrap:wrap">
-        <input type="email" required placeholder="your@email.edu" id="cta-email" style="min-width:240px">
-        <button class="btn btn-primary" type="submit">Subscribe</button>
+        <input type="email" required data-i18n-attr="placeholder:home.cta.ph" id="cta-email" style="min-width:240px">
+        <button class="btn btn-primary" type="submit" data-i18n="home.cta.btn"></button>
       </form>
     </div>
   </div>
@@ -164,8 +157,9 @@
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/app.js?v=2026-09-19c"></script>
-<script src="assets/js/globe.js?v=2026-09-19c"></script>
+<script src="assets/js/i18n.js?v=2026-09-20a"></script>
+<script src="assets/js/app.js?v=2026-09-20a"></script>
+<script src="assets/js/globe.js?v=2026-09-20a"></script>
 <script>
 (async () => {
   await QIST.boot('index.html');
@@ -209,7 +203,7 @@
   const demoCountry = document.getElementById('demo-country');
   const demoStage = document.getElementById('demo-stage');
   QIST.fillCountrySelect(demoCountry, elig, 'KZ');
-  document.getElementById('demo-total').textContent = active.length;
+  document.getElementById('demo-note').innerHTML = QIST.t('home.demo.note', { n: `<b>${active.length}</b>` });
 
   /* Which three calls to show.
      Sorting purely by deadline gave three calls that are open to any nationality, so the
@@ -241,7 +235,7 @@
       return `<div class="card demo-card demo-${m.tone}">
         <div class="meta">
           <span class="badge">${QIST.esc(QIST.OPPORTUNITY_TYPES[o.type] || o.type)}</span>
-          ${o.deadline ? `<span class="deadline">in ${QIST.daysLeft(o)} days</span>` : '<span>no deadline</span>'}
+          ${o.deadline ? `<span class="deadline">${QIST.t('opp.deadline.days', { n: QIST.daysLeft(o) })}</span>` : `<span>${QIST.t('opp.nodeadline')}</span>`}
         </div>
         <h3><a href="opportunities.html?country=${encodeURIComponent(profile.country)}&stage=${encodeURIComponent(profile.stage)}#opp-${QIST.esc(o.id)}">${QIST.esc(o.title)}</a></h3>
         <p class="small muted">${QIST.esc(o.organization)}</p>
@@ -252,7 +246,7 @@
         <p class="demo-line">${QIST.esc(blocker ? blocker.detail : m.verdict)}</p>
       </div>`;
     }).join('')
-      : '<div class="card"><p class="small muted">No open calls right now — we are adding them.</p></div>';
+      : `<div class="card"><p class="small muted">${QIST.t('home.demo.empty')}</p></div>`;
   }
   [demoCountry, demoStage].forEach(el => el.addEventListener('change', drawDemo));
   drawDemo();
@@ -269,10 +263,8 @@
       <span class="depth-bar"><i style="width:${Math.round((n / max) * 100)}%"></i></span>
       <span class="depth-n">${n}</span>
     </div>`).join('') +
-    `<p class="small muted" style="margin-top:12px">
-       ${new Set(unique.map(p => p.country).filter(Boolean)).size} countries ·
-       ${unique.length} members · names are not shown to organizations until the member agrees
-       to an introduction.</p>`;
+    `<p class="small muted" style="margin-top:12px">${QIST.t('home.depth.note', {
+       countries: new Set(unique.map(p => p.country).filter(Boolean)).size, people: unique.length })}</p>`;
 
   /* Pilot sign-up. This used to save the address into the visitor's own localStorage,
      which meant it never reached us. Now it posts to the configured endpoint, and if
@@ -283,27 +275,26 @@
 
   if (!QIST.SIGNUP_ENDPOINT) {
     emailInput.disabled = true;
-    emailInput.placeholder = 'sign-ups are not wired up yet';
+    emailInput.placeholder = '—';
     btn.disabled = true;
-    btn.textContent = 'Soon';
+    btn.textContent = '—';
     form.insertAdjacentHTML('afterend',
       '<p class="small" style="color:#9eacc0;margin-top:10px;flex-basis:100%">' +
-      'Sign-ups are not wired up yet — we will not collect addresses into a place we cannot read them from. ' +
-      'Set <code>QIST.SIGNUP_ENDPOINT</code> in <code>assets/js/app.js</code>; see the README.</p>');
+      QIST.t('home.cta.off') + '</p>');
   } else {
     form.addEventListener('submit', async e => {
       e.preventDefault();
       const email = emailInput.value.trim();
       if (!email) return;
-      btn.disabled = true; btn.textContent = 'Sending…';
+      btn.disabled = true; btn.textContent = QIST.t('common.sending');
       const res = await QIST.submitForm(QIST.SIGNUP_ENDPOINT, {
         _subject: 'ScienceBridge pilot sign-up',
         kind: 'pilot_signup', email, at: new Date().toISOString()
       });
       if (res.ok) {
-        form.innerHTML = '<p style="color:#f4e9d2;margin:0">You are on the list. The first digest arrives once we have a selection that fits your profile.</p>';
+        form.innerHTML = `<p style="color:#f4e9d2;margin:0">${QIST.t('home.cta.ok')}</p>`;
       } else {
-        btn.disabled = false; btn.textContent = 'Subscribe';
+        btn.disabled = false; btn.textContent = QIST.t('home.cta.btn');
         QIST.toast('Could not send. Please try again.');
       }
     });

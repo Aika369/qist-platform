@@ -6,7 +6,7 @@
 <title>People Directory — QIST</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-19c">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-20a">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
@@ -14,16 +14,16 @@
 <section class="section">
   <div class="container">
     <div class="section-head">
-      <h2 class="rule">Researchers</h2>
+      <h2 class="rule" data-i18n="dir.h2"></h2>
       <span class="muted small" id="dir-count"></span>
     </div>
 
       <div class="view-switch">
-    <a href="directory.html" class="active">List</a>
-    <a href="map.html">Map</a>
+    <a href="directory.html" class="active" data-i18n="dir.view.list"></a>
+    <a href="map.html" data-i18n="dir.view.map"></a>
   </div>
   <div class="filters">
-      <input type="text" id="f-q" class="search-input" placeholder="Search by name, topic, institution…">
+      <input type="text" id="f-q" class="search-input" data-i18n-attr="placeholder:dir.search.ph">
       <select id="f-topic"><option value="">Research field</option></select>
       <select id="f-country"><option value="">Country of work</option></select>
       <select id="f-role"><option value="">Career stage</option>
@@ -40,7 +40,7 @@
 
     <div id="dir-grid" class="grid grid-3"></div>
     <p id="dir-empty" class="muted" style="display:none;text-align:center;padding:40px 0">
-      No researchers match these filters. Try broadening your search.
+      <span data-i18n="dir.empty"></span>
     </p>
   </div>
 </section>
@@ -54,7 +54,8 @@
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/app.js?v=2026-09-19c"></script>
+<script src="assets/js/i18n.js?v=2026-09-20a"></script>
+<script src="assets/js/app.js?v=2026-09-20a"></script>
 <script>
 (async () => {
   await QIST.boot('directory.html');

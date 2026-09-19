@@ -6,7 +6,7 @@
 <title>Channels — QIST</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-19c">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-20a">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
@@ -26,10 +26,10 @@
           <button class="btn btn-primary" id="btn-new-post">＋ New post</button>
         </div>
         <div class="filters" style="margin-bottom:18px">
-          <input type="text" id="post-q" class="search-input" placeholder="Search posts…">
+          <input type="text" id="post-q" class="search-input" data-i18n-attr="placeholder:ch.search.ph">
         </div>
         <div id="posts"></div>
-        <p id="posts-empty" class="muted" style="display:none;text-align:center;padding:40px 0">No posts here yet — be the first to share something.</p>
+        <p id="posts-empty" class="muted" style="display:none;text-align:center;padding:40px 0" data-i18n="ch.empty"></p>
       </main>
     </div>
   </div>
@@ -38,7 +38,7 @@
 <div class="modal-overlay" id="post-modal">
   <div class="modal">
     <button class="close" onclick="document.getElementById('post-modal').classList.remove('open')">✕</button>
-    <h2 style="margin-bottom:16px">New post</h2>
+    <h2 style="margin-bottom:16px" data-i18n="ch.new"></h2>
     <div id="post-alert"></div>
     <form id="post-form">
       <div class="form-row">
@@ -70,14 +70,21 @@
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/app.js?v=2026-09-19c"></script>
+<script src="assets/js/i18n.js?v=2026-09-20a"></script>
+<script src="assets/js/app.js?v=2026-09-20a"></script>
 <script>
 (async () => {
   await QIST.boot('channels.html');
   const $ = id => document.getElementById(id);
   const channels = QIST.channels();
-  let current = new URLSearchParams(location.search).get('c') || 'jobs';
-  if (!channels.some(c => c.id === current)) current = 'jobs';
+  /* Old links live on: ?c=jobs, ?c=grants and ?c=collab were bookmarked and shared before
+     those channels moved into Opportunities. Landing on one used to throw, because the channel
+     no longer exists. Now the page opens the first live channel and says where the old one went,
+     instead of failing or pretending the link was never valid. */
+  const RETIRED = ['jobs', 'grants', 'collab'];
+  const asked = new URLSearchParams(location.search).get('c') || '';
+  const cameFromRetired = RETIRED.includes(asked);
+  let current = channels.some(c => c.id === asked) ? asked : channels[0].id;
 
   async function renderSidebar() {
     const all = await QIST.getPosts();
@@ -95,12 +102,18 @@
       }));
   }
 
-  function badgeFor(c) {
-    return { jobs: '', grants: 'teal', conferences: 'navy', collab: '', general: 'navy' }[c] || '';
+  function badgeFor(c) { return { conferences: 'navy', general: 'teal' }[c] || ''; }
+
+  if (cameFromRetired) {
+    document.querySelector('.container').insertAdjacentHTML('afterbegin',
+      `<div class="card pad-lg" style="margin-bottom:18px;border-left:4px solid var(--gold);text-align:left">
+         <p class="small" style="color:var(--ink-soft);line-height:1.6">${QIST.t('ch.moved')}</p>
+         <p style="margin-top:10px"><a class="btn btn-primary" href="opportunities.html">${QIST.t('ch.moved.link')}</a></p>
+       </div>`);
   }
 
   async function renderPosts() {
-    const ch = channels.find(c => c.id === current);
+    const ch = channels.find(c => c.id === current) || channels[0];
     $('ch-title').textContent = ch.em + ' ' + ch.name;
     $('ch-desc').textContent = ch.desc;
     const q = $('post-q').value.trim().toLowerCase();
@@ -113,7 +126,7 @@
           <span class="badge ${badgeFor(p.channel)}">${channels.find(c => c.id === p.channel)?.name || p.channel}</span>
           <span>📅 ${QIST.esc(p.date || '')}</span>
           <span>✍️ ${QIST.esc(p.author || 'QIST')}</span>
-          ${p.deadline ? `<span class="deadline">⏳ Deadline: ${QIST.esc(p.deadline)}</span>` : ''}
+          ${p.deadline ? `<span class="deadline">⏳ ${QIST.t('ch.f.deadline')}: ${QIST.esc(p.deadline)}</span>` : ''}
         </div>
         <h3>${QIST.esc(p.title)}</h3>
         <div class="body">${QIST.esc(p.body || '')}</div>

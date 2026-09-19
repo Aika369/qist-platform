@@ -6,25 +6,25 @@
 <title>Newsletter — QIST</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-19c">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-20a">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
 
 <section class="section">
   <div class="container" style="max-width:840px">
-    <div class="section-head"><h2 class="rule">The QIST Digest</h2></div>
-    <p class="muted" style="margin-bottom:30px">Community news, member achievements and hand-picked opportunities
-    for researchers of Central Asia, the Caucasus and Mongolia, and for colleagues from the region working abroad — in your inbox, every two weeks.</p>
+    <div class="section-head"><h2 class="rule" data-i18n="news.h2"></h2></div>
+    <p class="muted" style="margin-bottom:30px" data-i18n="news.lede"></p>
 
+    <p class="small muted" style="margin-bottom:18px" data-i18n="news.archive.note"></p>
     <div class="newsletter-cta" style="margin-bottom:44px">
       <div>
-        <h3>Subscribe to the digest</h3>
+        <h3 data-i18n="news.sub.h"></h3>
         <p class="small" id="sub-count"></p>
       </div>
       <form id="subscribe-form" style="display:flex;gap:10px;flex-wrap:wrap">
-        <input type="email" required placeholder="your@email.edu" id="sub-email" style="min-width:240px">
-        <button class="btn btn-primary" type="submit">Subscribe</button>
+        <input type="email" required data-i18n-attr="placeholder:home.cta.ph" id="sub-email" style="min-width:240px">
+        <button class="btn btn-primary" type="submit" data-i18n="home.cta.btn"></button>
       </form>
     </div>
 
@@ -34,7 +34,8 @@
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/app.js?v=2026-09-19c"></script>
+<script src="assets/js/i18n.js?v=2026-09-20a"></script>
+<script src="assets/js/app.js?v=2026-09-20a"></script>
 <script>
 (async () => {
   await QIST.boot('newsletter.html');

@@ -264,7 +264,9 @@
         "VI": "self_funded",
         "WF": "self_funded"
       },
-      "default": "self_funded"
+      "default": "self_funded",
+      "name_kk": "Horizon Europe",
+      "name_ru": "Horizon Europe"
     },
     "kz_national": {
       "name": "Kazakhstan national programmes",
@@ -276,7 +278,9 @@
         "KZ": "eligible"
       },
       "default": "not_eligible",
-      "note": "Requires Kazakhstani citizenship or a host organisation in Kazakhstan"
+      "note": "Requires Kazakhstani citizenship or a host organisation in Kazakhstan",
+      "name_kk": "Қазақстанның ұлттық бағдарламалары",
+      "name_ru": "Национальные программы Казахстана"
     },
     "open": {
       "name": "No country restrictions",
@@ -285,44 +289,74 @@
       "source_version": "",
       "source_date": "",
       "countries": {},
-      "default": "eligible"
+      "default": "eligible",
+      "name_kk": "Елдік шектеу жоқ",
+      "name_ru": "Без страновых ограничений"
     }
   },
   "statuses": {
     "eu_member": {
       "verdict": "ok",
       "label": "eligible — EU Member State",
-      "text": "{country} is an EU Member State: full participation and funding rights."
+      "text": "{country} is an EU Member State: full participation and funding rights.",
+      "label_kk": "сәйкес келеді — ЕО мүше мемлекеті",
+      "label_ru": "подходит — государство — член ЕС",
+      "text_kk": "{country} — Еуропалық одақтың мүше мемлекеті: қатысу және қаржыландыру құқықтары толық.",
+      "text_ru": "{country} — государство — член Европейского союза: полные права участия и финансирования."
     },
     "associated": {
       "verdict": "ok",
       "label": "eligible — Associated Country",
-      "text": "{country} is associated to Horizon Europe: the same rights as EU Member States, including coordinating a project."
+      "text": "{country} is associated to Horizon Europe: the same rights as EU Member States, including coordinating a project.",
+      "label_kk": "сәйкес келеді — қауымдастырылған ел",
+      "label_ru": "подходит — ассоциированная страна",
+      "text_kk": "{country} Horizon Europe-қа қауымдастырылған: жобаны үйлестіруді қоса алғанда, ЕО мүшелерімен бірдей құқықтар.",
+      "text_ru": "{country} ассоциирована с Horizon Europe: те же права, что и у государств — членов ЕС, включая координацию проекта."
     },
     "funded": {
       "verdict": "ok",
       "label": "eligible — funding available",
-      "text": "{country} is a third country automatically eligible for EU funding."
+      "text": "{country} is a third country automatically eligible for EU funding.",
+      "label_kk": "сәйкес келеді — қаржыландыру қолжетімді",
+      "label_ru": "подходит — финансирование доступно",
+      "text_kk": "{country} — ЕО қаржыландыруына автоматты түрде құқығы бар үшінші ел.",
+      "text_ru": "{country} — третья страна, автоматически имеющая право на финансирование ЕС."
     },
     "self_funded": {
       "verdict": "bad",
       "label": "not funded",
-      "text": "{country} is not on the automatic funding list. Participation is possible, but normally at your own cost."
+      "text": "{country} is not on the automatic funding list. Participation is possible, but normally at your own cost.",
+      "label_kk": "қаржыландырылмайды",
+      "label_ru": "не финансируется",
+      "text_kk": "{country} автоматты қаржыландыру тізімінде жоқ. Қатысуға болады, бірақ әдетте өз есебіңізден.",
+      "text_ru": "{country} нет в списке автоматического финансирования. Участие возможно, но обычно за свой счёт."
     },
     "eligible": {
       "verdict": "ok",
       "label": "eligible",
-      "text": "{country} meets the programme conditions."
+      "text": "{country} meets the programme conditions.",
+      "label_kk": "сәйкес келеді",
+      "label_ru": "подходит",
+      "text_kk": "{country} бағдарлама шарттарына сай келеді.",
+      "text_ru": "{country} соответствует условиям программы."
     },
     "not_eligible": {
       "verdict": "bad",
       "label": "not eligible",
-      "text": "{country} is not on this programme’s list of eligible countries."
+      "text": "{country} is not on this programme’s list of eligible countries.",
+      "label_kk": "сәйкес келмейді",
+      "label_ru": "не подходит",
+      "text_kk": "{country} осы бағдарламаның қатысуға құқылы елдер тізімінде жоқ.",
+      "text_ru": "{country} нет в списке стран, имеющих право участвовать в этой программе."
     },
     "unknown": {
       "verdict": "unk",
       "label": "condition unknown",
-      "text": "{country}: status not confirmed in the source — please check manually."
+      "text": "{country}: status not confirmed in the source — please check manually.",
+      "label_kk": "шарт белгісіз",
+      "label_ru": "условие неизвестно",
+      "text_kk": "{country}: дереккөзде мәртебе расталмаған — қолмен тексеріңіз.",
+      "text_ru": "{country}: статус не подтверждён в источнике — проверьте вручную."
     }
   },
   "countries": {
@@ -594,5 +628,90 @@
     "phd_plus": "PhD or above",
     "postdoc_plus": "Postdoc or above",
     "pi_only": "Principal Investigator only"
+  },
+  "career_stages_kk": {
+    "any": "Кез келген",
+    "phd_student": "PhD докторант және жоғары",
+    "phd_plus": "PhD және жоғары",
+    "postdoc_plus": "Постдок және жоғары",
+    "pi_only": "Тек жоба жетекшісі"
+  },
+  "career_stages_ru": {
+    "any": "Любая",
+    "phd_student": "Докторант PhD и выше",
+    "phd_plus": "PhD и выше",
+    "postdoc_plus": "Постдок и выше",
+    "pi_only": "Только руководитель проекта"
+  },
+  "countries_kk": {
+    "KZ": "Қазақстан",
+    "UZ": "Өзбекстан",
+    "KG": "Қырғызстан",
+    "TJ": "Тәжікстан",
+    "TM": "Түрікменстан",
+    "AZ": "Әзербайжан",
+    "GE": "Грузия",
+    "AM": "Армения",
+    "MN": "Моңғолия",
+    "AT": "Австрия",
+    "BE": "Бельгия",
+    "BG": "Болгария",
+    "HR": "Хорватия",
+    "CY": "Кипр",
+    "CZ": "Чехия",
+    "DK": "Дания",
+    "EE": "Эстония",
+    "FI": "Финляндия",
+    "FR": "Франция",
+    "DE": "Германия",
+    "GR": "Грекия",
+    "HU": "Венгрия",
+    "IE": "Ирландия",
+    "IT": "Италия",
+    "LV": "Латвия",
+    "LT": "Литва",
+    "LU": "Люксембург",
+    "MT": "Мальта",
+    "NL": "Нидерланд",
+    "PL": "Польша",
+    "PT": "Португалия",
+    "RO": "Румыния",
+    "SK": "Словакия",
+    "SI": "Словения",
+    "ES": "Испания",
+    "SE": "Швеция",
+    "AL": "Албания",
+    "BA": "Босния және Герцеговина",
+    "FO": "Фарер аралдары",
+    "IS": "Исландия",
+    "IL": "Израиль",
+    "XK": "Косово",
+    "MD": "Молдова",
+    "ME": "Черногория",
+    "MK": "Солтүстік Македония",
+    "NO": "Норвегия",
+    "RS": "Сербия",
+    "TR": "Түркия",
+    "TN": "Тунис",
+    "UA": "Украина",
+    "GB": "Ұлыбритания",
+    "NZ": "Жаңа Зеландия",
+    "CA": "Канада",
+    "CH": "Швейцария",
+    "EG": "Мысыр",
+    "BR": "Бразилия",
+    "JP": "Жапония",
+    "KR": "Корея Республикасы",
+    "AE": "Біріккен Араб Әмірліктері",
+    "US": "Америка Құрама Штаттары",
+    "CN": "Қытай",
+    "IN": "Үндістан",
+    "RU": "Ресей",
+    "AU": "Австралия",
+    "SG": "Сингапур",
+    "MY": "Малайзия",
+    "SA": "Сауд Арабиясы",
+    "QA": "Катар",
+    "PK": "Пәкістан"
   }
 }

@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-19c">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-20a">
 <style>
   .marker-cluster-custom { background: none; border: none; }
   .map-name-label {
@@ -24,15 +24,15 @@
 
 <div class="map-page">
   <div class="map-panel">
-    <h2>Researchers worldwide</h2>
+    <h2 data-i18n="map.h2"></h2>
     <div class="view-switch" style="margin-bottom:12px">
-      <a href="directory.html">List</a>
-      <a href="map.html" class="active">Map</a>
+      <a href="directory.html" data-i18n="dir.view.list"></a>
+      <a href="map.html" class="active" data-i18n="dir.view.map"></a>
     </div>
 
-    <p class="small muted" id="map-count" style="margin-bottom:12px">Loading…</p>
+    <p class="small muted" id="map-count" style="margin-bottom:12px" data-i18n="common.loading"></p>
     <div class="form-row">
-      <input type="text" id="map-search" class="search-input" style="width:100%" placeholder="Search name, topic, institution…">
+      <input type="text" id="map-search" class="search-input" style="width:100%" data-i18n-attr="placeholder:map.search.ph">
     </div>
     <div class="form-row">
       <select id="map-country" style="width:100%"><option value="">All countries</option></select>
@@ -45,7 +45,8 @@
   <div id="map"></div>
 </div>
 
-<script src="assets/js/app.js?v=2026-09-19c"></script>
+<script src="assets/js/i18n.js?v=2026-09-20a"></script>
+<script src="assets/js/app.js?v=2026-09-20a"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script>
@@ -158,7 +159,7 @@
       `<div style="padding:7px 0;border-bottom:1px solid var(--paper-2);cursor:pointer" data-lat="${p.lat}" data-lng="${p.lng}">
         <b style="color:var(--navy)">${QIST.esc(p.name)}</b><br>
         <span class="muted">${QIST.esc(p.institution || '')} · ${QIST.esc(p.city)}</span>
-      </div>`).join('') + (shown.length > 30 ? `<p class="muted" style="padding-top:8px">…and ${shown.length - 30} more (zoom the map)</p>` : '');
+      </div>`).join('') + (shown.length > 30 ? `<p class="muted" style="padding-top:8px">${QIST.t('map.more', { n: shown.length - 30 })}</p>` : '');
     document.querySelectorAll('#map-list [data-lat]').forEach(el =>
       el.addEventListener('click', () => map.flyTo([+el.dataset.lat, +el.dataset.lng], 10)));
   }

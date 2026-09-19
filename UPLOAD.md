@@ -6,7 +6,7 @@ not just the changed ones. Replace the repo contents with it and the mismatch ca
 
 ## Option A — GitHub in the browser (no tools)
 
-1. Unzip this archive. You get a folder with 34 files, including `assets/` and `data/`.
+1. Unzip this archive. You get a folder with 35 files, including `assets/` and `data/`.
 2. Open `https://github.com/Aika369/qist-platform`
 3. **Add file → Upload files**
 4. Open the unzipped folder on your computer, **select everything inside it**
@@ -31,7 +31,7 @@ Wait about a minute after committing, then open the live site and press `F12` �
 The first line should read:
 
 ```
-QIST build 2026-09-19c
+QIST build 2026-09-20a
 ```
 
 If it says anything else, or nothing, the JavaScript file did not reach the server.
@@ -50,6 +50,15 @@ country list beats our programme table:
   *not eligible*; with **Uzbekistan**, *eligible*. The source link under the verdict should
   point at the Schlumberger Foundation's own eligibility PDF, not at our table.
 - Open **TWAS–FAPESP**. Kazakhstan eligible, Georgia not.
+
+**New file in this release: `assets/js/i18n.js`.** It holds the Kazakh, Russian and English
+interface text and every page loads it before `app.js`. If it does not reach the server, the
+whole site shows raw keys like `nav.home` — so check that the `assets/js/` folder went up with
+three files in it, not two.
+
+Switch the language with the ҚАЗ / РУС / ENG buttons in the header. The menu, the forms and the
+match explanations change; the titles and conditions of the calls stay in the funder's own words,
+which is deliberate and explained on the card.
 
 First look at the header: it must read **ScienceBridge AI** with **BY QIST** as a small line
 underneath, not in a box.
@@ -95,7 +104,7 @@ HTML was new, but the browser was still running a cached copy of `app.js`. A har
 fixes that — `Ctrl+Shift+R` on Windows, `Cmd+Shift+R` on Mac.
 
 From this release the problem is handled in code: every local script and stylesheet is
-requested with a version marker, e.g. `assets/js/app.js?v=2026-09-19c`. A browser treats a
+requested with a version marker, e.g. `assets/js/app.js?v=2026-09-20a`. A browser treats a
 changed query string as a different file and must fetch it, so visitors stop getting a mix
 of new HTML and old JavaScript.
 

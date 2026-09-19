@@ -8,7 +8,7 @@
 const QIST = {
   /* Build stamp. Open the browser console on the live site: if this does not match the
      release you uploaded, the file did not reach the server. */
-  BUILD: '2026-09-19c',
+  BUILD: '2026-09-20a',
 
   /* Positioning, in one place, so it cannot drift between pages.
      MVP phase 1: nine countries of Central Asia, the Caucasus and Mongolia, plus their
@@ -17,6 +17,96 @@ const QIST = {
   BRAND_BY: 'by QIST',
   REGION_SHORT: 'Central Asia, the Caucasus and Mongolia',
   REGION_LONG: 'Kazakhstan, Uzbekistan, Kyrgyzstan, Tajikistan, Turkmenistan, Azerbaijan, Georgia, Armenia and Mongolia',
+
+
+  /* ================= LANGUAGE =================
+     Three languages: Kazakh, Russian, English. The dictionaries live in assets/js/i18n.js,
+     which loads before this file, so a page never flashes English before switching.
+
+     What is translated: the interface — menus, buttons, forms, headings, and the sentences the
+     match engine generates.
+
+     What is NOT translated, deliberately: the conditions a funder publishes. An opportunity's
+     title, summary and eligibility note stay in the language of the source, with a label saying
+     so. Machine-translating "the host institution must be in an EU Member State" is exactly the
+     class of harm this product exists to prevent — a researcher loses a week to a mistranslated
+     condition. A curator may add title_kk / summary_kk / title_ru / summary_ru by hand, and
+     those are used when present. Researchers' own names are never transliterated (D-15).
+
+     Choosing the language: ?lang= in the URL, then the visitor's saved choice, then the
+     browser, then English. */
+  LANGS: [
+    { code: 'kk', label: 'ҚАЗ', name: 'Қазақша' },
+    { code: 'ru', label: 'РУС', name: 'Русский' },
+    { code: 'en', label: 'ENG', name: 'English' }
+  ],
+  lang: 'en',
+
+  detectLang() {
+    const valid = c => this.LANGS.some(l => l.code === c);
+    const fromUrl = new URLSearchParams(location.search).get('lang');
+    if (valid(fromUrl)) return fromUrl;
+    let saved = null;
+    try { saved = localStorage.getItem('qist_lang'); } catch (_) {}
+    if (valid(saved)) return saved;
+    const nav = (navigator.languages || [navigator.language || '']).map(x => String(x).slice(0, 2).toLowerCase());
+    const hit = nav.find(valid);
+    return hit || 'en';
+  },
+
+  setLang(code, reload) {
+    if (!this.LANGS.some(l => l.code === code)) return;
+    this.lang = code;
+    try { localStorage.setItem('qist_lang', code); } catch (_) {}
+    document.documentElement.setAttribute('lang', code);
+    const p = new URLSearchParams(location.search);
+    p.set('lang', code);
+    history.replaceState(null, '', '?' + p + location.hash);
+    if (reload) location.reload();
+  },
+
+  /* Translate one key. Missing keys fall back to English and then to the key itself, so a
+     gap shows up as a visible key rather than an empty box — and the tests fail on it. */
+  t(key, vars) {
+    const dicts = (typeof QIST_I18N !== 'undefined') ? QIST_I18N : {};
+    const val = (dicts[this.lang] && dicts[this.lang][key])
+             || (dicts.en && dicts.en[key]);
+    if (val === undefined) {
+      if (this.lang !== 'en') console.warn('[i18n] missing key:', key, 'for', this.lang);
+      return key;
+    }
+    if (!vars) return val;
+    return val.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? vars[k] : m));
+  },
+
+  /* Apply the dictionary to markup. Three attributes, so a page carries its strings as keys:
+       data-i18n              -> textContent
+       data-i18n-html         -> innerHTML (only for strings that contain our own markup)
+       data-i18n-attr="placeholder:key;aria-label:key"  -> attributes */
+  applyI18n(root) {
+    (root || document).querySelectorAll('[data-i18n]').forEach(el => {
+      el.textContent = this.t(el.getAttribute('data-i18n'));
+    });
+    (root || document).querySelectorAll('[data-i18n-html]').forEach(el => {
+      el.innerHTML = this.t(el.getAttribute('data-i18n-html'));
+    });
+    (root || document).querySelectorAll('[data-i18n-attr]').forEach(el => {
+      el.getAttribute('data-i18n-attr').split(';').filter(Boolean).forEach(pair => {
+        const [attr, key] = pair.split(':');
+        if (attr && key) el.setAttribute(attr.trim(), this.t(key.trim()));
+      });
+    });
+    const title = (root || document).querySelector('title[data-i18n-title]');
+    if (title) document.title = this.t(title.getAttribute('data-i18n-title'));
+  },
+
+  /* Opportunity text in the reader's language when a curator supplied it, otherwise the
+     funder's own words plus an honest label. Never machine-translated. */
+  oppText(o, field) {
+    const localised = o[field + '_' + this.lang];
+    if (localised) return { text: localised, translated: true };
+    return { text: o[field] || '', translated: false };
+  },
 
   // Set to a deployed FastAPI URL (e.g. "https://api.qist.org") to go live.
   // Can also be overridden without redeploy: localStorage.setItem('qist_api_url', '...')
@@ -79,6 +169,11 @@ const QIST = {
       posts = [...this.overlay('posts'), ...base.filter(p => !removed.has(p.id))];
       if (channel) posts = posts.filter(p => p.channel === channel);
     }
+    /* A post that became a structured opportunity is not shown twice. The record itself is
+       kept, with `superseded_by` pointing at the entry that replaced it — we do not delete
+       people's posts to tidy up an interface. Posts in retired channels drop out the same way. */
+    const live = new Set(this.channels().map(c => c.id));
+    posts = posts.filter(p => !p.superseded_by && live.has(p.channel));
     return posts.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   },
 
@@ -103,13 +198,15 @@ const QIST = {
     return this.loadJSON('newsletter');
   },
 
+  /* Discussion channels.
+     Jobs, Research Grants and Collaboration Requests were removed: every post in them was
+     already a structured entry in Opportunities, where it carries an eligibility verdict and a
+     source link. Two places for the same call is one place too many, and the weaker one wins
+     the visitor's attention. What is left is what Opportunities cannot hold: events and talk. */
   channels() {
     return [
-      { id: 'jobs',       name: 'Jobs & Vacancies',        em: '💼', desc: 'Academic and industry positions relevant to researchers of the region — faculty openings, postdocs, PhD studentships, industry R&D roles.' },
-      { id: 'grants',     name: 'Research Grants',         em: '🏛️', desc: 'Funding calls, fellowships and grant programmes — national (Kazakhstan MSHE), international (Horizon Europe, NSF, DFG) and private foundations.' },
-      { id: 'conferences',name: 'Conferences & Events',    em: '🎓', desc: 'Calls for papers, upcoming conferences, workshops, summer schools and QIST community meetups.' },
-      { id: 'collab',     name: 'Collaboration Requests',  em: '🤝', desc: 'Looking for a co-author, a dataset, lab access or a project partner? Post here and find collaborators across the diaspora.' },
-      { id: 'general',    name: 'General Discussion',      em: '💬', desc: 'Everything else: advice on applications, life in academia, relocation, announcements and community news.' }
+      { id: 'conferences', name: this.t('ch.conferences.name'), em: '🎓', desc: this.t('ch.conferences.desc') },
+      { id: 'general',     name: this.t('ch.general.name'),     em: '💬', desc: this.t('ch.general.desc') }
     ];
   },
 
@@ -169,7 +266,10 @@ const QIST = {
   requireRole(role) {
     const u = this.currentUser();
     if (!u || (role === 'admin' && u.role !== 'admin')) {
-      location.href = 'login.html?next=' + encodeURIComponent(location.pathname.split('/').pop());
+      // Carry the chosen language through the redirect: landing on a sign-in page in a language
+      // you did not choose is how a translated site still feels untranslated.
+      location.href = 'login.html?lang=' + encodeURIComponent(this.lang) +
+                      '&next=' + encodeURIComponent(location.pathname.split('/').pop());
       return null;
     }
     return u;
@@ -225,9 +325,9 @@ const QIST = {
        map.html and matching.html are still absent: the map is a view inside Researchers,
        and matching is personal, so it lives behind sign-in. */
     const links = [
-      ['index.html', 'Home'], ['opportunities.html', 'Opportunities'],
-      ['directory.html', 'Researchers'], ['organizations.html', 'For organizations'],
-      ['about.html', 'About QIST']
+      ['index.html', this.t('nav.home')], ['opportunities.html', this.t('nav.opportunities')],
+      ['directory.html', this.t('nav.researchers')], ['organizations.html', this.t('nav.organizations')],
+      ['about.html', this.t('nav.about')]
     ];
     const nav = links.map(([href, label]) =>
       `<a href="${href}" class="${active === href ? 'active' : ''}">${label}</a>`).join('');
@@ -235,8 +335,15 @@ const QIST = {
       ? `<a class="btn btn-ghost btn-sm" href="profile.html">👤 ${this.esc(u.name.split(' ')[0])}</a>
          ${u.role === 'admin' ? '<a class="btn btn-primary btn-sm" href="admin.html">Admin</a>' : ''}
          <button class="btn btn-ghost btn-sm" onclick="QIST.logout()">Sign out</button>`
-      : `<a class="btn btn-ghost btn-sm" href="login.html">Sign in</a>
-         <a class="btn btn-primary btn-sm" href="login.html#register">Create profile</a>`;
+      : `<a class="btn btn-ghost btn-sm" href="login.html">${this.t('nav.signin')}</a>
+         <a class="btn btn-primary btn-sm" href="login.html#register">${this.t('nav.create')}</a>`;
+
+    /* Language switcher. Three codes, current one marked; the choice is remembered and also
+       written into the address, so a link can be sent in the language it was read in. */
+    const langs = this.LANGS.map(l =>
+      `<button type="button" class="lang-opt${l.code === this.lang ? ' is-on' : ''}"
+               data-lang="${l.code}" lang="${l.code}" title="${this.esc(l.name)}"
+               aria-pressed="${l.code === this.lang}">${l.label}</button>`).join('');
     /* Brand lockup: the product name on the first line, the association under it in small
        capitals. "by QIST" used to sit in a bordered pill, which read as a separate badge
        stuck onto the name. It is an attribution line, so it is set as one. */
@@ -251,8 +358,14 @@ const QIST = {
         </a>
         <button class="nav-toggle" onclick="document.querySelector('.main-nav').classList.toggle('open')">☰</button>
         <nav class="main-nav">${nav}</nav>
-        <div class="nav-auth">${auth}</div>
+        <div class="nav-auth">
+          <div class="lang-switch" role="group" aria-label="${this.esc(this.t('nav.language'))}">${langs}</div>
+          ${auth}
+        </div>
       </div>`;
+
+    document.querySelectorAll('.lang-opt').forEach(b =>
+      b.addEventListener('click', () => this.setLang(b.dataset.lang, true)));
   },
 
   renderFooter() {
@@ -262,29 +375,26 @@ const QIST = {
       <div class="container">
         <div class="cols">
           <div>
-            <h4>${this.BRAND} — an initiative of QIST</h4>
-            <p class="small">Qazaq International Science and Technology Association. ScienceBridge
-            connects researchers, universities, industry and funders across ${this.REGION_SHORT} —
-            ${this.REGION_LONG} — together with researchers from the region working anywhere in the
-            world. Nine countries in this first phase; the platform is built to go wider.
+            <h4>${this.t('foot.title', { brand: this.BRAND })}</h4>
+            <p class="small">${this.t('foot.about', { short: this.t('region.short'), long: this.t('region.long') })}
             <a href="https://qista.org" style="display:inline" target="_blank" rel="noopener">qista.org</a></p>
           </div>
           <div>
-            <h4>Platform</h4>
-            <a href="opportunities.html">Opportunities</a>
-            <a href="directory.html">Researchers</a>
-            <a href="map.html">Researcher map</a>
-            <a href="organizations.html">For organizations</a>
+            <h4>${this.t('foot.platform')}</h4>
+            <a href="opportunities.html">${this.t('nav.opportunities')}</a>
+            <a href="directory.html">${this.t('nav.researchers')}</a>
+            <a href="map.html">${this.t('foot.map')}</a>
+            <a href="organizations.html">${this.t('nav.organizations')}</a>
           </div>
           <div>
-            <h4>Community</h4>
-            <a href="about.html">About QIST</a>
-            <a href="newsletter.html">Newsletter</a>
-            <a href="channels.html">Discussions</a>
-            <a href="login.html#register">Create profile</a>
+            <h4>${this.t('foot.community')}</h4>
+            <a href="about.html">${this.t('nav.about')}</a>
+            <a href="newsletter.html">${this.t('foot.newsletter')}</a>
+            <a href="channels.html">${this.t('foot.discussions')}</a>
+            <a href="login.html#register">${this.t('nav.create')}</a>
           </div>
         </div>
-        <div class="fine">© ${new Date().getFullYear()} QIST · Built with and for researchers of ${this.REGION_SHORT} and their colleagues abroad · <a href="https://github.com/Aika369/qist-platform" style="display:inline">Source on GitHub</a></div>
+        <div class="fine">© ${new Date().getFullYear()} QIST · ${this.t('foot.fine', { short: this.t('region.short') })} · <a href="https://github.com/Aika369/qist-platform" style="display:inline">${this.t('foot.source')}</a></div>
       </div>`;
   },
 
@@ -483,11 +593,40 @@ const QIST = {
 
      A list on the opportunity must bring its own source link, exactly like a programme does.
      Empty or missing lists mean "no explicit list" and fall through to layer 2. */
+  /* Country names in the reader's language.
+     Shipping a 250-country table in three languages would be 750 strings to maintain and to
+     get wrong. The browser already has the CLDR data, so we ask it; if it cannot answer (old
+     browser, missing locale) we fall back to the English name in data/eligibility.json, which
+     is always present. */
+  countryName(code, elig) {
+    const fallback = (elig && elig.countries && elig.countries[code]) || code || '';
+    if (!code) return fallback;
+    /* A hand-written name wins: not every browser ships Kazakh region data, and a verdict that
+       says "Қазақстан" in one browser and "Kazakhstan" in another is a bug the reader sees. */
+    const own = elig && elig['countries_' + this.lang];
+    if (own && own[code]) return own[code];
+    try {
+      const dn = new Intl.DisplayNames([this.lang], { type: 'region' });
+      const name = dn.of(code);
+      // Chromium falls back to English silently; treat that as "no translation" only when it
+      // matches the English name exactly, which is harmless either way.
+      if (name) return name;
+    } catch (_) { /* no Intl data for this locale */ }
+    return fallback;
+  },
+
+  /* Pick `field_<lang>` when the data file carries it, otherwise the English original.
+     Applies to eligibility statuses, programme names and career-stage labels. */
+  loc(obj, field) {
+    if (!obj) return '';
+    return obj[field + '_' + this.lang] || obj[field] || '';
+  },
+
   checkCountry(opp, countryCode, elig) {
     const e    = opp.eligibility || {};
     const key  = e.programme || 'open';
     const prog = elig.programmes[key] || elig.programmes.open;
-    const countryName = elig.countries[countryCode] || 'Your country';
+    const countryName = this.countryName(countryCode, elig) || this.t('match.your_country');
 
     const listSource = e.countries_source_url ? {
       url: e.countries_source_url,
@@ -501,29 +640,27 @@ const QIST = {
     if (countryCode && excluded.includes(countryCode)) {
       const def = elig.statuses.not_eligible;
       return {
-        status: 'not_eligible', verdict: def.verdict, label: def.label,
-        text: `${countryName} is not on this funder's list of eligible countries.`,
-        programme: prog.name, source: listSource || null
+        status: 'not_eligible', verdict: def.verdict, label: this.loc(def, 'label'),
+        text: this.t('elig.list.no', { country: countryName }),
+        programme: this.loc(prog, 'name'), source: listSource || null
       };
     }
     if (allowed.length) {
       const ok  = countryCode && allowed.includes(countryCode);
       const def = ok ? elig.statuses.eligible : elig.statuses.not_eligible;
       return {
-        status: ok ? 'eligible' : 'not_eligible', verdict: def.verdict, label: def.label,
-        text: ok
-          ? `${countryName} is on this funder's list of eligible countries.`
-          : `${countryName} is not on this funder's list of eligible countries.`,
-        programme: prog.name, source: listSource || null
+        status: ok ? 'eligible' : 'not_eligible', verdict: def.verdict, label: this.loc(def, 'label'),
+        text: this.t(ok ? 'elig.list.yes' : 'elig.list.no', { country: countryName }),
+        programme: this.loc(prog, 'name'), source: listSource || null
       };
     }
 
     const status = prog.countries[countryCode] || prog.default || 'unknown';
     const def = elig.statuses[status] || elig.statuses.unknown;
     return {
-      status, verdict: def.verdict, label: def.label,
-      text: def.text.replace('{country}', countryName),
-      programme: prog.name,
+      status, verdict: def.verdict, label: this.loc(def, 'label'),
+      text: this.loc(def, 'text').replace('{country}', countryName),
+      programme: this.loc(prog, 'name'),
       source: prog.source_url ? {
         url: prog.source_url, name: prog.source_name,
         version: prog.source_version, date: prog.source_date
@@ -643,35 +780,34 @@ const QIST = {
      A requirement that the opportunity does not state is not counted at all, so a call with
      three conditions is scored out of three and not diluted to look weaker than it is. */
   matchOpportunity(opp, profile, elig) {
+    const T = (k, v) => this.t(k, v);
     const criteria = [];
     const c = this.checkCountry(opp, profile.country, elig);
-    const countryName = (elig.countries || {})[profile.country] || 'your country';
+    const countryName = this.countryName(profile.country, elig) || T('match.your_country');
 
     criteria.push({
-      key: 'country', label: 'Country eligibility', blocking: true,
+      key: 'country', label: T('match.country'), blocking: true,
       ok: c.verdict === 'ok', unknown: c.verdict === 'unk',
       detail: c.text,
       source: c.source
     });
 
     const s = this.checkStage(opp, profile.stage);
-    const need = (elig.career_stages || {})[opp.career_stage] || opp.career_stage;
-    const have = (elig.career_stages || {})[profile.stage] || profile.stage;
+    const stages = elig['career_stages_' + this.lang] || elig.career_stages || {};
+    const need = stages[opp.career_stage] || opp.career_stage;
+    const have = stages[profile.stage] || profile.stage;
     criteria.push({
-      key: 'stage', label: 'Career stage', blocking: true, ok: s.ok, unknown: false,
-      detail: s.ok
-        ? `This call asks for "${need}", and you selected "${have}".`
-        : `This call asks for "${need}". You selected "${have}", which is below it.`,
+      key: 'stage', label: T('match.stage'), blocking: true, ok: s.ok, unknown: false,
+      detail: s.ok ? T('match.stage.ok', { need, have }) : T('match.stage.bad', { need, have }),
       source: null
     });
 
     if (opp.deadline) {
       const expired = this.isExpired(opp), left = this.daysLeft(opp);
       criteria.push({
-        key: 'deadline', label: 'Deadline', blocking: true, ok: !expired, unknown: false,
-        detail: expired
-          ? `The deadline passed on ${opp.deadline}. Nothing can be submitted now.`
-          : `${left} days left — the deadline is ${opp.deadline}.`,
+        key: 'deadline', label: T('match.deadline'), blocking: true, ok: !expired, unknown: false,
+        detail: expired ? T('match.deadline.past', { date: opp.deadline })
+                        : T('match.deadline.left', { days: left, date: opp.deadline }),
         source: null
       });
     }
@@ -680,14 +816,12 @@ const QIST = {
       const mine = profile.fields || [];
       const hit = (opp.fields || []).filter(f => mine.includes(f));
       criteria.push({
-        key: 'field', label: 'Research field', blocking: false,
+        key: 'field', label: T('match.field'), blocking: false,
         ok: mine.length ? hit.length > 0 : false,
         unknown: mine.length === 0,
-        detail: !mine.length
-          ? 'You have not told us your research field, so this line cannot be judged.'
-          : hit.length
-            ? `Overlap in ${hit.join(', ')}.`
-            : `This call is for ${(opp.fields || []).join(', ')}, which is not one of your fields.`,
+        detail: !mine.length ? T('match.field.unknown')
+              : hit.length   ? T('match.field.ok', { list: hit.join(', ') })
+                             : T('match.field.bad', { list: (opp.fields || []).join(', ') }),
         source: null
       });
     }
@@ -695,15 +829,14 @@ const QIST = {
     if ((opp.methods_required || []).length) {
       const mine = (profile.methods || []).map(m => m.toLowerCase());
       const hit = opp.methods_required.filter(m => mine.includes(m.toLowerCase()));
+      const list = opp.methods_required.join(', ');
       criteria.push({
-        key: 'methods', label: 'Methods and equipment', blocking: false,
+        key: 'methods', label: T('match.methods'), blocking: false,
         ok: hit.length === opp.methods_required.length,
         unknown: !mine.length,
-        detail: !mine.length
-          ? `The call asks for ${opp.methods_required.join(', ')}. We do not know what you have access to.`
-          : hit.length === opp.methods_required.length
-            ? `You have all of: ${opp.methods_required.join(', ')}.`
-            : `The call asks for ${opp.methods_required.join(', ')}; we have ${hit.length} of ${opp.methods_required.length} on your side.`,
+        detail: !mine.length ? T('match.methods.unknown', { list })
+              : hit.length === opp.methods_required.length ? T('match.methods.ok', { list })
+              : T('match.methods.partial', { list, have: hit.length, total: opp.methods_required.length }),
         source: null
       });
     }
@@ -720,19 +853,17 @@ const QIST = {
     let verdict, tone;
     if (blockers.length) {
       tone = 'bad';
-      const names = blockers.map(b => b.label.toLowerCase()).join(' and ');
-      verdict = `You cannot apply to this one: ${names} ${blockers.length > 1 ? 'do' : 'does'} not work out. ` +
-                `The other lines do not change that.`;
+      verdict = T('match.verdict.blocked', { list: blockers.map(b => b.label.toLowerCase()).join(' + ') });
     } else if (met === total && !unknown) {
       tone = 'ok';
-      verdict = 'You meet every condition this call states. What is left is the quality of the application itself.';
+      verdict = T('match.verdict.all');
     } else if (met === total) {
       tone = 'ok';
-      verdict = `You meet every condition we can check. ${unknown} more ${unknown > 1 ? 'depend' : 'depends'} on details we do not have about you — fill them in above and this gets sharper.`;
+      verdict = T('match.verdict.all_known', { n: unknown });
     } else {
       tone = 'warn';
       const soft = criteria.filter(x => !x.blocking && !x.ok && !x.unknown).map(x => x.label.toLowerCase());
-      verdict = `Nothing blocks you from applying. The weak spot is ${soft.join(' and ')} — worth a look before you spend a week on it.`;
+      verdict = T('match.verdict.soft', { list: soft.join(' + ') });
     }
 
     return { met, total, unknown, pct, tone, verdict, criteria, blocked: blockers.length > 0 };
@@ -789,12 +920,15 @@ const QIST = {
     const names = elig.countries;
     const pri = elig.priority_countries || [];
     const esc = s => this.esc(s);
-    const opt = c => `<option value="${esc(c)}"${c === selected ? ' selected' : ''}>${esc(names[c])}</option>`;
+    const label = c => this.countryName(c, elig);
+    const opt = c => `<option value="${esc(c)}"${c === selected ? ' selected' : ''}>${esc(label(c))}</option>`;
+    // Sorted in the reader's language, so the list reads alphabetically in Kazakh and Russian too.
+    const coll = new Intl.Collator(this.lang);
     const rest = Object.keys(names).filter(c => !pri.includes(c))
-      .sort((a, b) => names[a].localeCompare(names[b]));
+      .sort((a, b) => coll.compare(label(a), label(b)));
     sel.innerHTML =
-      `<optgroup label="Greater Central Asia">${pri.filter(c => names[c]).map(opt).join('')}</optgroup>` +
-      `<optgroup label="All countries">${rest.map(opt).join('')}</optgroup>`;
+      `<optgroup label="${esc(this.t('region.group.priority'))}">${pri.filter(c => names[c]).map(opt).join('')}</optgroup>` +
+      `<optgroup label="${esc(this.t('common.allcountries'))}">${rest.map(opt).join('')}</optgroup>`;
   },
   hasPreciseGeo(person) { return (person.geo_precision || (person.city ? 'city' : 'country')) === 'city'; },
 
@@ -828,6 +962,11 @@ const QIST = {
 
   async boot(active) {
     console.info('QIST build', this.BUILD);
+    /* Language is settled before anything is drawn, so no page shows English and then
+       swaps under the reader's eyes. */
+    this.lang = this.detectLang();
+    document.documentElement.setAttribute('lang', this.lang);
+    this.applyI18n(document);
     this.renderHeader(active);
     this.renderFooter();
     await this.detectApi();

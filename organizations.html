@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>For organizations — ScienceBridge / QIST</title>
+<title data-i18n-title="org.title">For organizations — ScienceBridge AI by QIST</title>
 <meta name="description" content="Universities and companies: post an R&D need or a vacancy, find researchers by field and country, or book a 30-minute conversation with the QIST team.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-19c">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-20a">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
@@ -17,15 +17,15 @@
 <section class="org-hero">
   <div class="container">
     <div class="org-switch" role="tablist" aria-label="Who you are">
-      <button id="as-company" role="tab" aria-selected="true">I am from a company</button>
-      <button id="as-university" role="tab" aria-selected="false">I am from a university</button>
+      <button id="as-company" role="tab" aria-selected="true" data-i18n="org.tab.company"></button>
+      <button id="as-university" role="tab" aria-selected="false" data-i18n="org.tab.university"></button>
     </div>
     <h1 id="org-h1">Put your R&amp;D problem in front of researchers who can solve it</h1>
     <p id="org-sub" class="org-sub"></p>
     <div class="org-jump">
-      <a class="btn btn-primary" href="#post">Post a need</a>
-      <a class="btn btn-outline" href="#find">See the expertise</a>
-      <a class="btn btn-ghost" href="#talk">Book 30 minutes</a>
+      <a class="btn btn-primary" href="#post" data-i18n="org.jump.post"></a>
+      <a class="btn btn-outline" href="#find" data-i18n="org.jump.find"></a>
+      <a class="btn btn-ghost" href="#talk" data-i18n="org.jump.talk"></a>
     </div>
   </div>
 </section>
@@ -35,77 +35,73 @@
   <!-- ================= 1. post a need ================= -->
   <section id="post" class="org-block">
     <div class="section-head"><div>
-      <h2 class="rule">1 · Post a need</h2>
+      <h2 class="rule" data-i18n="org.post.h2"></h2>
       <p class="small muted" style="margin-top:6px;max-width:66ch" id="post-lede"></p>
     </div></div>
 
     <form class="card pad-lg org-form" id="need-form">
       <div class="org-row-2">
-        <label>What is it
+        <label><span data-i18n="org.f.what"></span>
           <select id="n-type">
-            <option value="rnd_challenge">An R&amp;D problem we need solved</option>
-            <option value="academic_job">An academic position</option>
-            <option value="industry_job">An industry R&amp;D position</option>
-            <option value="consortium_role">A partner for a project consortium</option>
-            <option value="expert_request">One expert opinion on a specific question</option>
+            <option value="rnd_challenge" data-i18n="org.f.rnd"></option>
+            <option value="academic_job" data-i18n="org.f.acad"></option>
+            <option value="industry_job" data-i18n="org.f.ind"></option>
+            <option value="consortium_role" data-i18n="org.f.cons"></option>
+            <option value="expert_request" data-i18n="org.f.expert"></option>
           </select>
         </label>
-        <label>Deadline, if there is one
+        <label><span data-i18n="org.f.deadline"></span>
           <input type="date" id="n-deadline">
         </label>
       </div>
 
-      <label>Title
-        <input type="text" id="n-title" required placeholder="Predictive maintenance for gas turbine blades — 9-month applied project">
+      <label><span data-i18n="org.f.title"></span>
+        <input type="text" id="n-title" required data-i18n-attr="placeholder:org.f.title.ph">
       </label>
 
-      <label>What needs doing, and what would count as done
-        <textarea id="n-summary" rows="5" required placeholder="The problem in your own words, the data or equipment you already have, and what a good result looks like. Skip the marketing — a researcher decides in the first three lines whether this is their problem."></textarea>
+      <label><span data-i18n="org.f.summary"></span>
+        <textarea id="n-summary" rows="5" required data-i18n-attr="placeholder:org.f.summary.ph"></textarea>
       </label>
 
       <div class="org-row-2">
-        <label>Research field
+        <label><span data-i18n="org.f.field"></span>
           <select id="n-field"></select>
         </label>
-        <label>Who you need
+        <label><span data-i18n="org.f.who"></span>
           <select id="n-stage"></select>
         </label>
       </div>
 
       <div class="org-row-2">
-        <label>Country
+        <label><span data-i18n="common.country"></span>
           <select id="n-country"></select>
         </label>
-        <label>Is the funding in place?
+        <label><span data-i18n="org.f.funding"></span>
           <select id="n-funding">
-            <option value="confirmed">Yes, the budget exists</option>
-            <option value="cofunding_required">Partly — we are looking for co-funding</option>
-            <option value="not_confirmed">No — we would apply for it together</option>
+            <option value="confirmed" data-i18n="org.f.funding.yes"></option>
+            <option value="cofunding_required" data-i18n="org.f.funding.part"></option>
+            <option value="not_confirmed" data-i18n="org.f.funding.no"></option>
           </select>
         </label>
       </div>
 
       <div class="org-row-2">
-        <label>Organisation
-          <input type="text" id="n-org" required placeholder="Nazarbayev University, School of Engineering">
+        <label><span data-i18n="common.org"></span>
+          <input type="text" id="n-org" required data-i18n-attr="placeholder:org.f.orgname.ph">
         </label>
-        <label>Your name and role
-          <input type="text" id="n-name" required placeholder="Aigerim Bekova, head of the research office">
+        <label><span data-i18n="org.f.you"></span>
+          <input type="text" id="n-name" required data-i18n-attr="placeholder:org.f.you.ph">
         </label>
       </div>
 
-      <label>Email for the reply
+      <label><span data-i18n="org.f.replyto"></span>
         <input type="email" id="n-email" required placeholder="you@university.edu">
       </label>
 
-      <p class="org-note">
-        A curator reads every submission and, if it is concrete enough to act on, publishes it in
-        <a href="opportunities.html">Opportunities</a> with your organisation named and a link back to you.
-        Nothing appears on the site automatically. Usually within two working days.
-      </p>
+      <p class="org-note" data-i18n="org.post.note"></p>
 
       <div class="org-actions">
-        <button type="submit" class="btn btn-primary" id="need-send">Send it to a curator</button>
+        <button type="submit" class="btn btn-primary" id="need-send" data-i18n="org.post.send"></button>
         <span class="small muted" id="need-state"></span>
       </div>
     </form>
@@ -114,59 +110,51 @@
   <!-- ================= 2. what expertise is in the network ================= -->
   <section id="find" class="org-block">
     <div class="section-head"><div>
-      <h2 class="rule">2 · See what expertise is in the network</h2>
-      <p class="small muted" style="margin-top:6px;max-width:66ch">
-        <b id="find-total">…</b> researchers who joined QIST themselves and gave us their own details.
-        Search by field and country to see who is there. <b>Names, organisations and links are not
-        shown here</b> — they belong to the researchers, not to us, and each person decides whether
-        to be introduced to you. Ask for an introduction and we put the question to them.
-      </p>
+      <h2 class="rule" data-i18n="org.find.h2"></h2>
+      <p class="small muted" style="margin-top:6px;max-width:66ch" id="find-lede"></p>
     </div></div>
 
     <div class="filters" id="find-filters">
-      <input type="text" id="fd-q" class="search-input" placeholder="Search by research topic…">
+      <input type="text" id="fd-q" class="search-input" data-i18n-attr="placeholder:org.find.ph">
       <select id="fd-field"></select>
       <select id="fd-country"></select>
     </div>
 
-    <p class="small muted" id="find-count" style="margin-bottom:14px">Loading…</p>
+    <p class="small muted" id="find-count" style="margin-bottom:14px" data-i18n="common.loading"></p>
     <div class="grid grid-3" id="find-list"></div>
-    <div class="org-more"><button class="btn btn-outline" id="find-more" hidden>Show more</button></div>
+    <div class="org-more"><button class="btn btn-outline" id="find-more" hidden data-i18n="common.showmore"></button></div>
   </section>
 
   <!-- ================= 3. book a conversation ================= -->
   <section id="talk" class="org-block">
     <div class="section-head"><div>
-      <h2 class="rule">3 · Book 30 minutes</h2>
+      <h2 class="rule" data-i18n="org.talk.h2"></h2>
       <p class="small muted" style="margin-top:6px;max-width:66ch" id="talk-lede"></p>
     </div></div>
 
     <form class="card pad-lg org-form" id="talk-form">
       <div class="org-row-2">
-        <label>Organisation
+        <label><span data-i18n="common.org"></span>
           <input type="text" id="t-org" required placeholder="Al-Farabi Kazakh National University">
         </label>
-        <label>Your name and role
+        <label><span data-i18n="org.f.you"></span>
           <input type="text" id="t-name" required placeholder="Aigerim Bekova, vice-rector for research">
         </label>
       </div>
       <div class="org-row-2">
-        <label>Email
+        <label><span data-i18n="common.email"></span>
           <input type="email" id="t-email" required placeholder="you@university.edu">
         </label>
-        <label>Country
+        <label><span data-i18n="common.country"></span>
           <select id="t-country"></select>
         </label>
       </div>
-      <label>What would make this call worth your time
-        <textarea id="t-goal" rows="3" placeholder="For example: we want our staff to stop missing Horizon Europe deadlines, or we need three co-authors abroad for a joint application in materials science."></textarea>
+      <label><span data-i18n="org.talk.goal"></span>
+        <textarea id="t-goal" rows="3" data-i18n-attr="placeholder:org.talk.goal.ph"></textarea>
       </label>
-      <p class="org-note">
-        This is a discovery conversation, not a sales call. We are at pilot stage and we are trying to
-        learn what a research office actually needs before we build it. There is nothing to buy today.
-      </p>
+      <p class="org-note" data-i18n="org.talk.note"></p>
       <div class="org-actions">
-        <button type="submit" class="btn btn-primary" id="talk-send">Request a conversation</button>
+        <button type="submit" class="btn btn-primary" id="talk-send" data-i18n="org.talk.send"></button>
         <span class="small muted" id="talk-state"></span>
       </div>
     </form>
@@ -174,25 +162,25 @@
 
   <!-- ================= honest state ================= -->
   <section class="org-block">
-    <div class="section-head"><div><h2 class="rule">What works today, and what does not</h2></div></div>
+    <div class="section-head"><div><h2 class="rule" data-i18n="org.honest.h2"></h2></div></div>
     <div class="grid grid-2">
       <div class="card pad-lg org-honest ok">
-        <h3>Working now</h3>
+        <h3 data-i18n="org.honest.ok.h"></h3>
         <ul>
-          <li><b id="honest-people">…</b> researchers who joined QIST themselves, searchable by field and country — without names, until they agree to an introduction.</li>
-          <li><b id="honest-opps">…</b> curated opportunities open right now, each with an eligibility verdict for your country and a link to the funder's own page.</li>
-          <li>Eligibility checked against the published source for all 250 countries — including the cases where a funder's own list overrides the programme rules.</li>
-          <li>Posted needs reviewed by a curator and published with your organisation named.</li>
+          <li id="honest-a"></li>
+          <li id="honest-b"></li>
+          <li data-i18n="org.honest.ok.c"></li>
+          <li data-i18n="org.honest.ok.d"></li>
         </ul>
       </div>
       <div class="card pad-lg org-honest gap">
-        <h3>Not there yet — say so out loud</h3>
+        <h3 data-i18n="org.honest.gap.h"></h3>
         <ul>
-          <li><b>No organisation accounts.</b> Everything here reaches us by email until the backend is deployed.</li>
-          <li><b>No verified organisation badges</b>, so nothing on this site proves who anyone is.</li>
-          <li><b>No paid product and no price list.</b> Nothing to buy, nothing to sign.</li>
-          <li><b>Contacts are never released</b> without the researcher's consent to that specific request — including to you.</li>
-          <li><b>Support from public figures is not endorsement by the state.</b> QIST is a community project.</li>
+          <li data-i18n="org.honest.gap.a"></li>
+          <li data-i18n="org.honest.gap.b"></li>
+          <li data-i18n="org.honest.gap.c"></li>
+          <li data-i18n="org.honest.gap.d"></li>
+          <li data-i18n="org.honest.gap.e"></li>
         </ul>
       </div>
     </div>
@@ -202,7 +190,8 @@
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/app.js?v=2026-09-19c"></script>
+<script src="assets/js/i18n.js?v=2026-09-20a"></script>
+<script src="assets/js/app.js?v=2026-09-20a"></script>
 <script>
 (async () => {
   await QIST.boot('organizations.html');
@@ -212,7 +201,7 @@
      rendering a half-broken screen. */
   if (typeof QIST.submitOrgRequest !== 'function' || !QIST.PRIMARY_FIELDS) {
     $('find-count').innerHTML =
-      '<b>assets/js/app.js is older than this page.</b> Upload the whole release together — this page expects build 2026-09-19c.';
+      '<b>assets/js/app.js is older than this page.</b> Upload the whole release together — this page expects build 2026-09-20a.';
     return;
   }
 
@@ -228,36 +217,16 @@
      separate pages — the survey had four industry respondents — so the split is a switch,
      not two URLs. See DECISIONS.md D-28. */
   const COPY = {
-    university: {
-      h1: 'Put your department’s work in front of researchers who can do it',
-      sub: 'Open positions, joint applications, co-authors abroad, partners for a consortium. ' +
-           'QIST reaches researchers across Central Asia, the Caucasus and Mongolia, and from ' +
-           'those countries working abroad — the people a university in the region is usually ' +
-           'trying to reach and usually cannot.',
-      post: 'A vacancy, a PhD place, a co-author search or a partner for a Horizon Europe or ' +
-            'Erasmus+ consortium. Written once, published where researchers already look for calls.',
-      talk: 'Thirty minutes with the QIST team about how your research office works now: where ' +
-            'applications die, which deadlines get missed, what you already tried. We are collecting ' +
-            'these conversations before building anything for universities, and yours would be one of them.'
-    },
-    company: {
-      h1: 'Put your R&D problem in front of researchers who can solve it',
-      sub: 'A concrete technical problem, a hire, or one expert opinion. The network covers ' +
-           'engineering, materials, AI, energy, biotech and life sciences across Central Asia, ' +
-           'the Caucasus and Mongolia, and among researchers from the region working abroad.',
-      post: 'An R&D problem, a position, or a single question you need an expert answer to. ' +
-            'The clearer the problem, the faster someone recognises it as theirs.',
-      talk: 'Thirty minutes about the problem you are trying to staff or solve. We will tell you ' +
-            'plainly whether anyone in this directory can help, including when the answer is no.'
-    }
+    university: { h1: 'org.h1.university', sub: 'org.sub.university', post: 'org.post.lede.university', talk: 'org.talk.lede.university' },
+    company:    { h1: 'org.h1.company',    sub: 'org.sub.company',    post: 'org.post.lede.company',    talk: 'org.talk.lede.company' }
   };
 
   function setAudience(who, push) {
-    const c = COPY[who] || COPY.university;
-    $('org-h1').textContent = c.h1;
-    $('org-sub').textContent = c.sub;
-    $('post-lede').textContent = c.post;
-    $('talk-lede').textContent = c.talk;
+    const c = COPY[who] || COPY.company;
+    $('org-h1').textContent = QIST.t(c.h1);
+    $('org-sub').textContent = QIST.t(c.sub);
+    $('post-lede').textContent = QIST.t(c.post);
+    $('talk-lede').textContent = QIST.t(c.talk);
     $('as-university').setAttribute('aria-selected', who === 'university');
     $('as-company').setAttribute('aria-selected', who === 'company');
     audience = who;
@@ -286,8 +255,9 @@
   /* ---------- 2. find researchers ----------
      A real search over the same directory data, not a mock-up. Counts next to each field are
      the number of people behind it, so an empty area of the map is visible rather than hidden. */
+  const countryLabel = name => name; // people.json stores country names, not ISO codes
   const counts = QIST.fieldCounts(people);
-  $('fd-field').insertAdjacentHTML('beforeend', '<option value="">All research fields</option>');
+  $('fd-field').insertAdjacentHTML('beforeend', `<option value="">${QIST.t('common.allfields')}</option>`);
   QIST.PRIMARY_FIELDS.forEach(f => {
     const n = counts[f] || 0;
     $('fd-field').insertAdjacentHTML('beforeend',
@@ -295,16 +265,16 @@
   });
 
   const countryNames = [...new Set(people.map(p => p.country).filter(Boolean))].sort((a, b) => a.localeCompare(b));
-  $('fd-country').insertAdjacentHTML('beforeend', '<option value="">All countries</option>');
+  $('fd-country').insertAdjacentHTML('beforeend', `<option value="">${QIST.t('common.allcountries')}</option>`);
   countryNames.forEach(c => {
     const n = people.filter(p => p.country === c).length;
     $('fd-country').insertAdjacentHTML('beforeend', `<option value="${QIST.esc(c)}">${QIST.esc(c)} (${n})</option>`);
   });
 
-  $('find-total').textContent = people.length;
-  $('honest-people').textContent = people.length;
+  $('find-lede').innerHTML = QIST.t('org.find.lede', { n: `<b>${people.length}</b>` });
+  $('honest-a').innerHTML = QIST.t('org.honest.ok.a', { n: `<b>${people.length}</b>` });
   // the honest number is what is still open, not everything ever added
-  $('honest-opps').textContent = opps.filter(o => !QIST.isExpired(o)).length;
+  $('honest-b').innerHTML = QIST.t('org.honest.ok.b', { n: `<b>${opps.filter(o => !QIST.isExpired(o)).length}</b>` });
 
   const PAGE = 12;
   let shown = PAGE, matches = [];
@@ -336,11 +306,11 @@
      introduction, which is the moment QIST is actually useful. See DECISIONS.md D-34. */
   function seniority(p) {
     const y = Number(p.experience);
-    if (!Number.isFinite(y) || y <= 0) return 'experience not stated';
-    if (y < 5)  return 'early career · under 5 years';
-    if (y < 10) return '5–10 years of experience';
-    if (y < 20) return '10–20 years of experience';
-    return '20+ years of experience';
+    if (!Number.isFinite(y) || y <= 0) return QIST.t('org.sen.unknown');
+    if (y < 5)  return QIST.t('org.sen.early');
+    if (y < 10) return QIST.t('org.sen.5');
+    if (y < 20) return QIST.t('org.sen.10');
+    return QIST.t('org.sen.20');
   }
 
   function anonCard(p) {
@@ -350,22 +320,22 @@
       <div class="anon-top">
         <span class="anon-mask" aria-hidden="true">•••</span>
         <div>
-          <h3>${QIST.esc(fields[0] || 'Researcher')}</h3>
-          <div class="anon-meta">${QIST.esc(seniority(p))}${p.country ? ' · ' + QIST.esc(p.country) : ''}</div>
+          <h3>${QIST.esc(fields[0] || QIST.t('org.anon.role'))}</h3>
+          <div class="anon-meta">${QIST.esc(seniority(p))}${p.country ? ' · ' + QIST.esc(countryLabel(p.country)) : ''}</div>
         </div>
       </div>
       ${topics.length ? `<div class="tags">${topics.map(t => `<span class="tag">${QIST.esc(t)}</span>`).join('')}</div>` : ''}
-      <p class="anon-note">Name and organisation are shown once this person agrees to an introduction.</p>
+      <p class="anon-note">${QIST.t('org.anon.note')}</p>
       <div class="org-card-foot">
-        <button class="btn btn-outline btn-sm" data-intro="${QIST.esc(p.id)}">Request an introduction</button>
+        <button class="btn btn-outline btn-sm" data-intro="${QIST.esc(p.id)}">${QIST.t('org.anon.intro')}</button>
       </div>
     </div>`;
   }
 
   function drawPeople() {
     $('find-count').innerHTML = matches.length
-      ? `<b>${matches.length}</b> of ${people.length} researchers match`
-      : 'Nobody in the network matches that. Try a broader field, or post the need above and let a curator look.';
+      ? QIST.t('org.find.count', { shown: `<b>${matches.length}</b>`, total: people.length })
+      : QIST.t('org.find.empty');
     $('find-list').innerHTML = matches.slice(0, shown).map(anonCard).join('');
     $('find-more').hidden = matches.length <= shown;
   }
@@ -384,11 +354,10 @@
       const p = people.find(x => x.id === open.dataset.intro);
       const box = open.closest('.org-card-foot');
       box.innerHTML = `<div class="org-intro">
-        <p class="small">We will put your request to this researcher first. Their name, organisation
-          and contact details reach you only if they say yes to your specific request.</p>
+        <p class="small">${QIST.t('org.anon.consent')}</p>
         <div class="org-intro-row">
-          <input type="email" class="search-input" data-intro-email="${QIST.esc(p.id)}" placeholder="your work email" aria-label="Your work email">
-          <button class="btn btn-primary btn-sm" data-intro-send="${QIST.esc(p.id)}">Send request</button>
+          <input type="email" class="search-input" data-intro-email="${QIST.esc(p.id)}" placeholder="${QIST.esc(QIST.t('org.anon.youremail'))}" aria-label="${QIST.esc(QIST.t('org.anon.youremail'))}">
+          <button class="btn btn-primary btn-sm" data-intro-send="${QIST.esc(p.id)}">${QIST.t('org.anon.send')}</button>
         </div>
         <span class="small muted" data-intro-state="${QIST.esc(p.id)}"></span>
       </div>`;
@@ -403,36 +372,36 @@
     const input = $('find-list').querySelector(`[data-intro-email="${CSS.escape(id)}"]`);
     const state = $('find-list').querySelector(`[data-intro-state="${CSS.escape(id)}"]`);
     const from = (input.value || '').trim();
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(from)) { state.textContent = 'That does not look like an email address.'; input.focus(); return; }
-    send.disabled = true; send.textContent = 'Sending…';
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(from)) { state.textContent = QIST.t('org.anon.bademail'); input.focus(); return; }
+    send.disabled = true; send.textContent = QIST.t('common.sending');
     const res = await QIST.submitOrgRequest('org_introduction', 'Introduction request: ' + p.name, {
       researcher_id: p.id, researcher_name: p.name,
       researcher_org: p.institution || '', from_email: from
     });
     if (res.ok) {
-      send.textContent = '✓ Sent'; input.disabled = true;
-      state.textContent = 'We will ask this researcher and come back to you either way.';
+      send.textContent = QIST.t('common.sent'); input.disabled = true;
+      state.textContent = QIST.t('org.anon.ok');
     } else {
-      send.disabled = false; send.textContent = 'Send request';
+      send.disabled = false; send.textContent = QIST.t('org.anon.send');
       state.textContent = explain(res.reason);
     }
   });
 
   /* ---------- forms ---------- */
   function explain(reason) {
-    if (reason === 'not_configured') return 'Submissions are not wired up yet: set QIST.SIGNUP_ENDPOINT in assets/js/app.js.';
-    return 'Could not send that. Try again, or write to ' + (QIST.CONTACT_EMAIL || 'the QIST team') + '.';
+    if (reason === 'not_configured') return QIST.t('org.state.noendpoint');
+    return QIST.t('org.state.fail', { email: QIST.CONTACT_EMAIL || 'QIST' });
   }
 
   async function handle(formId, btnId, stateId, kind, subject, collect) {
     $(formId).addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = $(btnId), state = $(stateId);
-      btn.disabled = true; const label = btn.textContent; btn.textContent = 'Sending…';
+      btn.disabled = true; const label = btn.textContent; btn.textContent = QIST.t('common.sending');
       const res = await QIST.submitOrgRequest(kind, subject(), { audience, ...collect() });
       if (res.ok) {
-        btn.textContent = '✓ Sent';
-        state.textContent = 'We reply from ' + (QIST.CONTACT_EMAIL || 'the QIST team') + ', usually within two working days.';
+        btn.textContent = QIST.t('common.sent');
+        state.textContent = QIST.t('org.state.reply', { email: QIST.CONTACT_EMAIL || 'QIST' });
         $(formId).reset();
         setTimeout(() => { btn.disabled = false; btn.textContent = label; }, 2500);
       } else {

@@ -716,3 +716,62 @@ table.data tr:hover td { background: var(--paper); }
   .depth-row { grid-template-columns: 1fr auto; }
   .depth-bar { grid-column: 1 / -1; }
 }
+
+/* ================= language switcher =================
+   Three codes in the header. Small, always visible, current one marked — a reader who cannot
+   read the interface must be able to find this without reading the interface. */
+.lang-switch { display: inline-flex; border: 1px solid rgba(181,138,46,.5); border-radius: 999px; overflow: hidden; margin-right: 10px; }
+.lang-opt {
+  font: inherit; font-family: var(--sans); font-size: .64rem; font-weight: 700; letter-spacing: .06em;
+  padding: 5px 9px; border: 0; background: transparent; color: rgba(244,233,210,.7); cursor: pointer;
+}
+.lang-opt:hover { color: var(--gold-soft); background: rgba(181,138,46,.16); }
+.lang-opt.is-on { background: var(--gold); color: #fff; }
+@media (max-width: 720px) {
+  .lang-switch { margin-right: 6px; }
+  .lang-opt { padding: 4px 7px; font-size: .6rem; }
+}
+
+/* The language switcher adds a third block to the header bar. At phone width the brand, the
+   burger, the switcher and two buttons no longer fit on one 390px line, and the header was
+   pushing the whole page 137px wider. The header is allowed to wrap, and the sign-in pair
+   drops to its own line under the brand. */
+@media (max-width: 720px) {
+  .site-header .container { flex-wrap: wrap; height: auto; padding-top: 10px; padding-bottom: 10px; gap: 10px 14px; }
+  .nav-toggle { order: 2; margin-left: auto; }
+  .lang-switch { order: 3; margin-right: 0; }
+  .nav-auth { order: 4; flex-basis: 100%; justify-content: flex-start; flex-wrap: wrap; gap: 8px; }
+  .nav-auth .lang-switch { order: -1; }
+  .main-nav { order: 5; }
+}
+
+/* Russian and Kazakh menu labels are longer than the English ones, and at laptop widths the
+   nav was wrapping inside a word. The bar gets a minimum height instead of a fixed one, the
+   gaps tighten, and each item refuses to break mid-label. */
+.site-header .container { height: auto; min-height: 64px; gap: 18px; }
+.main-nav a { white-space: nowrap; }
+@media (max-width: 1100px) and (min-width: 721px) {
+  .site-header .container { gap: 12px; }
+  .main-nav { gap: 2px; }
+  .main-nav a { padding-left: 9px; padding-right: 9px; font-size: .82rem; }
+  .lang-opt { padding: 5px 7px; }
+}
+/* The caveat lines sat flush against the card edge because they inherit the row padding
+   rather than the block's. */
+.match-caveat { padding-left: 15px; padding-right: 15px; padding-bottom: 12px; }
+
+/* Between 721 and 1000px the full menu, the language switcher and the two buttons no longer
+   fit on one line once the labels are Russian or Kazakh, and the header pushed the page
+   150px sideways. The burger now takes over at 1000px instead of 720px — the same collapse
+   that already worked, just triggered before the overflow rather than after it. */
+@media (max-width: 1000px) {
+  .main-nav {
+    display: none; position: absolute; top: 64px; left: 0; right: 0;
+    background: var(--navy); flex-direction: column; padding: 12px 20px 18px; gap: 2px;
+    border-bottom: 3px solid var(--gold); z-index: 20;
+  }
+  .main-nav.open { display: flex; }
+  .main-nav a { white-space: normal; }
+  .nav-toggle { display: block; margin-left: auto; }
+  .nav-auth .btn { padding: 6px 12px; font-size: .8rem; }
+}
