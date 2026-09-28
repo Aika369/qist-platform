@@ -8,7 +8,7 @@
 const QIST = {
   /* Build stamp. Open the browser console on the live site: if this does not match the
      release you uploaded, the file did not reach the server. */
-  BUILD: '2026-09-20a',
+  BUILD: '2026-09-28c',
 
   /* Positioning, in one place, so it cannot drift between pages.
      MVP phase 1: nine countries of Central Asia, the Caucasus and Mongolia, plus their
@@ -97,7 +97,7 @@ const QIST = {
       });
     });
     const title = (root || document).querySelector('title[data-i18n-title]');
-    if (title) document.title = this.t(title.getAttribute('data-i18n-title'));
+    if (title) document.title = `${this.t(title.getAttribute('data-i18n-title'))} · ${this.BRAND}`;
   },
 
   /* Opportunity text in the reader's language when a curator supplied it, otherwise the
@@ -158,6 +158,13 @@ const QIST = {
     return [...this.overlay('people'), ...merged];
   },
 
+  /* Every public count and list uses this. Records flagged as a probable duplicate stay in
+     the data for a human to resolve (D-14), but showing them made the same site say 492 on
+     the home page and 497 in the directory, the map and the organizations page. */
+  uniquePeople(people) {
+    return people.filter(p => !p.possible_duplicate_of);
+  },
+
   async getPosts(channel) {
     let posts;
     if (this.apiAlive) {
@@ -205,8 +212,8 @@ const QIST = {
      the visitor's attention. What is left is what Opportunities cannot hold: events and talk. */
   channels() {
     return [
-      { id: 'conferences', name: this.t('ch.conferences.name'), em: '🎓', desc: this.t('ch.conferences.desc') },
-      { id: 'general',     name: this.t('ch.general.name'),     em: '💬', desc: this.t('ch.general.desc') }
+      { id: 'conferences', name: this.t('ch.conferences.name'), icon: 'cap',  desc: this.t('ch.conferences.desc') },
+      { id: 'general',     name: this.t('ch.general.name'),     icon: 'chat', desc: this.t('ch.general.desc') }
     ];
   },
 
@@ -279,10 +286,30 @@ const QIST = {
   initials(name) {
     return name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
   },
+  /* Four tones from the brand, not seven unrelated hues: a page of purple, red and olive
+     avatars read as noise, and red already means "not eligible" everywhere else. */
   avatarColor(name) {
-    const palette = ['#2c4a77', '#2e6e62', '#7a4a2c', '#5a3d6e', '#a33a3a', '#1f6079', '#6e662e'];
+    const palette = ['#2c4a77', '#2e6e62', '#4b5d78', '#1f4f63'];
     let h = 0; for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0;
     return palette[h % palette.length];
+  },
+  /* Inline stroke icons in place of emoji. Emoji render differently on every OS, ignore the
+     text colour and carry their own mood (🤝, 📮) — an icon here is a label, not decoration.
+     The pin means a known city; the globe means the record only holds a country (D-12). */
+  ICONS: {
+    pin: '<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+    external: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+    map: '<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/>',
+    calendar: '<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+    chat: '<path d="M20 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/>',
+    cap: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/>'
+  },
+  icon(name) {
+    return `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${this.ICONS[name] || ''}</svg>`;
   },
   esc(s) {
     return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -306,7 +333,7 @@ const QIST = {
         <div>
           <h3>${this.esc(p.name)}</h3>
           <div class="role">${this.esc(p.title || '')}${p.institution ? ' · ' + this.esc(p.institution) : ''}</div>
-          ${(p.city || p.country) ? `<div class="loc">${this.hasPreciseGeo(p) ? '📍' : '🌐'} ${this.esc(this.geoLabel(p))}</div>` : ''}
+          ${(p.city || p.country) ? `<div class="loc">${this.icon(this.hasPreciseGeo(p) ? 'pin' : 'globe')} ${this.esc(this.geoLabel(p))}</div>` : ''}
           ${p.possible_duplicate_of ? '<div class="loc" style="color:var(--red)">possible duplicate record — under review</div>' : ''}
         </div>
       </div>
@@ -330,13 +357,16 @@ const QIST = {
       ['about.html', this.t('nav.about')]
     ];
     const nav = links.map(([href, label]) =>
-      `<a href="${href}" class="${active === href ? 'active' : ''}">${label}</a>`).join('');
+      `<a href="${href}" class="${active === href ? 'active' : ''}"${active === href ? ' aria-current="page"' : ''}>${label}</a>`).join('');
+    /* "Sign in" is shown only when a backend is configured. Without one, sign-in is disabled
+       (D-11), and the button led to a form that could not be used — a dead end in the most
+       prominent place on every page. "Create profile" works without a backend (D-29). */
     const auth = u
-      ? `<a class="btn btn-ghost btn-sm" href="profile.html">👤 ${this.esc(u.name.split(' ')[0])}</a>
-         ${u.role === 'admin' ? '<a class="btn btn-primary btn-sm" href="admin.html">Admin</a>' : ''}
-         <button class="btn btn-ghost btn-sm" onclick="QIST.logout()">Sign out</button>`
-      : `<a class="btn btn-ghost btn-sm" href="login.html">${this.t('nav.signin')}</a>
-         <a class="btn btn-primary btn-sm" href="login.html#register">${this.t('nav.create')}</a>`;
+      ? `<a class="btn btn-ghost btn-sm" href="profile.html">${this.esc(u.name.split(' ')[0])}</a>
+         ${u.role === 'admin' ? '<a class="btn btn-gold btn-sm" href="admin.html">Admin</a>' : ''}
+         <button class="btn btn-ghost btn-sm" onclick="QIST.logout()">${this.t('nav.signout')}</button>`
+      : `${this.apiBase ? `<a class="btn btn-ghost btn-sm" href="login.html">${this.t('nav.signin')}</a>` : ''}
+         <a class="btn btn-gold btn-sm" href="login.html#register">${this.t('nav.create')}</a>`;
 
     /* Language switcher. Three codes, current one marked; the choice is remembered and also
        written into the address, so a link can be sent in the language it was read in. */
@@ -356,16 +386,25 @@ const QIST = {
             <span class="brand-by">${this.BRAND_BY}</span>
           </span>
         </a>
-        <button class="nav-toggle" onclick="document.querySelector('.main-nav').classList.toggle('open')">☰</button>
-        <nav class="main-nav">${nav}</nav>
+        <nav class="main-nav" id="main-nav">${nav}
+          ${u ? '' : `<a class="btn btn-gold nav-create" href="login.html#register">${this.t('nav.create')}</a>`}
+        </nav>
         <div class="nav-auth">
           <div class="lang-switch" role="group" aria-label="${this.esc(this.t('nav.language'))}">${langs}</div>
           ${auth}
         </div>
+        <button class="nav-toggle" type="button" aria-controls="main-nav" aria-expanded="false"
+                aria-label="${this.esc(this.t('nav.menu'))}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
       </div>`;
 
     document.querySelectorAll('.lang-opt').forEach(b =>
       b.addEventListener('click', () => this.setLang(b.dataset.lang, true)));
+    const toggle = document.querySelector('.nav-toggle');
+    const menu = document.getElementById('main-nav');
+    toggle.addEventListener('click', () =>
+      toggle.setAttribute('aria-expanded', String(menu.classList.toggle('open'))));
   },
 
   renderFooter() {
@@ -394,7 +433,8 @@ const QIST = {
             <a href="login.html#register">${this.t('nav.create')}</a>
           </div>
         </div>
-        <div class="fine">© ${new Date().getFullYear()} QIST · ${this.t('foot.fine', { short: this.t('region.short') })} · <a href="https://github.com/Aika369/qist-platform" style="display:inline">${this.t('foot.source')}</a></div>
+        <div class="fine">© ${new Date().getFullYear()} QIST · ${this.t('foot.fine', { short: this.t('region.short') })} · <a href="https://github.com/Aika369/qist-platform">${this.t('foot.source')}</a>
+          <br><span class="photos">${this.t('foot.photos')}</span></div>
       </div>`;
   },
 
@@ -544,6 +584,16 @@ const QIST = {
     confirmed:          'funding confirmed',
     not_confirmed:      'funding not confirmed',
     cofunding_required: 'co-funding required'
+  },
+  /* Labels in the reader's language. The two tables above stay as the canonical English
+     values: the curator screen and validateOpportunity() read their keys. */
+  typeLabel(type) {
+    const v = this.t('opp.type.' + type);
+    return v === 'opp.type.' + type ? (this.OPPORTUNITY_TYPES[type] || type) : v;
+  },
+  fundingLabel(status) {
+    const v = this.t('opp.fund.' + status);
+    return v === 'opp.fund.' + status ? (this.FUNDING_LABELS[status] || status) : v;
   },
 
   // Career-stage ranks: the declared stage must be at least the required one.
@@ -858,8 +908,11 @@ const QIST = {
       tone = 'ok';
       verdict = T('match.verdict.all');
     } else if (met === total) {
+      /* Names what could not be checked instead of counting it: "1 more depend on details"
+         was both ungrammatical and vaguer than the list itself. */
       tone = 'ok';
-      verdict = T('match.verdict.all_known', { n: unknown });
+      const unchecked = criteria.filter(x => x.unknown).map(x => x.label.toLowerCase());
+      verdict = T('match.verdict.all_known', { n: unknown, list: unchecked.join(', ') });
     } else {
       tone = 'warn';
       const soft = criteria.filter(x => !x.blocking && !x.ok && !x.unknown).map(x => x.label.toLowerCase());
@@ -867,6 +920,92 @@ const QIST = {
     }
 
     return { met, total, unknown, pct, tone, verdict, criteria, blocked: blockers.length > 0 };
+  },
+
+  /* Condition chips, shown wherever a call appears (home page and Opportunities). Each chip
+     names the condition in the reader's own terms, their country and their stage, and its
+     colour is the result. The full sentence is in the title and in the details panel. */
+  condChips(m, profile, elig) {
+    const stages = elig['career_stages_' + this.lang] || elig.career_stages || {};
+    const names = {
+      country: this.countryName(profile.country, elig) || this.t('match.country'),
+      stage: stages[profile.stage] || this.t('match.stage'),
+      deadline: this.t('match.deadline'),
+      field: this.t('match.field'),
+      methods: this.t('match.methods')
+    };
+    return `<div class="conds">${m.criteria.map(c => {
+      const cls = c.unknown ? 'unk' : c.ok ? 'ok' : 'bad';
+      return `<span class="cond ${cls}" data-k="${c.key}" title="${this.esc(c.detail)}">${this.esc(names[c.key] || c.label)}</span>`;
+    }).join('')}</div>`;
+  },
+
+  /* A select inside a sentence is as wide as the option it shows, not as wide as the longest
+     of 250 country names, so "I'm a PhD based in Kazakhstan" stays on one line. */
+  fitSelect(sel) {
+    const measure = () => {
+      const probe = document.createElement('span');
+      const cs = getComputedStyle(sel);
+      probe.style.cssText = `position:absolute;visibility:hidden;white-space:pre;font:${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily};letter-spacing:${cs.letterSpacing}`;
+      probe.textContent = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : '';
+      document.body.appendChild(probe);
+      const pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+      sel.style.width = Math.ceil(probe.getBoundingClientRect().width + pad + 8) + 'px';
+      probe.remove();
+    };
+    measure();
+    // Measured again once the web font is in: the fallback font is narrower than Inter.
+    if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(measure);
+  },
+
+  /* The left column of a call: the closing date in the reader's language and how far off it is. */
+  whenCell(o) {
+    if (!o.deadline) return `<div class="when"><b>${this.t('opp.col.none')}</b></div>`;
+    /* Kazakh month abbreviations are written out: some browsers' ICU has no short Kazakh
+       months and prints "M09 30" (the same gap as the country names, D-44). */
+    const KK_MONTHS = ['қаң', 'ақп', 'нау', 'сәу', 'мам', 'мау', 'шіл', 'там', 'қыр', 'қаз', 'қар', 'жел'];
+    const d = new Date(o.deadline + 'T00:00:00');
+    let date = o.deadline;
+    if (this.lang === 'kk') date = `${d.getDate()} ${KK_MONTHS[d.getMonth()]}`;
+    else try { date = new Intl.DateTimeFormat(this.lang, { day: 'numeric', month: 'short' }).format(d); } catch (_) {}
+    if (this.isExpired(o)) return `<div class="when"><b>${this.esc(date)}</b><span>${this.t('opp.col.closed')}</span></div>`;
+    /* The bar under the date is how much of a 60-day window is left: a column of calls can
+       be scanned for what is closing without reading every "in N days". */
+    const n = this.daysLeft(o);
+    const left = Math.max(0.04, Math.min(1, n / 60));
+    return `<div class="when${n <= 7 ? ' soon' : n <= 30 ? ' near' : ''}"><b>${this.esc(date)}</b><span>${this.t('opp.deadline.days', { n })}</span><i class="left" style="--left:${left.toFixed(2)}" aria-hidden="true"></i></div>`;
+  },
+
+  reducedMotion() {
+    return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  },
+
+  /* Count from one number to another, so a changed result is seen changing. */
+  tweenNumber(el, from, to, ms = 450) {
+    if (!el) return;
+    if (from === to || this.reducedMotion()) { el.textContent = to; return; }
+    const t0 = performance.now();
+    const step = now => {
+      const k = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(from + (to - from) * e);
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  },
+
+  /* Re-render a list of calls and mark every condition chip whose result changed. When the
+     reader switches country, the eye goes to the chips that flipped, not to all of them. */
+  flashChanges(container, render) {
+    const before = {};
+    container.querySelectorAll('[data-opp] .cond[data-k]').forEach(c => {
+      before[c.closest('[data-opp]').dataset.opp + ':' + c.dataset.k] = c.className;
+    });
+    render();
+    if (!Object.keys(before).length) return;
+    container.querySelectorAll('[data-opp] .cond[data-k]').forEach(c => {
+      const was = before[c.closest('[data-opp]').dataset.opp + ':' + c.dataset.k];
+      if (was && was !== c.className) c.classList.add('changed');
+    });
   },
 
   checkStage(opp, userStage) {
@@ -969,6 +1108,14 @@ const QIST = {
     this.applyI18n(document);
     this.renderHeader(active);
     this.renderFooter();
+    /* "/" puts the cursor in the page's search box, as on most search-heavy sites. */
+    document.addEventListener('keydown', e => {
+      if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = (document.activeElement && document.activeElement.tagName) || '';
+      if (/INPUT|TEXTAREA|SELECT/.test(tag) || document.activeElement.isContentEditable) return;
+      const box = document.querySelector('[data-slash]');
+      if (box) { e.preventDefault(); box.focus(); box.select && box.select(); }
+    });
     await this.detectApi();
   }
 };

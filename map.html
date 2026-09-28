@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Researcher Map — QIST</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title data-i18n-title="map.h2">Researchers worldwide · ScienceBridge AI</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='26' fill='%232447a8'/><text x='50' y='69' font-size='56' font-weight='700' text-anchor='middle' fill='%23ffffff' font-family='Georgia, serif'>Q</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,600;7..72,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-20a">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-28c">
 <style>
   .marker-cluster-custom { background: none; border: none; }
   .map-name-label {
     background: none; border: none; box-shadow: none;
-    font: 600 12px "Inter", sans-serif; color: #16263d;
+    font: 600 12px "IBM Plex Sans", sans-serif; color: #0e1733;
     text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 0 4px #fff;
   }
   .map-name-label::before { display: none; }
@@ -35,24 +35,24 @@
       <input type="text" id="map-search" class="search-input" style="width:100%" data-i18n-attr="placeholder:map.search.ph">
     </div>
     <div class="form-row">
-      <select id="map-country" style="width:100%"><option value="">All countries</option></select>
+      <select id="map-country" style="width:100%" data-i18n-attr="aria-label:common.allcountries"><option value="" data-i18n="common.allcountries"></option></select>
     </div>
     <div class="form-row">
-      <select id="map-topic" style="width:100%"><option value="">All research fields</option></select>
+      <select id="map-topic" style="width:100%" data-i18n-attr="aria-label:common.allfields"><option value="" data-i18n="common.allfields"></option></select>
     </div>
     <div id="map-list" class="small"></div>
   </div>
   <div id="map"></div>
 </div>
 
-<script src="assets/js/i18n.js?v=2026-09-20a"></script>
-<script src="assets/js/app.js?v=2026-09-20a"></script>
+<script src="assets/js/i18n.js?v=2026-09-28c"></script>
+<script src="assets/js/app.js?v=2026-09-28c"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script>
 (async () => {
   await QIST.boot('map.html');
-  const people = await QIST.getPeople();
+  const people = QIST.uniquePeople(await QIST.getPeople());
 
   const map = L.map('map', { worldCopyJump: true, zoomControl: false }).setView([38, 40], 3);
   L.control.zoom({ position: 'topright' }).addTo(map);
@@ -64,6 +64,7 @@
     maxZoom: 16
   }).addTo(map);
 
+  const markers = new Map();   // person id -> marker, for ?person=
   const cluster = L.markerClusterGroup({
     maxClusterRadius: 42,
     iconCreateFunction: c => L.divIcon({
@@ -74,7 +75,7 @@
   map.addLayer(cluster);
 
   const pin = L.divIcon({
-    html: `<div style="width:16px;height:16px;border-radius:50%;background:#b58a2e;border:2.5px solid #16263d;box-shadow:0 1px 4px rgba(0,0,0,.4)"></div>`,
+    html: `<div style="width:14px;height:14px;border-radius:50%;background:#e3a53a;border:2.5px solid #0e1733;box-shadow:0 1px 4px rgba(0,0,0,.35)"></div>`,
     className: '', iconSize: [16, 16], iconAnchor: [8, 8]
   });
 
@@ -96,9 +97,9 @@
       <div>
         <b>${QIST.esc(p.name)}</b>
         <div class="small">${QIST.esc(p.title || '')}<br>${QIST.esc(p.institution || '')}<br>
-        ${(p.city || p.country) ? `📍 ${QIST.esc([p.city, p.country].filter(Boolean).join(', '))}<br>` : ''}
+        ${(p.city || p.country) ? `${QIST.icon(QIST.hasPreciseGeo(p) ? 'pin' : 'globe')} ${QIST.esc([p.city, p.country].filter(Boolean).join(', '))}<br>` : ''}
         <span class="muted">${(p.topics || []).slice(0, 3).map(QIST.esc).join(' · ')}</span><br>
-        <a href="directory.html?person=${QIST.esc(p.id)}">View profile →</a></div>
+        <a href="directory.html?person=${encodeURIComponent(p.id)}">${QIST.t('map.pop.profile')} →</a></div>
       </div>
     </div>`;
   }
@@ -117,6 +118,7 @@
     });
 
     cluster.clearLayers();
+    markers.clear();
 
     /* Only some records carry precise coordinates. For the rest the source data holds a
        country centroid with no city and no organisation. Scattering them with random jitter
@@ -129,7 +131,10 @@
       const jitter = () => (Math.random() - 0.5) * 0.015; // separate pins within one city
       const m = L.marker([p.lat + jitter(), p.lng + jitter()], { icon: pin });
       m.bindPopup(popupHtml(p), { maxWidth: 320 });
-      m.bindTooltip(p.name, { permanent: true, direction: 'right', offset: [9, 0], className: 'map-name-label' });
+      /* Names on hover only. As permanent labels they piled onto each other and onto the
+         cluster badges wherever two cities sit close together. */
+      m.bindTooltip(p.name, { direction: 'right', offset: [9, 0], className: 'map-name-label' });
+      markers.set(String(p.id), m);
       cluster.addLayer(m);
     });
 
@@ -143,22 +148,22 @@
       const m = L.marker([group[0].lat, group[0].lng], { icon });
       m.bindPopup(`<div style="min-width:220px">
         <b>${QIST.esc(country)}</b>
-        <div class="small muted" style="margin:4px 0 8px">${group.length} researchers · no city recorded in the data</div>
+        <div class="small muted" style="margin:4px 0 8px">${QIST.t('map.country.n', { n: group.length })}</div>
         <div class="small">${group.slice(0, 8).map(x => QIST.esc(x.name)).join('<br>')}${
-          group.length > 8 ? `<br><span class="muted">…and ${group.length - 8} more</span>` : ''}</div>
-        <div class="small muted" style="margin-top:8px">This marker sits at the centre of the country, not at a workplace.</div>
+          group.length > 8 ? `<br><span class="muted">${QIST.t('map.more', { n: group.length - 8 })}</span>` : ''}</div>
+        <div class="small muted" style="margin-top:8px">${QIST.t('map.country.note')}</div>
       </div>`, { maxWidth: 320 });
+      group.forEach(x => markers.set(String(x.id), m));
       cluster.addLayer(m);
     });
 
     const nPrecise = shown.filter(p => QIST.hasPreciseGeo(p)).length;
     document.getElementById('map-count').innerHTML =
-      `${shown.length} of ${people.length} researchers · ${new Set(shown.map(p => p.country)).size} countries` +
-      `<br><span style="color:var(--ink-faint)">${nPrecise} have a known city; the rest are shown as a country marker</span>`;
+      QIST.t('map.count', { n: shown.length, countries: new Set(shown.map(p => p.country)).size }) +
+      `<br><span style="color:var(--ink-faint)">${QIST.t('map.precise', { n: nPrecise })}</span>`;
     document.getElementById('map-list').innerHTML = shown.slice(0, 30).map(p =>
-      `<div style="padding:7px 0;border-bottom:1px solid var(--paper-2);cursor:pointer" data-lat="${p.lat}" data-lng="${p.lng}">
-        <b style="color:var(--navy)">${QIST.esc(p.name)}</b><br>
-        <span class="muted">${QIST.esc(p.institution || '')} · ${QIST.esc(p.city)}</span>
+      `<div class="map-list-item" role="button" tabindex="0" data-lat="${p.lat}" data-lng="${p.lng}">
+        <b>${QIST.esc(p.name)}</b>${QIST.esc([p.institution, p.city].filter(Boolean).join(' · '))}
       </div>`).join('') + (shown.length > 30 ? `<p class="muted" style="padding-top:8px">${QIST.t('map.more', { n: shown.length - 30 })}</p>` : '');
     document.querySelectorAll('#map-list [data-lat]').forEach(el =>
       el.addEventListener('click', () => map.flyTo([+el.dataset.lat, +el.dataset.lng], 10)));
@@ -167,6 +172,12 @@
   ['map-search', 'map-country', 'map-topic'].forEach(id =>
     document.getElementById(id).addEventListener('input', apply));
   apply();
+
+  /* map.html?person=<id>, from "Show on map" in the directory: fly to that person and open
+     their popup (or their country marker when the record has no city). */
+  const want = new URLSearchParams(location.search).get('person');
+  const target = want && markers.get(want);
+  if (target) cluster.zoomToShowLayer(target, () => target.openPopup());
 })();
 </script>
 </body>

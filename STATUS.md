@@ -1,6 +1,32 @@
 # STATUS
 
-Updated: 2026-09-19 · Iterations 1–7
+Updated: 2026-09-28 · Iterations 1–8
+
+## Iteration 8 — design and UX, 2026-09-28
+
+Build `2026-09-28c`. Decisions D-48…D-57.
+
+- **Visual system.** Palette from Samarkand tilework (lapis night, lapis, turquoise, saffron),
+  Literata + IBM Plex Sans, girih ornament on the edge of dark sections. Every text/background
+  pair is 4.5:1 or better; the old white-on-gold buttons were 3.2:1.
+- **Home.** The hero asks for career stage and country in one sentence and answers with the
+  number of open calls that fit, plus one tile per call. Three calls below carry condition
+  chips. The globe section shows members by field; hovering a field lights its members.
+- **Opportunities.** Profile as a sticky sentence, type filter with counts, sort by deadline
+  (was file order), a four-month deadline timeline, condition chips on every call, deadline
+  bar under each date. `/` focuses search.
+- **Researchers.** Rows instead of cards, 24 per page, ranked search, filters in the URL,
+  profile dialog in three languages with "Show on map" and a link to correct or remove it.
+- **For organizations.** Network search moved first; forms in a two-column layout.
+- **Fixes found on the way.** Mirrored globe (D-54). Newsletter sign-up that never left the
+  browser (D-57). 492/497 mismatch (D-56). Invisible ghost buttons on light backgrounds,
+  including Edit/Remove on the curator screen. Kazakh dates printed as "M09 30" in Chrome.
+- **Photos** in `assets/img/` are generated illustrations, labelled in the footer (D-53).
+- **Not reviewed by a native speaker:** every new Kazakh and Russian string (B-35 still open).
+
+Tested in headless Chromium: 9 pages × 3 languages × 390 and 1440px with no JS errors, no
+raw i18n keys and no horizontal scroll; directory, home, opportunities, timeline and motion
+checks all pass.
 
 ## Works
 
