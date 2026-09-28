@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-28e">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-28f">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
@@ -46,21 +46,28 @@
   </div>
 </section>
 
-<!-- ================= three calls, checked =================
-     The same condition chips as the Opportunities page, driven by the profile in the hero.
-     Which three: D-39, so each shows a different edge of the check. -->
+<!-- ================= departure board =================
+     The calls closing next, as a departures board: date, call, funder, whether the reader
+     can apply, days left. Driven by the profile in the hero; when the country or stage
+     changes, the verdicts that change flip over. Which calls: the three picked by D-39 so the
+     check shows different edges, topped up to six by deadline. -->
 <section class="section">
   <div class="container">
     <div class="sec-head">
-      <h2 data-i18n="home.calls.h2"></h2>
+      <h2 data-i18n="board.h2"></h2>
       <a href="opportunities.html" id="calls-all"><span data-i18n="home.demo.all"></span></a>
-      <p class="legend" aria-hidden="true">
-        <span class="cond ok" data-i18n="legend.ok"></span>
-        <span class="cond bad" data-i18n="legend.bad"></span>
-        <span class="cond unk" data-i18n="legend.unk"></span>
-      </p>
+      <p class="lede" id="board-sub"></p>
     </div>
-    <div class="rows" id="demo-list"></div>
+    <div class="board" id="board" role="table">
+      <div class="board-head" role="row">
+        <span role="columnheader" data-i18n="board.col.date"></span>
+        <span role="columnheader" data-i18n="board.col.call"></span>
+        <span role="columnheader" data-i18n="board.col.org"></span>
+        <span role="columnheader" data-i18n="board.col.you"></span>
+        <span role="columnheader" data-i18n="board.col.left"></span>
+      </div>
+      <div id="board-rows"></div>
+    </div>
   </div>
 </section>
 
@@ -129,9 +136,9 @@
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/i18n.js?v=2026-09-28e"></script>
-<script src="assets/js/app.js?v=2026-09-28e"></script>
-<script src="assets/js/globe.js?v=2026-09-28e"></script>
+<script src="assets/js/i18n.js?v=2026-09-28f"></script>
+<script src="assets/js/app.js?v=2026-09-28f"></script>
+<script src="assets/js/globe.js?v=2026-09-28f"></script>
 <script>
 (async () => {
   await QIST.boot('index.html');
@@ -183,7 +190,7 @@
   take(() => true);
   take(countrySensitive);
   take(o => o.career_stage && o.career_stage !== 'any');
-  while (three.length < 3 && three.length < byDeadline.length) take(() => true);
+  while (three.length < 6 && three.length < byDeadline.length) take(() => true);
   three.sort((a, b) => (a.deadline || '9').localeCompare(b.deadline || '9'));
 
   function draw() {
@@ -199,18 +206,59 @@
     $('hero-show').href = `opportunities.html?${q}&elig=1`;
     $('calls-all').href = `opportunities.html?${q}`;
 
-    QIST.flashChanges($('demo-list'), () => { $('demo-list').innerHTML = three.length ? three.map(o => {
-      const m = QIST.matchOpportunity(o, profile, elig);
-      return `<article class="opp compact opp-${m.tone}" data-opp="${QIST.esc(o.id)}">
-        ${QIST.whenCell(o)}
-        <div class="opp-main">
-          <p class="opp-line"><span class="opp-type">${QIST.esc(QIST.typeLabel(o.type))}</span><span>${QIST.esc(o.organization)}</span></p>
-          <h3><a href="opportunities.html?${q}#opp-${encodeURIComponent(o.id)}">${QIST.esc(o.title)}</a></h3>
-          ${QIST.condChips(m, profile, elig)}
-        </div>
-      </article>`;
-    }).join('') : `<p class="empty">${QIST.t('home.demo.empty')}</p>`; });
+    drawBoard(profile, q);
   }
+  /* ---------- the board ---------- */
+  const MONTHS = {
+    en: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+    ru: ['ЯНВ', 'ФЕВ', 'МАР', 'АПР', 'МАЙ', 'ИЮН', 'ИЮЛ', 'АВГ', 'СЕН', 'ОКТ', 'НОЯ', 'ДЕК'],
+    kk: ['ҚАҢ', 'АҚП', 'НАУ', 'СӘУ', 'МАМ', 'МАУ', 'ШІЛ', 'ТАМ', 'ҚЫР', 'ҚАЗ', 'ҚАР', 'ЖЕЛ']
+  };
+  const flaps = (text, row) => [...text].map((ch, k) => ch === ' '
+    ? '<i class="gap"></i>'
+    : `<b class="flap" style="--d:${row * 70 + k * 35}ms">${QIST.esc(ch)}</b>`).join('');
+  const tones = {};
+  function drawBoard(profile, q) {
+    $('board-sub').textContent = QIST.t('board.sub', {
+      stage: demoStage.options[demoStage.selectedIndex].text,
+      country: QIST.countryName(profile.country, elig) || profile.country
+    });
+    const rows = $('board-rows');
+    const first = !rows.children.length;
+    if (first) {
+      rows.innerHTML = three.map((o, r) => {
+        const d = new Date(o.deadline + 'T00:00:00');
+        const date = o.deadline ? `${String(d.getDate()).padStart(2, '0')} ${(MONTHS[QIST.lang] || MONTHS.en)[d.getMonth()]}` : '— — —';
+        const n = QIST.daysLeft(o);
+        return `<a class="board-row" role="row" data-opp="${QIST.esc(o.id)}" href="opportunities.html#opp-${encodeURIComponent(o.id)}">
+          <span class="b-date" role="cell" aria-label="${QIST.esc(o.deadline || '')}">${flaps(date, r)}</span>
+          <span class="b-call" role="cell"><b>${QIST.esc(o.title)}</b><small>${QIST.esc(QIST.typeLabel(o.type))}</small></span>
+          <span class="b-org" role="cell">${QIST.esc(o.organization)}</span>
+          <span class="b-you" role="cell"><span class="st"></span></span>
+          <span class="b-left${n !== null && n <= 7 ? ' hot' : ''}" role="cell">${n === null ? '—' : QIST.t('board.days', { n })}</span>
+        </a>`;
+      }).join('');
+    }
+    [...rows.children].forEach((row, r) => {
+      const o = three[r];
+      const tone = QIST.matchOpportunity(o, profile, elig).tone;
+      const st = row.querySelector('.st');
+      st.className = `st ${tone}`;
+      st.textContent = QIST.t('board.' + tone);
+      row.href = `opportunities.html?${q}#opp-${encodeURIComponent(o.id)}`;
+      if (!first && tones[o.id] !== tone && !QIST.reducedMotion()) {
+        st.classList.remove('flip'); void st.offsetWidth; st.classList.add('flip');
+      }
+      tones[o.id] = tone;
+    });
+  }
+
+  // the dates flip in when the board first comes into view, not on page load below the fold
+  const boardEl = $('board');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => { if (es[0].isIntersecting) { boardEl.classList.add('in'); io.disconnect(); } }, { threshold: 0.25 });
+    io.observe(boardEl);
+  } else boardEl.classList.add('in');
   [demoCountry, demoStage].forEach(el => el.addEventListener('change', () => { QIST.fitSelect(el); draw(); }));
   [demoCountry, demoStage].forEach(el => QIST.fitSelect(el));
   draw();

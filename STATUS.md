@@ -4,14 +4,14 @@ Updated: 2026-09-28 · Iterations 1–8
 
 ## Iteration 8 — design and UX, 2026-09-28
 
-Build `2026-09-28d`. Decisions D-48…D-57.
+Build `2026-09-28f`. Decisions D-48…D-58.
 
 - **Visual system.** Dark theme: near-black ground, warm white type, one saffron accent. Onest
   throughout. Each page opens with its key number filled with a photograph of the region.
   Every text/background pair is 4.5:1 or better; the old white-on-gold buttons were 3.2:1.
 - **Home.** The hero is the count itself — 13/17 open calls that fit — cut out of a photograph
-  of the steppe; it recounts when the reader changes career stage or country. Three calls below
-  carry condition chips. The globe section shows members by field; hovering a field lights
+  of the steppe; it recounts when the reader changes career stage or country. Below it, a
+  departures board of the six calls closing next, with the reader's verdict on each. The globe section shows members by field; hovering a field lights
   its members.
 - **Opportunities.** Profile as a sticky sentence, type filter with counts, sort by deadline
   (was file order), a four-month deadline timeline, condition chips on every call, deadline

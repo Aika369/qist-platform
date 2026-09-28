@@ -6,7 +6,7 @@
 <title data-i18n-title="login.h">Create your profile · ScienceBridge AI</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='26' fill='%232447a8'/><text x='50' y='69' font-size='56' font-weight='700' text-anchor='middle' fill='%23ffffff' font-family='Georgia, serif'>Q</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-28e">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-28f">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
@@ -67,8 +67,8 @@
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/i18n.js?v=2026-09-28e"></script>
-<script src="assets/js/app.js?v=2026-09-28e"></script>
+<script src="assets/js/i18n.js?v=2026-09-28f"></script>
+<script src="assets/js/app.js?v=2026-09-28f"></script>
 <script>
 (async () => {
   await QIST.boot('login.html');
@@ -88,6 +88,8 @@
     document.querySelector('.auth-wrap').innerHTML = `
       <div class="profile-req">
         <div class="intro">
+          <span class="photo-num" id="top-num" style="background-image:url('assets/img/tiles-samarkand.jpg');background-position:center 40%;font-size:clamp(6rem,12vw,11rem)" aria-hidden="true">492</span>
+          <span class="unit">${QIST.t('top.joined')}</span>
           <h1>${QIST.t('login.h')}</h1>
           <p>${QIST.t('login.p', { email: QIST.esc(QIST.CONTACT_EMAIL || 'QIST') })}</p>
           <p class="note-line" style="margin-top:20px">${QIST.t('login.privacy')} <a href="about.html#data">${QIST.t('nav.about')}</a></p>
@@ -112,6 +114,7 @@
 
     const s = id => document.getElementById(id);
     try { QIST.fillCountrySelect(s('q-country'), await QIST.getEligibility(), 'KZ'); } catch (_) {}
+    try { s('top-num').textContent = QIST.uniquePeople(await QIST.getPeople()).length; } catch (_) {}
 
     s('req-form').addEventListener('submit', async (e) => {
       e.preventDefault();
