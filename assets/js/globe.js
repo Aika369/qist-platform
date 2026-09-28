@@ -28,18 +28,18 @@
   var ROUTE_LIFT = 0.14;    // apex of a route arc above the surface
   var TILT = 34 * RAD;      // north pole leans toward the viewer, so 48N sits near the centre
   var COS_T = Math.cos(TILT), SIN_T = Math.sin(TILT);
-  var FONT = '"IBM Plex Sans", system-ui, sans-serif';
+  var FONT = '"Onest", system-ui, sans-serif';
 
   /* Registan palette, as in style.css */
   var C = {
-    oceanHi: 'rgba(40,74,170,0.55)',
-    oceanMid: 'rgba(20,34,92,0.88)',
-    oceanLo: 'rgba(8,14,40,0.96)',
+    oceanHi: 'rgba(38,46,70,0.9)',
+    oceanMid: 'rgba(18,22,34,0.95)',
+    oceanLo: 'rgba(9,10,15,0.98)',
     land: '232,236,248',        // plaster white
-    grid: 'rgba(120,200,205,',  // turquoise
-    ring: 'rgba(227,165,58,',   // saffron
-    saffron: '#e3a53a',
-    saffronRGB: '227,165,58',
+    grid: 'rgba(200,205,215,',  // turquoise
+    ring: 'rgba(245,182,66,',   // saffron
+    saffron: '#f5b642',
+    saffronRGB: '245,182,66',
     turq: '#1f9aa0',
     ink: '#e6ebf7',
     ink2: 'rgba(179,189,214,'
@@ -306,8 +306,8 @@
 
       /* glow */
       var halo = ctx.createRadialGradient(cx, cy, R * 0.97, cx, cy, R * 1.16);
-      halo.addColorStop(0, 'rgba(31,154,160,0.14)');
-      halo.addColorStop(1, 'rgba(31,154,160,0)');
+      halo.addColorStop(0, 'rgba(245,182,66,0.08)');
+      halo.addColorStop(1, 'rgba(245,182,66,0)');
       ctx.fillStyle = halo;
       ctx.beginPath(); ctx.arc(cx, cy, R * 1.16, 0, TAU); ctx.fill();
 
@@ -348,7 +348,7 @@
 
       /* rim */
       ctx.lineWidth = 1;
-      ctx.strokeStyle = 'rgba(120,200,205,0.35)';
+      ctx.strokeStyle = 'rgba(200,205,215,0.22)';
       ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.stroke();
 
       /* routes, once the reveal has reached their far end */
@@ -429,7 +429,7 @@
         // a dark halo behind the text keeps it legible over land points
         ctx.lineJoin = 'round';
         ctx.lineWidth = 4;
-        ctx.strokeStyle = 'rgba(10,17,44,0.85)';
+        ctx.strokeStyle = 'rgba(7,8,11,0.9)';
         ctx.font = '500 ' + fs + 'px ' + FONT;
         ctx.strokeText(name, lx, ly);
         ctx.fillStyle = hovered === L.c ? '#fff' : C.ink;

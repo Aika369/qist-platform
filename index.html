@@ -8,28 +8,23 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='26' fill='%232447a8'/><text x='50' y='69' font-size='56' font-weight='700' text-anchor='middle' fill='%23ffffff' font-family='Georgia, serif'>Q</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,600;7..72,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-28c">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-28d">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
 
 <!-- ================= hero =================
-     Two jobs, one per tab. "Find a call" is first because the first user in PRD.md is a
-     researcher, and the eligibility check is the thing no other site does: the reader states
-     their stage and country and gets a count of calls they can enter, not a list to read. -->
-<section class="hero girih-edge">
+     The one number the site exists for: how many of the open calls this reader can enter.
+     The numeral is cut out of a photograph of the steppe; it recounts when the stage or the
+     country changes. -->
+<section class="hero">
   <div class="container">
-    <div class="hero-copy">
-      <h1 data-i18n-html="home.h1"></h1>
+    <div class="photo-num" id="hero-num" style="background-image:url('assets/img/steppe-fieldwork.jpg')" aria-hidden="true"><span id="fit-n">13</span>/<span id="open-n">17</span></div>
+    <div class="hero-row">
+      <h1 id="hero-h1" data-i18n-html="home.f.h1"></h1>
       <p class="lead" data-i18n="home.lead"></p>
-
-      <div class="hero-tabs" role="tablist" data-i18n-attr="aria-label:home.h1">
-        <button type="button" role="tab" id="tab-call" aria-controls="panel-call" aria-selected="true" data-i18n="home.tab.call"></button>
-        <button type="button" role="tab" id="tab-people" aria-controls="panel-people" aria-selected="false" data-i18n="home.tab.people"></button>
-      </div>
-
-      <div class="hero-panel on-navy" id="panel-call" role="tabpanel" aria-labelledby="tab-call">
+      <div>
         <p class="sentence">
           <span data-i18n="home.s.a"></span>
           <select id="demo-stage" data-i18n-attr="aria-label:opp.mystage">
@@ -40,36 +35,14 @@
             <option value="pi_only" data-i18n="opp.stage.pi_only"></option>
           </select><span data-i18n="home.s.b"></span><select id="demo-country" data-i18n-attr="aria-label:opp.mycountry"></select>
         </p>
-        <p class="hero-result" id="hero-result" aria-live="polite"></p>
-        <div class="tiles" id="hero-tiles" aria-hidden="true"></div>
+        <p class="sr-only" id="hero-result" aria-live="polite"></p>
         <div class="hero-actions">
-          <a class="btn btn-gold btn-lg" id="hero-show" href="opportunities.html" data-i18n="home.s.show"></a>
-          <a class="link" href="opportunities.html" data-i18n="home.s.all"></a>
+          <a class="btn btn-primary btn-lg" id="hero-show" href="opportunities.html" data-i18n="home.s.show"></a>
+          <a class="link" href="directory.html" data-i18n="home.tab.people"></a>
         </div>
       </div>
-
-      <div class="hero-panel" id="panel-people" role="tabpanel" aria-labelledby="tab-people" hidden>
-        <form class="hero-search" id="hero-search" role="search">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
-          <label class="sr-only" for="hero-query" data-i18n="home.search.ph"></label>
-          <input id="hero-query" name="q" type="text" data-i18n-attr="placeholder:home.search.ph" autocomplete="off">
-          <button type="submit" data-i18n="common.search"></button>
-        </form>
-        <div class="hero-suggestions">
-          <span data-i18n="home.suggested"></span>
-          <button type="button" data-query="Oil &amp; gas" data-i18n="home.chip.oil"></button>
-          <button type="button" data-query="Mining metallurgy" data-i18n="home.chip.mining"></button>
-          <button type="button" data-query="Energy transition" data-i18n="home.chip.energy"></button>
-          <button type="button" data-query="Biomedical engineering" data-i18n="home.chip.biomed"></button>
-          <button type="button" data-query="Artificial intelligence" data-i18n="home.chip.ai"></button>
-          <button type="button" data-query="Medicine" data-i18n="home.chip.med"></button>
-          <button type="button" data-query="Logistics supply chain" data-i18n="home.chip.log"></button>
-        </div>
-      </div>
-
-      <p class="hero-facts" id="hero-facts"></p>
     </div>
-
+    <p class="hero-facts" id="hero-facts"></p>
   </div>
 </section>
 
@@ -94,7 +67,7 @@
 <!-- ================= the network by field =================
      The globe shows where members work (real coordinates, D-12 markers for country-level
      records). Beside it, depth by field, no names (D-34); each row opens the directory. -->
-<section class="network girih-edge">
+<section class="section network">
   <div class="container">
     <div class="sec-head">
       <h2 data-i18n="home.depth.h2"></h2>
@@ -156,9 +129,9 @@
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/i18n.js?v=2026-09-28c"></script>
-<script src="assets/js/app.js?v=2026-09-28c"></script>
-<script src="assets/js/globe.js?v=2026-09-28c"></script>
+<script src="assets/js/i18n.js?v=2026-09-28d"></script>
+<script src="assets/js/app.js?v=2026-09-28d"></script>
+<script src="assets/js/globe.js?v=2026-09-28d"></script>
 <script>
 (async () => {
   await QIST.boot('index.html');
@@ -184,22 +157,8 @@
      only calls with an open deadline count as open. */
   const active = opps.filter(o => !QIST.isExpired(o));
   const countries = new Set(people.map(p => p.country).filter(Boolean)).size;
-  $('hero-facts').innerHTML = QIST.t('home.facts', { people: people.length, countries, opps: active.length });
-
-  /* ---------- tabs ---------- */
-  const tabs = [['tab-call', 'panel-call'], ['tab-people', 'panel-people']];
-  function selectTab(id) {
-    tabs.forEach(([t, p]) => {
-      $(t).setAttribute('aria-selected', String(t === id));
-      $(p).hidden = t !== id;
-    });
-  }
-  tabs.forEach(([t]) => $(t).addEventListener('click', () => selectTab(t)));
-  document.querySelector('.hero-tabs').addEventListener('keydown', e => {
-    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-    const next = document.activeElement.id === 'tab-call' ? 'tab-people' : 'tab-call';
-    selectTab(next); $(next).focus();
-  });
+  $('hero-facts').innerHTML = QIST.t('home.f.facts', { people: `<b>${people.length}</b>`, countries: `<b>${countries}</b>`, opps: `<b>${active.length}</b>` });
+  $('open-n').textContent = active.length;
 
   /* ---------- the check ---------- */
   const elig = await QIST.getEligibility();
@@ -231,27 +190,11 @@
     const q = `country=${encodeURIComponent(profile.country)}&stage=${encodeURIComponent(profile.stage)}`;
 
     const fit = active.filter(o => !QIST.matchOpportunity(o, profile, elig).blocked).length;
-    const result = $('hero-result');
-    const was = result.dataset.fit === undefined ? fit : Number(result.dataset.fit);
-    result.dataset.fit = fit;
-    result.innerHTML = fit
-      ? QIST.t('home.s.result', { fit: `<b>${was}</b>`, open: active.length })
-      : QIST.t('home.s.none', { open: active.length });
-    if (fit) QIST.tweenNumber(result.querySelector('b'), was, fit);
-
-    /* One tile per open call, closing soonest first: lit if the profile qualifies. When the
-       country changes, the tiles that go out are the calls it rules out. */
-    const tiles = $('hero-tiles');
-    if (!tiles.children.length) {
-      tiles.innerHTML = byDeadline.map(o =>
-        `<a class="tile" href="opportunities.html#opp-${encodeURIComponent(o.id)}" title="${QIST.esc(o.title)}" tabindex="-1"></a>`).join('');
-    }
-    [...tiles.children].forEach((el, i) => {
-      const o = byDeadline[i];
-      el.classList.toggle('on', !QIST.matchOpportunity(o, profile, elig).blocked);
-      el.href = `opportunities.html?${q}#opp-${encodeURIComponent(o.id)}`;
-      el.style.transitionDelay = QIST.reducedMotion() ? '0ms' : `${i * 18}ms`;
-    });
+    /* The numeral recounts; the screen-reader line says the same thing in words. */
+    const fitEl = $('fit-n');
+    const was = Number(fitEl.textContent) || fit;
+    QIST.tweenNumber(fitEl, was, fit, 600);
+    $('hero-result').textContent = QIST.t('home.s.result', { fit, open: active.length }).replace(/<[^>]+>/g, '');
     $('hero-show').href = `opportunities.html?${q}&elig=1`;
     $('calls-all').href = `opportunities.html?${q}`;
 
@@ -331,14 +274,6 @@
     });
   }
 
-  /* ---------- find a researcher ---------- */
-  const openDirectorySearch = query => {
-    const value = String(query || '').trim();
-    location.href = 'directory.html' + (value ? '?q=' + encodeURIComponent(value) : '');
-  };
-  $('hero-search').addEventListener('submit', e => { e.preventDefault(); openDirectorySearch($('hero-query').value); });
-  document.querySelectorAll('.hero-suggestions [data-query]').forEach(b =>
-    b.addEventListener('click', () => openDirectorySearch(b.dataset.query)));
 })();
 </script>
 </body>
