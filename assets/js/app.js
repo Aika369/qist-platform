@@ -8,7 +8,7 @@
 const QIST = {
   /* Build stamp. Open the browser console on the live site: if this does not match the
      release you uploaded, the file did not reach the server. */
-  BUILD: '2026-09-28d',
+  BUILD: '2026-09-28e',
 
   /* Positioning, in one place, so it cannot drift between pages.
      MVP phase 1: nine countries of Central Asia, the Caucasus and Mongolia, plus their
@@ -974,6 +974,21 @@ const QIST = {
     const n = this.daysLeft(o);
     const left = Math.max(0.04, Math.min(1, n / 60));
     return `<div class="when${n <= 7 ? ' soon' : n <= 30 ? ' near' : ''}"><b>${this.esc(date)}</b><span>${this.t('opp.deadline.days', { n })}</span><i class="left" style="--left:${left.toFixed(2)}" aria-hidden="true"></i></div>`;
+  },
+
+  /* On a pointer device the photograph inside the home numeral follows the cursor a little,
+     so the figure reads as a window onto the picture rather than a flat fill. */
+  parallax(el, strength = 4) {
+    if (!el || this.reducedMotion() || !matchMedia('(hover: hover)').matches) return;
+    const base = getComputedStyle(el).backgroundPosition.split(' ').map(v => parseFloat(v));
+    if (base.length < 2 || base.some(Number.isNaN)) return;
+    let raf = 0, tx = 0, ty = 0;
+    const apply = () => { raf = 0; el.style.backgroundPosition = `${base[0] + tx}% ${base[1] + ty}%`; };
+    window.addEventListener('pointermove', e => {
+      tx = (e.clientX / innerWidth - .5) * strength * 2;
+      ty = (e.clientY / innerHeight - .5) * strength * 2;
+      if (!raf) raf = requestAnimationFrame(apply);
+    }, { passive: true });
   },
 
   reducedMotion() {

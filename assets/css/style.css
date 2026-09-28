@@ -106,6 +106,12 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:fo
   background-size: cover; background-position: center 58%; background-repeat: no-repeat;
   -webkit-background-clip: text; background-clip: text;
   padding-bottom: .04em; margin-left: -.04em;
+  animation: num-in .9s cubic-bezier(.2, .7, .2, 1) both;
+}
+/* The numeral rises into place once, on load: the page's key figure is the first thing read. */
+@keyframes num-in {
+  from { clip-path: inset(100% 0 0 0); transform: translateY(.08em); }
+  to   { clip-path: inset(0 0 0 0); transform: none; }
 }
 
 /* Inner-page opening: the page's number on the left, title and lede on the right. */
@@ -644,7 +650,7 @@ table.data tr:hover td { background: var(--bg-3); }
   .hero-row .lead { grid-row: auto; }
   .hero-facts { gap: 18px; }
   .page-top { padding: 24px 0 28px; }
-  .page-top .photo-num { font-size: 38vw; }
+  .page-top .photo-num, .org-num .photo-num { font-size: 44vw; }
   .sentence, .sentence select { font-size: 1rem; }
   .opp, .opp.compact { grid-template-columns: minmax(0, 1fr); padding: 20px 0; }
   .when { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
@@ -686,6 +692,6 @@ table.data tr:hover td { background: var(--bg-3); }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .cond.changed { animation: none; }
+  .cond.changed, .photo-num { animation: none; }
   .globe-tip, .toast, .btn, .tl-dot { transition: none; }
 }
