@@ -3,76 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title data-i18n-title="about.h2">About QIST — ScienceBridge AI by QIST</title>
+<title data-i18n-title="about.h2">About QIST · ScienceBridge AI</title>
 <meta name="description" content="Who is behind ScienceBridge, where the researcher profiles came from, how to manage your data and how to remove your profile.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='26' fill='%232447a8'/><text x='50' y='69' font-size='56' font-weight='700' text-anchor='middle' fill='%23ffffff' font-family='Georgia, serif'>Q</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-20a">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-28f">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
 
-<div class="container" style="padding-top:26px;padding-bottom:50px;max-width:820px">
-
-  <div class="section-head"><h2 class="rule" data-i18n="about.h2"></h2></div>
-
-  <div class="card pad-lg" style="text-align:left;margin-bottom:20px">
-    <p style="font-size:1.02rem;color:var(--ink-soft)" data-i18n-html="about.intro"></p>
-    <p style="font-size:1.02rem;color:var(--ink-soft);margin-top:12px" data-i18n="about.phase"></p>
-    <p class="small muted" style="margin-top:12px" data-i18n="about.stage"></p>
+<div class="container">
+  <div class="page-top">
+    <div><span class="photo-num" style="background-image:url('assets/img/ulugh-beg.jpg');background-position:70% center" aria-hidden="true">QIST</span></div>
+    <div><h1 data-i18n="about.h2"></h1><p class="lede" data-i18n="top.qist"></p></div>
   </div>
+</div>
 
-  <h3 id="data" style="margin-bottom:10px" data-i18n="about.data.h"></h3>
-  <div class="card pad-lg" style="text-align:left;margin-bottom:20px">
-    <p class="small" style="color:var(--ink-soft)" data-i18n-html="about.data.p1"></p>
-    <p class="small" style="color:var(--ink-soft);margin-top:10px" data-i18n-html="about.data.p2"></p>
-    <p class="small" style="color:var(--ink-soft);margin-top:10px" data-i18n="about.data.p3"></p>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+<div class="container">
+
+  <article class="prose">
+    <p class="intro" data-i18n-html="about.intro"></p>
+    <p data-i18n="about.phase"></p>
+    <p class="meta" data-i18n="about.stage"></p>
+
+    <h2 id="data" data-i18n="about.data.h"></h2>
+    <p data-i18n-html="about.data.p1"></p>
+    <p data-i18n-html="about.data.p2"></p>
+    <p data-i18n="about.data.p3"></p>
+    <div class="actions">
       <a class="btn btn-primary" id="claim-link" href="#" data-i18n="about.claim"></a>
       <a class="btn btn-outline" id="remove-link" href="#" data-i18n="about.remove"></a>
     </div>
-    <p class="small muted" id="contact-fallback" style="margin-top:12px"></p>
-  </div>
+    <p class="meta" id="contact-fallback"></p>
 
-  <h3 style="margin-bottom:10px" data-i18n="about.use.h"></h3>
-  <div class="card pad-lg" style="text-align:left;margin-bottom:20px">
-    <ul class="small" style="color:var(--ink-soft);list-style:none;display:flex;flex-direction:column;gap:9px">
+    <h2 data-i18n="about.use.h"></h2>
+    <ul>
       <li data-i18n="about.use.a"></li>
       <li data-i18n="about.use.b"></li>
       <li data-i18n="about.use.c"></li>
       <li data-i18n="about.use.d"></li>
     </ul>
-  </div>
 
-  <h3 style="margin-bottom:10px" data-i18n="about.else.h"></h3>
-  <div class="grid grid-2" style="margin-bottom:20px">
-    <div class="card feature-card">
-      <div class="icon">📮</div>
-      <h3 data-i18n="foot.newsletter"></h3>
-      <p class="small muted" data-i18n="about.else.news"></p>
-      <p style="margin-top:10px"><a href="newsletter.html" data-i18n="about.else.newslink"></a></p>
+    <h2 data-i18n="about.else.h"></h2>
+    <div class="link-list">
+      <a href="newsletter.html">
+        <b><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span data-i18n="foot.newsletter"></span></b>
+        <span data-i18n="about.else.news"></span>
+      </a>
+      <a href="channels.html">
+        <b><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/></svg><span data-i18n="about.else.disc.h"></span></b>
+        <span data-i18n="about.else.disc"></span>
+      </a>
     </div>
-    <div class="card feature-card">
-      <div class="icon">💬</div>
-      <h3 data-i18n="about.else.disc.h"></h3>
-      <p class="small muted" data-i18n="about.else.disc"></p>
-      <p style="margin-top:10px"><a href="channels.html" data-i18n="about.else.disclink"></a></p>
-    </div>
-  </div>
 
-  <h3 style="margin-bottom:10px" data-i18n="about.contact.h"></h3>
-  <div class="card pad-lg" style="text-align:left">
-    <p class="small" style="color:var(--ink-soft)" data-i18n="about.contact.p"></p>
-    <p class="small muted" style="margin-top:8px" id="contact-line"></p>
-  </div>
-
+    <h2 data-i18n="about.contact.h"></h2>
+    <p data-i18n="about.contact.p"></p>
+    <p class="meta" id="contact-line"></p>
+  </article>
 </div>
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/i18n.js?v=2026-09-20a"></script>
-<script src="assets/js/app.js?v=2026-09-20a"></script>
+<script src="assets/js/i18n.js?v=2026-09-28f"></script>
+<script src="assets/js/app.js?v=2026-09-28f"></script>
 <script>
 (async () => {
   await QIST.boot('about.html');

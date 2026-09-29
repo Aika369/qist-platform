@@ -3,160 +3,269 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>People Directory — QIST</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-20a">
+<title data-i18n-title="dir.h2">Researchers · ScienceBridge AI</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='26' fill='%232447a8'/><text x='50' y='69' font-size='56' font-weight='700' text-anchor='middle' fill='%23ffffff' font-family='Georgia, serif'>Q</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-28f">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
 
-<section class="section">
-  <div class="container">
-    <div class="section-head">
-      <h2 class="rule" data-i18n="dir.h2"></h2>
-      <span class="muted small" id="dir-count"></span>
-    </div>
-
+<div class="container">
+  <div class="page-top">
+    <div><span class="photo-num" id="top-num" style="background-image:url('assets/img/lab-astana.jpg');background-position:center 40%" aria-hidden="true">492</span><span class="unit" data-i18n="top.people"></span></div>
+    <div>
+      <h1 data-i18n="dir.h2"></h1>
+      <p class="lede" data-i18n="dir.lede"></p>
       <div class="view-switch">
-    <a href="directory.html" class="active" data-i18n="dir.view.list"></a>
-    <a href="map.html" data-i18n="dir.view.map"></a>
+        <a href="directory.html" class="active" aria-current="page" data-i18n="dir.view.list"></a>
+        <a href="map.html" data-i18n="dir.view.map"></a>
+      </div>
+    </div>
   </div>
-  <div class="filters">
-      <input type="text" id="f-q" class="search-input" data-i18n-attr="placeholder:dir.search.ph">
-      <select id="f-topic"><option value="">Research field</option></select>
-      <select id="f-country"><option value="">Country of work</option></select>
-      <select id="f-role"><option value="">Career stage</option>
-        <option>Professor</option><option>Associate Professor</option><option>Assistant Professor</option>
-        <option>Postdoc</option><option>PhD Student</option><option>Researcher</option><option>Industry</option>
+</div>
+
+<div class="container">
+    <div class="dir-filters">
+      <span class="search-wrap"><input type="text" id="f-q" class="search-input" data-slash aria-keyshortcuts="/" data-i18n-attr="placeholder:dir.search.ph;aria-label:dir.search.ph"><kbd aria-hidden="true">/</kbd></span>
+      <select id="f-field" data-i18n-attr="aria-label:common.allfields"><option value="" data-i18n="common.allfields"></option></select>
+      <select id="f-country" data-i18n-attr="aria-label:common.allcountries"><option value="" data-i18n="common.allcountries"></option></select>
+      <select id="f-stage" data-i18n-attr="aria-label:dir.stage.all">
+        <option value="" data-i18n="dir.stage.all"></option>
+        <option value="professor" data-i18n="dir.stage.professor"></option>
+        <option value="associate" data-i18n="dir.stage.associate"></option>
+        <option value="assistant" data-i18n="dir.stage.assistant"></option>
+        <option value="postdoc" data-i18n="dir.stage.postdoc"></option>
+        <option value="phd" data-i18n="dir.stage.phd"></option>
+        <option value="researcher" data-i18n="dir.stage.researcher"></option>
+        <option value="industry" data-i18n="dir.stage.industry"></option>
       </select>
-      <select id="f-exp"><option value="">Experience</option>
-        <option value="0-5">0–5 years</option>
-        <option value="5-10">5–10 years</option>
-        <option value="10-99">10+ years</option>
+      <select id="f-exp" data-i18n-attr="aria-label:dir.exp.all">
+        <option value="" data-i18n="dir.exp.all"></option>
+        <option value="0-5" data-i18n="dir.exp.0"></option>
+        <option value="5-10" data-i18n="dir.exp.5"></option>
+        <option value="10-99" data-i18n="dir.exp.10"></option>
       </select>
-      <button class="btn btn-outline btn-sm" id="f-clear">Clear</button>
+      <button class="btn btn-quiet btn-sm" id="f-clear" data-i18n="common.clear"></button>
     </div>
 
-    <div id="dir-grid" class="grid grid-3"></div>
-    <p id="dir-empty" class="muted" style="display:none;text-align:center;padding:40px 0">
-      <span data-i18n="dir.empty"></span>
-    </p>
-  </div>
-</section>
+    <p class="count-line" id="dir-count" data-i18n="common.loading"></p>
+    <div id="dir-grid" class="rows"></div>
+    <div class="more"><button class="btn btn-outline" id="dir-more" hidden></button></div>
+    <div id="dir-empty" class="empty" hidden>
+      <p data-i18n="dir.empty"></p>
+      <button class="btn btn-outline btn-sm" id="dir-reset" data-i18n="common.clear"></button>
+    </div>
+</div>
 
 <div class="modal-overlay" id="person-modal">
-  <div class="modal">
-    <button class="close" onclick="document.getElementById('person-modal').classList.remove('open')">✕</button>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="person-name">
+    <button class="close" type="button" data-close data-i18n-attr="aria-label:common.close">✕</button>
     <div id="person-detail"></div>
   </div>
 </div>
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/i18n.js?v=2026-09-20a"></script>
-<script src="assets/js/app.js?v=2026-09-20a"></script>
+<script src="assets/js/i18n.js?v=2026-09-28f"></script>
+<script src="assets/js/app.js?v=2026-09-28f"></script>
 <script>
 (async () => {
   await QIST.boot('directory.html');
-  const people = await QIST.getPeople();
+  const people = QIST.uniquePeople(await QIST.getPeople());
   const $ = id => document.getElementById(id);
+  $('top-num').textContent = people.length;
+  const PAGE = 24;
+  let limit = PAGE;
 
-  const topicCounts = {};
-  people.flatMap(p => p.topics || []).forEach(t => topicCounts[t] = (topicCounts[t] || 0) + 1);
-  Object.keys(topicCounts).filter(t => topicCounts[t] >= 3).sort().forEach(t =>
-    $('f-topic').insertAdjacentHTML('beforeend', `<option>${QIST.esc(t)}</option>`));
+  /* Filters use the same 35 QIST research fields as the map, the home page and the
+     organizations page. The old list was every free-text topic used three times or more,
+     labelled "Research field", so the same word meant two different things on two pages. */
+  const fieldCounts = QIST.fieldCounts(people);
+  QIST.PRIMARY_FIELDS.forEach(f => {
+    const n = fieldCounts[f] || 0;
+    if (n) $('f-field').insertAdjacentHTML('beforeend', `<option value="${QIST.esc(f)}">${QIST.esc(f)} (${n})</option>`);
+  });
   [...new Set(people.map(p => p.country))].filter(Boolean).sort().forEach(c =>
     $('f-country').insertAdjacentHTML('beforeend', `<option>${QIST.esc(c)}</option>`));
 
+  /* Career stage is read from the free-text title; the records carry no stage field. */
   function stage(p) {
     const t = (p.title || '').toLowerCase();
-    if (t.includes('assistant professor')) return 'Assistant Professor';
-    if (t.includes('associate professor')) return 'Associate Professor';
-    if (t.includes('professor') || t.includes('dean') || t.includes('rector')) return 'Professor';
-    if (t.includes('postdoc')) return 'Postdoc';
-    if (t.includes('phd')) return 'PhD Student';
-    if (t.includes('scientist') || t.includes('engineer') || t.includes('lead') || t.includes('founder')) return 'Industry';
-    return 'Researcher';
+    if (t.includes('assistant professor')) return 'assistant';
+    if (t.includes('associate professor')) return 'associate';
+    if (t.includes('professor') || t.includes('dean') || t.includes('rector')) return 'professor';
+    if (t.includes('postdoc')) return 'postdoc';
+    if (t.includes('phd')) return 'phd';
+    if (t.includes('scientist') || t.includes('engineer') || t.includes('lead') || t.includes('founder')) return 'industry';
+    return 'researcher';
+  }
+  const stageLabel = p => QIST.t('dir.stage.' + stage(p));
+
+  /* ---------- search ----------
+     Used to keep anyone whose record contained any word of the query, in file order, so a
+     problem described in a sentence ("corrosion in oil pipelines") matched half the network
+     with the best people buried on page nine. Now every record is scored: a word in the
+     topics counts most, then the title, then organisation and bio; people matching more of
+     the words come first. When enough people match at least half of the words, the rest are
+     dropped. Words match from the start ("oil" finds "oil & gas", not "soil"), and plurals
+     are trimmed so "pipelines" finds "pipeline". */
+  const STOP = new Set(['the', 'and', 'for', 'with', 'from', 'into', 'your', 'that', 'this', 'want', 'need', 'solve', 'our', 'are', 'who', 'can', 'problem', 'research']);
+  const stem = w => w.length > 4 ? w.replace(/(ies|es|s|ing|ed)$/, '') : w;
+  function terms(q) {
+    return [...new Set(q.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(w => w.length > 2 && !STOP.has(w)).map(stem))];
+  }
+  const escRe = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  function score(p, ts, phrase) {
+    const topics = (p.topics || []).join(' ').toLowerCase();
+    const title = `${p.name} ${p.title || ''}`.toLowerCase();
+    const rest = `${p.institution || ''} ${p.city || ''} ${p.country || ''} ${p.bio || ''} ${QIST.primaryFields(p).join(' ')}`.toLowerCase();
+    let hits = 0, weight = 0;
+    ts.forEach(t => {
+      const re = new RegExp('(^|[^\\p{L}\\p{N}])' + escRe(t), 'u');
+      const w = (re.test(topics) ? 3 : 0) + (re.test(title) ? 2 : 0) + (re.test(rest) ? 1 : 0);
+      if (w) { hits++; weight += w; }
+    });
+    if (phrase && `${title} ${topics} ${rest}`.includes(phrase)) { hits = Math.max(hits, ts.length); weight += 6; }
+    return { hits, weight };
   }
 
-  function openPerson(p) {
-    $('person-detail').innerHTML = `
-      <div class="top" style="display:flex;gap:16px;align-items:center;margin-bottom:16px">
-        <div class="avatar" style="width:72px;height:72px;flex:0 0 72px;font-size:1.4rem;background:${QIST.avatarColor(p.name)}">${QIST.initials(p.name)}</div>
-        <div>
-          <h2 style="font-size:1.5rem">${QIST.esc(p.name)}</h2>
-          <div class="role">${QIST.esc(p.title || '')}</div>
-          ${(p.city || p.country) ? `<div class="loc muted small">📍 ${QIST.esc([p.city, p.country].filter(Boolean).join(', '))}</div>` : ''}
-        </div>
-      </div>
-      <p><b>Institution:</b> ${QIST.esc(p.institution || '—')}</p>
-      <p><b>Career stage:</b> ${stage(p)}${p.experience ? ` · <b>Experience:</b> ~${p.experience} years` : ''}</p>
-      <p style="margin:10px 0"><b>Research topics:</b></p>
-      <div class="tags" style="margin-bottom:14px">${(p.topics || []).map(t => `<span class="tag gold">${QIST.esc(t)}</span>`).join('')}</div>
-      ${p.bio ? `<p class="small" style="color:var(--ink-soft);margin-bottom:14px">${QIST.esc(p.bio)}</p>` : ''}
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        ${p.link ? `<a class="btn btn-navy btn-sm" href="${QIST.esc(p.link)}" target="_blank" rel="noopener">🔗 Public profile</a>` : ''}
-        <a class="btn btn-outline btn-sm" href="map.html">🗺️ See on map</a>
-        <a class="btn btn-primary btn-sm" href="matching.html?with=${QIST.esc(p.id)}">🤝 Propose collaboration</a>
-      </div>`;
-    $('person-modal').classList.add('open');
+  /* ---------- state lives in the URL, like the opportunities page ---------- */
+  const IDS = { q: 'f-q', field: 'f-field', country: 'f-country', stage: 'f-stage', exp: 'f-exp' };
+  function readUrl() {
+    const u = new URLSearchParams(location.search);
+    Object.entries(IDS).forEach(([k, id]) => { if (u.has(k)) $(id).value = u.get(k); });
+  }
+  const initial = new URLSearchParams(location.search);
+  function writeUrl(person) {
+    const u = new URLSearchParams();
+    if (initial.get('lang')) u.set('lang', initial.get('lang'));
+    Object.entries(IDS).forEach(([k, id]) => { if ($(id).value) u.set(k, $(id).value); });
+    if (person) u.set('person', person);
+    history.replaceState(null, '', u.toString() ? '?' + u : location.pathname);
   }
 
-  function apply() {
+  function filtered() {
     const q = $('f-q').value.trim().toLowerCase();
-    const to = $('f-topic').value, co = $('f-country').value, ro = $('f-role').value, ex = $('f-exp').value;
-    const shown = people.filter(p => {
-      if (to && !(p.topics || []).includes(to)) return false;
+    const field = $('f-field').value, co = $('f-country').value, st = $('f-stage').value, ex = $('f-exp').value;
+    let list = people.filter(p => {
+      if (field && !QIST.primaryFields(p).includes(field)) return false;
       if (co && p.country !== co) return false;
-      if (ro && stage(p) !== ro) return false;
+      if (st && stage(p) !== st) return false;
       if (ex) {
         const [lo, hi] = ex.split('-').map(Number);
         const e = p.experience ?? -1;
         if (e < lo || e >= hi) return false;
       }
-      if (q) {
-        const hay = `${p.name} ${p.title} ${p.institution} ${p.city} ${p.country} ${(p.topics || []).join(' ')} ${p.bio || ''}`.toLowerCase();
-        const stopWords = new Set(['the', 'and', 'for', 'with', 'from', 'into', 'your', 'that', 'this', 'want', 'need', 'solve']);
-        const terms = q.split(/[^a-z0-9]+/).filter(term => term.length > 2 && !stopWords.has(term));
-        if (!(hay.includes(q) || (terms.length && terms.some(term => hay.includes(term))))) return false;
-      }
       return true;
     });
-
-    $('dir-count').textContent = `${shown.length} researcher${shown.length === 1 ? '' : 's'}`;
-    $('dir-empty').style.display = shown.length ? 'none' : 'block';
-    $('dir-grid').innerHTML = shown.map(p => QIST.personCard(p, {
-      footer: `<div class="small muted">${stage(p)}${p.experience ? ` · ~${p.experience} yrs experience` : ''}</div>`
-    })).join('');
-
-    document.querySelectorAll('#dir-grid .person-card').forEach(el => {
-      el.style.cursor = 'pointer';
-      el.addEventListener('click', ev => {
-        if (ev.target.classList.contains('tag')) {
-          const sel = $('f-topic'), t = ev.target.dataset.topic;
-          if (![...sel.options].some(o => o.value === t))
-            sel.insertAdjacentHTML('beforeend', `<option>${QIST.esc(t)}</option>`);
-          sel.value = t;
-          apply();
-          ev.stopPropagation();
-          return;
-        }
-        openPerson(people.find(p => String(p.id) === el.dataset.id));
-      });
-    });
+    const ts = terms(q);
+    if (!q) return list;
+    if (!ts.length) return list.filter(p => `${p.name} ${(p.topics || []).join(' ')}`.toLowerCase().includes(q));
+    const scored = list.map(p => ({ p, ...score(p, ts, q) })).filter(x => x.hits)
+      .sort((a, b) => b.hits - a.hits || b.weight - a.weight);
+    const strong = scored.filter(x => x.hits >= Math.ceil(ts.length / 2));
+    return (strong.length >= 6 ? strong : scored).map(x => x.p);
   }
 
-  ['f-q', 'f-topic', 'f-country', 'f-role', 'f-exp'].forEach(id => $(id).addEventListener('input', apply));
-  $('f-clear').addEventListener('click', () => {
-    ['f-q', 'f-topic', 'f-country', 'f-role', 'f-exp'].forEach(id => $(id).value = '');
-    apply();
-  });
-  const params = new URLSearchParams(location.search);
-  $('f-q').value = params.get('q') || '';
-  apply();
+  /* One person per row: who (name, title), where (organisation, place), what (topics).
+     Replaced a grid of 250px cards that showed nine people per screen. */
+  function card(p) {
+    const e = p.experience ? ` · ${QIST.t('dir.exp.years', { n: p.experience })}` : '';
+    const geo = (p.city || p.country)
+      ? `<span class="loc">${QIST.icon(QIST.hasPreciseGeo(p) ? 'pin' : 'globe')} ${QIST.esc(QIST.geoLabel(p))}</span>` : '';
+    const topics = (p.topics || []).slice(0, 4);
+    return `<div class="person" role="button" tabindex="0" data-id="${QIST.esc(p.id)}" aria-label="${QIST.esc(p.name)}">
+      <div class="avatar" style="background:${QIST.avatarColor(p.name)}" aria-hidden="true">${QIST.initials(p.name)}</div>
+      <div>
+        <h3>${QIST.esc(p.name)}</h3>
+        <p class="role">${QIST.esc(p.title || '')}</p>
+        <p class="stage">${QIST.esc(stageLabel(p))}${e}</p>
+      </div>
+      <p class="org">${QIST.esc(p.institution || '')}${geo}</p>
+      <div class="tags">${topics.map(t => `<span class="tag" data-topic="${QIST.esc(t)}">${QIST.esc(t)}</span>`).join('')}</div>
+    </div>`;
+  }
 
-  const want = params.get('person');
+  function render() {
+    writeUrl();
+    const shown = filtered();
+    $('dir-count').textContent = QIST.t('dir.count', { n: shown.length, total: people.length });
+    $('dir-empty').hidden = shown.length > 0;
+    $('dir-grid').innerHTML = shown.slice(0, limit).map(card).join('');
+    const rest = shown.length - limit;
+    $('dir-more').hidden = rest <= 0;
+    $('dir-more').textContent = QIST.t('dir.more', { n: Math.min(PAGE, rest) });
+  }
+  function refilter() { limit = PAGE; render(); }
+
+  /* ---------- the profile dialog ---------- */
+  const modal = $('person-modal');
+  let lastFocus = null;
+  function openPerson(p) {
+    lastFocus = document.activeElement;
+    const geo = (p.city || p.country)
+      ? `<p class="loc">${QIST.icon(QIST.hasPreciseGeo(p) ? 'pin' : 'globe')} ${QIST.esc(QIST.geoLabel(p))}</p>` : '';
+    $('person-detail').innerHTML = `
+      <div class="pm-head">
+        <div class="avatar pm-avatar" style="background:${QIST.avatarColor(p.name)}">${QIST.initials(p.name)}</div>
+        <div>
+          <h2 id="person-name">${QIST.esc(p.name)}</h2>
+          <p class="role">${QIST.esc(p.title || '')}</p>
+          ${geo}
+        </div>
+      </div>
+      <dl class="pm-facts">
+        ${p.institution ? `<dt>${QIST.t('dir.m.institution')}</dt><dd>${QIST.esc(p.institution)}</dd>` : ''}
+        <dt>${QIST.t('dir.m.stage')}</dt><dd>${QIST.esc(stageLabel(p))}${p.experience ? ` · ${QIST.t('dir.exp.years', { n: p.experience })}` : ''}</dd>
+        <dt>${QIST.t('dir.m.fields')}</dt><dd>${QIST.primaryFields(p).map(QIST.esc).join(', ') || '—'}</dd>
+      </dl>
+      ${(p.topics || []).length ? `<div class="tags pm-tags">${p.topics.map(t => `<span class="tag" data-topic="${QIST.esc(t)}">${QIST.esc(t)}</span>`).join('')}</div>` : ''}
+      ${p.bio ? `<p class="pm-bio">${QIST.esc(p.bio)}</p>` : ''}
+      <div class="pm-actions">
+        ${p.link ? `<a class="btn btn-primary btn-sm" href="${QIST.esc(p.link)}" target="_blank" rel="noopener">${QIST.t('dir.m.profile')} ${QIST.icon('external')}</a>` : ''}
+        ${p.lat && p.lng ? `<a class="btn btn-outline btn-sm" href="map.html?person=${encodeURIComponent(p.id)}">${QIST.icon('map')} ${QIST.t('dir.m.map')}</a>` : ''}
+      </div>
+      <p class="pm-own"><a href="about.html">${QIST.t('dir.m.yours')}</a></p>`;
+    modal.classList.add('open');
+    writeUrl(p.id);
+    modal.querySelector('[data-close]').focus();
+  }
+  function closePerson() {
+    if (!modal.classList.contains('open')) return;
+    modal.classList.remove('open');
+    writeUrl();
+    if (lastFocus) lastFocus.focus();
+  }
+  modal.addEventListener('click', e => {
+    if (e.target === modal || e.target.closest('[data-close]')) return closePerson();
+    const tag = e.target.closest('.tag[data-topic]');
+    if (tag) { closePerson(); $('f-q').value = tag.dataset.topic; refilter(); }
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePerson(); });
+
+  /* ---------- events ---------- */
+  const grid = $('dir-grid');
+  function activate(e) {
+    const el = e.target.closest('.person');
+    if (!el) return;
+    const tag = e.target.closest('.tag[data-topic]');
+    if (tag) { $('f-q').value = tag.dataset.topic; refilter(); return; }
+    openPerson(people.find(p => String(p.id) === el.dataset.id));
+  }
+  grid.addEventListener('click', activate);
+  grid.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(e); } });
+
+  $('f-q').addEventListener('input', refilter);
+  ['f-field', 'f-country', 'f-stage', 'f-exp'].forEach(id => $(id).addEventListener('change', refilter));
+  const clear = () => { Object.values(IDS).forEach(id => $(id).value = ''); refilter(); };
+  $('f-clear').addEventListener('click', clear);
+  $('dir-reset').addEventListener('click', clear);
+  $('dir-more').addEventListener('click', () => { limit += PAGE; render(); });
+
+  readUrl();
+  render();
+  const want = initial.get('person');
   if (want) {
     const p = people.find(x => String(x.id) === want);
     if (p) openPerson(p);

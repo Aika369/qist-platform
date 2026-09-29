@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title data-i18n-title="login.h">Create profile — ScienceBridge AI by QIST</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%2316263d' stroke='%23b58a2e' stroke-width='6'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23f4e9d2' font-family='Georgia'>Q</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2026-09-20a">
+<title data-i18n-title="login.h">Create your profile · ScienceBridge AI</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='26' fill='%232447a8'/><text x='50' y='69' font-size='56' font-weight='700' text-anchor='middle' fill='%23ffffff' font-family='Georgia, serif'>Q</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=2026-09-28f">
 </head>
 <body>
 <header class="site-header" id="site-header"></header>
@@ -67,8 +67,8 @@
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script src="assets/js/i18n.js?v=2026-09-20a"></script>
-<script src="assets/js/app.js?v=2026-09-20a"></script>
+<script src="assets/js/i18n.js?v=2026-09-28f"></script>
+<script src="assets/js/app.js?v=2026-09-28f"></script>
 <script>
 (async () => {
   await QIST.boot('login.html');
@@ -83,31 +83,38 @@
        curator creates the profile by hand until the backend is deployed (DECISIONS.md D-29).
        No password field: asking for a password we have nowhere to store would be worse than
        the dead end it replaces. */
+    /* Explanation on the left, the form on the right: what happens to the request and what
+       gets published are read before anything is typed, not squeezed under the button. */
     document.querySelector('.auth-wrap').innerHTML = `
-      <div class="card auth-card org-form" style="padding:30px 32px;text-align:left">
-        <h2 style="margin-bottom:8px">${QIST.t('login.h')}</h2>
-        <p class="small muted" style="margin-bottom:16px">${QIST.t('login.p', { email: QIST.esc(QIST.CONTACT_EMAIL || 'QIST') })}</p>
-        <form id="req-form" style="display:flex;flex-direction:column;gap:13px">
+      <div class="profile-req">
+        <div class="intro">
+          <span class="photo-num" id="top-num" style="background-image:url('assets/img/tiles-samarkand.jpg');background-position:center 40%;font-size:clamp(6rem,12vw,11rem)" aria-hidden="true">492</span>
+          <span class="unit">${QIST.t('top.joined')}</span>
+          <h1>${QIST.t('login.h')}</h1>
+          <p>${QIST.t('login.p', { email: QIST.esc(QIST.CONTACT_EMAIL || 'QIST') })}</p>
+          <p class="note-line" style="margin-top:20px">${QIST.t('login.privacy')} <a href="about.html#data">${QIST.t('nav.about')}</a></p>
+          <p class="other">${QIST.t('login.org')}</p>
+        </div>
+        <form class="panel form" id="req-form">
           <label>${QIST.t('login.name')}<input type="text" id="q-name" required placeholder="Aigerim Bekova"></label>
           <label>${QIST.t('common.email')}<input type="email" id="q-email" required placeholder="you@university.edu"></label>
-          <div class="org-row-2">
+          <div class="row-2">
             <label>${QIST.t('login.title')}<input type="text" id="q-title" placeholder="PhD Student"></label>
             <label>${QIST.t('login.inst')}<input type="text" id="q-inst" placeholder="Nazarbayev University"></label>
           </div>
           <label>${QIST.t('common.country')}<select id="q-country"></select></label>
           <label>${QIST.t('login.topics')}<input type="text" id="q-topics" placeholder="machine learning, optimization"></label>
-          <label>${QIST.t('login.link')}
-            <input type="text" id="q-link" placeholder="https://orcid.org/…">
-          </label>
-          <p class="org-note">${QIST.t('login.privacy')} <a href="about.html#data">${QIST.t('nav.about')}</a>.</p>
-          <button class="btn btn-primary" type="submit" id="q-send">${QIST.t('login.send')}</button>
-          <span class="small muted" id="q-state"></span>
+          <label>${QIST.t('login.link')}<input type="text" id="q-link" placeholder="https://orcid.org/…"></label>
+          <div class="actions">
+            <button class="btn btn-primary" type="submit" id="q-send">${QIST.t('login.send')}</button>
+            <span class="state" id="q-state" aria-live="polite"></span>
+          </div>
         </form>
-        <p class="small muted" style="margin-top:16px">${QIST.t('login.org')}</p>
       </div>`;
 
     const s = id => document.getElementById(id);
     try { QIST.fillCountrySelect(s('q-country'), await QIST.getEligibility(), 'KZ'); } catch (_) {}
+    try { s('top-num').textContent = QIST.uniquePeople(await QIST.getPeople()).length; } catch (_) {}
 
     s('req-form').addEventListener('submit', async (e) => {
       e.preventDefault();
